@@ -1,0 +1,203 @@
+/* Styles for the mobile registration flow (flow-registration.html); also used by scroll-demo.html. */
+
+  /* ---------- Registration hub ---------- */
+  .guests-summary {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+  }
+  /* The ring is a glance, not a feature — 44 px keeps it readable while the
+     row stays one comfortable line tall. The <svg> carries width/height
+     attributes, so it has to be told to follow the wrapper or it renders at
+     its intrinsic 56 px and spills out of the box. */
+  .guests-summary .gs-ring { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+  .guests-summary .gs-ring svg { width: 100%; height: 100%; display: block; transform: rotate(-90deg); }
+  .guests-summary .gs-ring .track { fill: none; stroke: var(--n-75); stroke-width: 6; }
+  .guests-summary .gs-ring .arc { fill: none; stroke: url(#gsGrad); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 141; stroke-dashoffset: 71; }
+  .guests-summary .gs-ring .pct { position: absolute; inset: 0; display: grid; place-items: center; font-size: 10.5px; font-weight: 700; color: var(--blue-500); }
+  .guests-summary .gs-title { font-size: 13.5px; font-weight: 600; color: var(--navy); line-height: 18px; }
+  .guests-summary .gs-sub { font-size: 11.5px; line-height: 16px; color: var(--text-secondary); margin-top: 1px; }
+
+  .guest-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 18px;
+    width: 100%; text-align: left;
+    position: relative;
+    transition: background 0.15s;
+    overflow: hidden;
+  }
+  .guest-row + .guest-row, .guest-row + .add-row, .add-row + .guest-row,
+  .add-row + .add-row { border-top: 1px solid var(--border); }
+  .guest-row:hover { background: #fbfbfe; }
+  .guest-row::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px;
+  }
+  .guest-row.complete::before { background: var(--green-700); }
+  .guest-row.pending::before,
+  .guest-row.iv-pending::before { background: var(--amber-500); }
+  .guest-row.complete { background: linear-gradient(90deg, transparent 40%, rgba(232, 252, 247, 0.75)); }
+  .guest-row.pending,
+  .guest-row.iv-pending { background: linear-gradient(90deg, transparent 40%, rgba(255, 242, 224, 0.75)); }
+
+  .guest-row .g-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .guest-row .g-name { font-size: 14.5px; font-weight: 700; color: var(--navy); }
+  .guest-row .g-sub { font-size: 12px; line-height: 17px; color: var(--text-secondary); }
+
+  .guest-row .g-status {
+    margin-left: auto; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+    text-align: right;
+  }
+  .guest-row .st-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .guest-row .st-label .icon { width: 16px; height: 16px; flex-shrink: 0; }
+  .guest-row .st-action { font-size: 12.5px; font-weight: 500; }
+  .guest-row.complete .st-label { color: var(--green-700); }
+  .guest-row.pending .st-label,
+  .guest-row.iv-pending .st-label { color: var(--amber-700); }
+  .guest-row.pending .st-action,
+  .guest-row.iv-pending .st-action { color: var(--amber-700); }
+
+  .guest-row .g-more,
+  .guest-row .g-chev { flex-shrink: 0; display: grid; place-items: center; color: var(--n-500); }
+  .guest-row .g-more { width: 22px; }
+  .guest-row .g-more:hover, .guest-row .g-chev:hover { color: var(--navy); }
+  /* Phone frames: the row-level overflow menu costs ~40px of a 340px row and
+     squeezes the name to ~120px. The chevron already opens the guest, so the
+     kebab (a desktop convenience) stands down here. */
+  .phone .guest-row .g-more { display: none; }
+
+  /* register-all banner */
+  .register-all {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 15px;
+    border-radius: var(--r-lg);
+    background: var(--tint-promo);
+    border: 1px solid var(--n-100);
+  }
+  .register-all .ra-icon { color: var(--blue-500); }
+  .register-all .ra-text { font-size: 12px; line-height: 17px; color: var(--n-600); flex: 1; }
+  .register-all .ra-text b { color: var(--navy); }
+
+  /* ---------- Details form ---------- */
+  .autofill-card {
+    border: 1.5px dashed var(--n-300);
+    border-radius: var(--r-2xl);
+    background: linear-gradient(135deg, rgba(240, 243, 255, 0.75), rgba(244, 244, 253, 0.6));
+    padding: 16px;
+    display: flex; align-items: center; gap: 14px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+  }
+  .autofill-card:hover { border-color: var(--blue-500); box-shadow: var(--shadow-focus); }
+  .autofill-card .af-icon {
+    width: 46px; height: 46px; border-radius: 14px;
+    background: var(--gradient-brand);
+    color: #fff;
+    display: grid; place-items: center;
+    box-shadow: var(--shadow-brand);
+    flex-shrink: 0;
+  }
+  .autofill-card .af-title { font-size: 13.5px; font-weight: 700; color: var(--navy); }
+  .autofill-card .af-sub { font-size: 11.5px; line-height: 16px; color: var(--text-secondary); margin-top: 2px; }
+  .autofill-card .af-chev { margin-left: auto; color: var(--blue-500); }
+
+  .form-grid { display: flex; flex-direction: column; gap: 14px; }
+  .form-grid .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .prefilled-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--green-800);
+  }
+
+  .section-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    margin: 10px 4px 0;
+  }
+  .section-label .icon { color: var(--blue-500); }
+  .section-label .divider { flex: 1; height: 1px; background: var(--border); }
+
+  /* signature */
+  .sig-pad {
+    border: 1.5px dashed var(--n-300);
+    border-radius: var(--r-lg);
+    background: var(--n-50);
+    height: 130px;
+    position: relative;
+    display: grid; place-items: center;
+    overflow: hidden;
+  }
+  .sig-pad .sig-mock {
+    font-family: 'Caveat', cursive;
+    font-size: 44px;
+    color: var(--navy);
+    transform: rotate(-3deg);
+  }
+  .sig-pad .sig-clear {
+    position: absolute; top: 8px; right: 8px;
+    width: 30px; height: 30px; border-radius: 9px;
+    background: var(--n-0); border: 1px solid var(--border);
+    display: grid; place-items: center; color: var(--n-600);
+    box-shadow: var(--shadow-card);
+  }
+  .sig-pad .sig-line {
+    position: absolute; left: 12%; right: 12%; bottom: 26px;
+    border-bottom: 1.5px solid var(--n-300);
+  }
+  .sig-hint { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+
+  .consent-row { display: flex; gap: 10px; align-items: flex-start; padding: 2px 4px; }
+  .consent-row .cbox {
+    width: 20px; height: 20px; border-radius: 6px;
+    background: var(--blue-500);
+    display: grid; place-items: center;
+    color: #fff; flex-shrink: 0; margin-top: 1px;
+  }
+  .consent-row p { font-size: 11.5px; line-height: 16px; color: var(--n-600); }
+  .consent-row a { color: var(--blue-500); font-weight: 600; }
+
+  /* Inline Vela box (mobile) — appears under the focused field */
+  .vela-box {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 11px 13px;
+    border-radius: 14px;
+    background: var(--tint-info);
+    box-shadow: 0 0 0 1px rgba(56, 91, 248, 0.22);
+    animation: vela-attention 0.5s ease;
+    margin-top: 2px;
+  }
+  .vela-box .vb-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--gradient-brand);
+    display: grid; place-items: center;
+    color: #fff; flex-shrink: 0;
+    box-shadow: var(--shadow-brand);
+  }
+  .vela-box .vb-name { font-size: 11px; font-weight: 700; color: var(--blue-500); }
+  .vela-box .vb-text { font-size: 11.5px; line-height: 16px; color: var(--n-600); margin-top: 1px; }
+  .vela-box .vb-text b { color: var(--navy); }
+  .vela-box .vb-close { margin-left: auto; color: var(--n-500); flex-shrink: 0; padding: 2px; }
+
+  /* Guest registered but identity NOT verified yet */
+
+  /* Mobile: form fields are full width (matches GuestFormFields single-column stack) */
+  .phone .two-col { grid-template-columns: 1fr; }
+
+  /* consent checkbox is never pre-checked — guest must tap it */
+  .consent-row .cbox.unchecked { background: var(--n-0); border: 1.5px solid var(--n-500); color: transparent; cursor: pointer; }
+
+  /* agreements block (SignBlock: AgreementClausesBox + ContractBox) */
+  .pill-opt {
+    display: inline-block; padding: 1px 8px; border-radius: 99px;
+    background: var(--n-75); color: var(--text-secondary);
+    font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    vertical-align: 1px; margin-left: 4px;
+  }
+  .fine-print { font-size: 11px; line-height: 16px; color: var(--text-tertiary); padding: 0 4px; }
+  .fine-print a { color: var(--blue-500); font-weight: 600; }
+  .fine-print b { color: var(--text-secondary); }

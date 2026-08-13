@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staged journey — Desktop (Redesign Prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="photos.css">
+<link rel="stylesheet" href="upsell.css">
+<style>
+  /* hero (blue box — booking dates) */
+  .hero {
+    border-radius: 20px;
+    background: var(--gradient-hero);
+    color: #fff;
+    padding: 26px 30px;
+    position: relative; overflow: hidden;
+    box-shadow: var(--shadow-elev);
+    margin-top: 14px;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -50px; right: -30px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: rgba(107, 224, 168, 0.22); filter: blur(52px);
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -80px; left: 24%;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: rgba(140, 165, 255, 0.3); filter: blur(60px);
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .hero-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 26px; align-items: center; }
+  /* check-out hugs the right edge so the block reads balanced instead of
+     bunching every column's content against the left */
+  .hero-grid > div:last-child { text-align: right; }
+  .hero .db-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.6); }
+  .hero .db-time { font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; margin-top: 4px; }
+  .hero .db-date { font-size: 12px; font-weight: 500; text-transform: uppercase; color: rgba(255,255,255,0.72); margin-top: 2px; }
+  .hero-center { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .hero-center .nights { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.65); }
+  .hero-center .arrow-circle {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: grid; place-items: center;
+  }
+
+  /* ── Stage tabs (segmented, above the blue box) ── */
+  .stages {
+    display: flex; align-items: center; gap: 0;
+    background: var(--tint-pressed);
+    border: 1px solid #dce2ff;
+    border-radius: 14px;
+    padding: 5px;
+    box-shadow: var(--shadow-card);
+    margin-top: 20px;
+    /* z-index lifts the bar's stacking context above the hero (both get one from
+       the fadeUp transform), so locked-tab tooltips aren't painted behind it */
+    position: relative; z-index: 5;
+  }
+  /* the sliding pill that glides beneath the active tab */
+  .stg-indicator {
+    position: absolute; top: 5px; bottom: 5px; left: 0; width: 0;
+    background: var(--blue-500); border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(56,92,248,0.32);
+    z-index: 0; pointer-events: none;
+    transform: translateX(0);
+  }
+  .stages.ready .stg-indicator { transition: transform 0.44s cubic-bezier(.34,1.4,.5,1), width 0.44s cubic-bezier(.34,1.4,.5,1); }
+  .stages .stg {
+    flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 9px 10px; border-radius: 10px;
+    background: none; border: 0;
+    font-size: 12.5px; font-weight: 600; color: var(--n-500);
+    position: relative; z-index: 1; cursor: pointer;
+    transition: color 0.2s, opacity 0.2s;
+  }
+  /* hover ghost on clickable, non-active tabs */
+  .stages .stg:not(.locked):not(.active)::before {
+    content: ''; position: absolute; inset: 0; border-radius: 10px;
+    background: #e4e9ff; opacity: 0; transition: opacity 0.15s; z-index: -1;
+  }
+  .stages .stg:not(.locked):not(.active):hover { color: var(--navy); }
+  .stages .stg:not(.locked):not(.active):hover::before { opacity: 1; }
+  .stages .stg.done { color: var(--n-600); }
+  .stages .stg.active { color: #fff; }
+  .stages .stg.locked { color: var(--n-500); opacity: 0.6; cursor: not-allowed; }
+  .stages .stg:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(56,91,248,0.3); }
+  .stages .stg.just-freed { animation: stg-pop 0.5s ease; }
+  @keyframes stg-pop { 0% { transform: scale(0.94); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+  /* per-stage mark: dot / check (done) / pulsing today-dot (live) */
+  .stg-mark { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; flex-shrink: 0; }
+  .stg-mark .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--n-300); }
+  .stg-mark .dot.mint { background: #7be3b0; }
+  .stg-mark .dot.live { background: var(--blue-500); animation: live-pulse 1.8s ease-in-out infinite; }
+  .stg-mark .icon { width: 13px; height: 13px; }
+  .stg.done .stg-mark .icon { color: var(--blue-500); }
+  @keyframes live-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(56,92,248,0.5); } 50% { box-shadow: 0 0 0 4px rgba(56,92,248,0); } }
+
+  /* thin dividers between tabs, hidden on both sides of the active pill */
+  .stages .stg:not(:last-child)::after {
+    content: ''; position: absolute; right: -1px; top: 50%;
+    width: 1px; height: 14px; background: var(--border);
+    transform: translateY(-50%);
+  }
+  .stages .stg.active::after,
+  .stages .stg.active + .stg::after,
+  .stages .stg:has(+ .stg.active)::after { background: transparent; }
+
+  /* locked-tab tooltip */
+  .stg-tip {
+    position: absolute; top: calc(100% + 9px); left: 50%;
+    transform: translate(-50%, 4px);
+    background: var(--navy); color: #fff;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+    padding: 6px 10px; border-radius: 8px; box-shadow: var(--shadow-elev);
+    opacity: 0; pointer-events: none; transition: opacity 0.18s, transform 0.18s; z-index: 6;
+  }
+  .stg-tip::before { content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-bottom-color: var(--navy); }
+  .stages .stg.locked:hover .stg-tip { opacity: 1; transform: translate(-50%, 0); }
+  /* the last tab's tooltip would spill past the column, so anchor it right-edge
+     and keep the arrow over the tab's centre */
+  .stages .stg:last-child .stg-tip { left: auto; right: 0; transform: translate(0, 4px); }
+  .stages .stg:last-child.locked:hover .stg-tip { transform: translate(0, 0); }
+  .stages .stg:last-child .stg-tip::before { left: auto; right: 81px; transform: none; }
+
+  /* stage panels */
+  .stage-panels { position: relative; }
+  .stage-panel { display: none; }
+  .stage-panel.is-active { display: block; animation: panel-in 0.42s cubic-bezier(.22,.61,.36,1); }
+  @keyframes panel-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* open / status banners */
+  .open-banner { display: flex; align-items: center; gap: 16px; padding: 18px 20px; }
+  /* panels opening with a banner sat flush against the hero — match the 26px
+     top margin a leading .section-head would have given them */
+  .stage-panel > .open-banner:first-child { margin-top: 26px; }
+  .open-banner .ob-icon { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; font-size: 23px; background: var(--tint-pressed); flex-shrink: 0; }
+  .open-banner.departure .ob-icon { background: var(--amber-50); }
+  .open-banner .ob-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .open-banner .ob-sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 3px; }
+  .open-banner .btn { margin-left: auto; flex-shrink: 0; }
+
+  .review-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; }
+  .review-stars { display: flex; gap: 4px; color: var(--amber-500); }
+  .review-stars .icon { width: 25px; height: 25px; fill: currentColor; stroke: none; cursor: pointer; transition: transform 0.12s; }
+  .review-stars .icon:hover { transform: scale(1.15); }
+  .review-card .rv-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .review-card .rv-sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 3px; }
+  .review-card .btn { margin-left: auto; flex-shrink: 0; }
+
+  /* checklist desktop */
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 0 12px; }
+  .section-head h2 { font-size: 17px; font-weight: 600; color: var(--navy); }
+  .section-head .counter { font-size: 13px; color: var(--text-secondary); }
+  .section-head .counter b { color: var(--blue-500); }
+
+  .cl-progress {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    /* The CTA can't shrink (its label must stay on one line), so in a narrow
+       column something has to give — let the row wrap and drop the button to
+       its own line rather than letting it overhang the card. */
+    flex-wrap: wrap;
+  }
+  /* the copy block is the flexible one; min-width:0 lets it actually shrink
+     instead of being floored by its longest word */
+  .cl-progress > :not(.cl-ring):not(.cp-cta) { flex: 1 1 150px; min-width: 0; }
+  .cl-ring { position: relative; width: 60px; height: 60px; flex-shrink: 0; }
+  .cl-ring svg { transform: rotate(-90deg); }
+  .cl-ring .track { fill: none; stroke: var(--n-75); stroke-width: 7; }
+  .cl-ring .arc { fill: none; stroke: url(#clGrad); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 163; stroke-dashoffset: 65; }
+  .cl-ring .pct { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--blue-500); }
+  .cl-progress .cp-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .cl-progress .cp-sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 3px; }
+  /* keep the CTA at its natural width — it sits in a flex row, so without this
+     it gets squeezed and the label wraps out of the fixed-height pill */
+  .cl-progress .cp-cta { margin-left: auto; flex-shrink: 0; white-space: nowrap; }
+
+  .task-list { position: relative; }
+  .task-list::before {
+    content: ''; position: absolute; left: 40px; top: 12px; bottom: 12px;
+    width: 2px; background: var(--n-200);
+  }
+  .task-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border);
+    width: 100%; text-align: left;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .task-row:first-child { border-top: none; }
+  .task-row:hover { background: #fbfbfe; }
+  .task-badge {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    border: 3px solid #fff;
+    position: relative; z-index: 1;
+  }
+  .task-badge.done { background: var(--green-50); color: var(--green-800); }
+  .task-badge.next { background: var(--blue-500); color: #fff; box-shadow: 0 0 0 4px rgba(56, 92, 248, 0.14); animation: pulse-ring 2.4s infinite; }
+  .task-badge.todo { background: var(--tint-pressed); color: var(--n-600); }
+  .task-row .t-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .task-row .t-sub { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+  .task-row .t-right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .task-row .chev { color: var(--n-500); transition: transform 0.15s, color 0.15s; }
+  .task-row:hover .chev { transform: translateX(3px); color: var(--blue-500); }
+  .task-row.is-next { background: linear-gradient(90deg, rgba(56, 91, 248, 0.05), transparent 60%); }
+  .task-row.is-next::before {
+    content: ''; position: absolute; left: 0; top: 10px; bottom: 10px;
+    width: 3.5px; border-radius: 0 4px 4px 0;
+    background: var(--blue-500);
+  }
+  .t-chip {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    height: 23px; padding: 0 10px; border-radius: 99px;
+    display: inline-flex; align-items: center;
+  }
+  .t-chip.done { background: var(--green-50); color: var(--green-800); }
+  .t-chip.next { background: var(--tint-pressed); color: var(--blue-500); }
+  .t-chip.todo { background: var(--n-75); color: var(--n-600); }
+
+  /* stay cards */
+  .stay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .stay-card {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 22px 16px 18px; gap: 9px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .stay-card:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(56,92,248,0.14), 0 3px 8px rgba(22,22,67,0.06); }
+  .stay-card .sc-icon {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: var(--tint-pressed); color: var(--blue-500);
+    display: grid; place-items: center;
+  }
+  .stay-card .sc-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .stay-card .sc-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 17px; }
+  .btn-dark { background: var(--navy); color: #fff; }
+  .btn-dark:hover { background: var(--navy-700); }
+
+  /* right rail cards */
+  /* ── Upsell carousel (one offer at a time in the rail) ── */
+  .uc-carousel { position: relative; }
+  .uc-viewport { overflow: hidden; border-radius: var(--r-lg); }
+  .uc-track { display: flex; transition: transform 0.42s cubic-bezier(.22,.61,.36,1); }
+  .uc-track > .upsell-card { flex: 0 0 100%; min-width: 0; }
+  .uc-nav { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+  .uc-dots { display: flex; align-items: center; gap: 6px; }
+  .uc-dot {
+    width: 6px; height: 6px; border-radius: 50%; padding: 0; border: 0;
+    background: var(--n-300); cursor: pointer;
+    transition: background 0.2s, width 0.2s;
+  }
+  .uc-dot.on { background: var(--blue-500); width: 16px; border-radius: 99px; }
+
+  .upsell-card { overflow: hidden; }
+  /* Frame only — the ph-* scene class on the element supplies the photograph.
+     A `background` shorthand here would reset it. */
+  .upsell-card .uc-img { height: 110px; position: relative; background-color: var(--n-100); }
+  .upsell-card .uc-img .uc-tag {
+    position: absolute; top: 10px; left: 10px;
+    height: 22px; padding: 0 9px;
+    display: inline-flex; align-items: center;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--navy);
+  }
+  .upsell-card .uc-body { padding: 13px 14px 14px; }
+  .upsell-card .uc-title { font-size: 13.5px; font-weight: 600; color: var(--navy); }
+  .upsell-card .uc-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 3px; }
+  .upsell-card .uc-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 11px; }
+  .upsell-card .uc-price { font-size: 13.5px; font-weight: 700; color: var(--navy); }
+
+  .contact-card { padding: 14px; display: flex; align-items: center; gap: 12px; }
+  .contact-card .cc-icon {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: var(--tint-info); color: var(--blue-500);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .contact-card .cc-title { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .contact-card .cc-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+</style>
+</head>
+<body>
+<div class="proto-stage">
+  <h1>Staged journey — Desktop (Redesign 2.0 Prototype)</h1>
+  <p class="lede">Home split into four stages — <b>Pre-stay, Check-in, Stay, Departure</b>. The booking hero stays constant; the tabs above it switch between stages, each revealing only its own actions. Stages ahead of today stay locked until their date — use the date simulator to watch them unlock. An alternative to the flat Home, kept separate so the two can be compared. Mock data only.</p>
+
+  <div class="browser" style="position:relative">
+    <div class="browser-bar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="url"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-lock-sm"/></svg> guest.chekin.com/villa-serena</span>
+      <span style="width:52px"></span>
+    </div>
+
+    <div class="desktop-shell with-rail">
+
+      <!-- ═══ Sidebar — shared, see chrome.js ═══ -->
+      <aside class="sidebar" data-sidebar data-active="home"></aside>
+
+      <!-- ═══ Main ═══ -->
+      <main class="desk-main">
+        <div class="greet fade-up">
+          <h1>Welcome, María 👋</h1>
+          <p id="greetSub">Your stay in Barcelona is almost ready — 2 tasks left before your keys unlock.</p>
+        </div>
+
+        <!-- Stage tabs (switch the panels below) -->
+        <nav class="stages fade-up d1" id="journeyTabs" aria-label="Stay stages">
+          <span class="stg-indicator" id="stgIndicator"></span>
+          <button class="stg" data-stage="0" type="button"><span class="stg-mark"></span>Pre-stay<span class="stg-tip"></span></button>
+          <button class="stg" data-stage="1" type="button"><span class="stg-mark"></span>Check-in<span class="stg-tip"></span></button>
+          <button class="stg" data-stage="2" type="button"><span class="stg-mark"></span>Stay<span class="stg-tip"></span></button>
+          <button class="stg" data-stage="3" type="button"><span class="stg-mark"></span>Departure<span class="stg-tip"></span></button>
+        </nav>
+
+        <!-- Booking dates (blue box) -->
+        <section class="hero fade-up d2">
+          <div class="hero-grid">
+            <div>
+              <div class="db-label">Check-in</div>
+              <div class="db-time">15:00</div>
+              <div class="db-date">Friday, 10 July</div>
+            </div>
+            <div class="hero-center">
+              <span class="nights">4 nights</span>
+              <span class="arrow-circle"><svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></span>
+            </div>
+            <div>
+              <div class="db-label">Check-out</div>
+              <div class="db-time">11:00</div>
+              <div class="db-date">Tuesday, 14 July</div>
+            </div>
+          </div>
+        </section>
+
+        <div class="stage-panels">
+
+        <!-- ─── Stage 0 · Pre-stay ─── -->
+        <div class="stage-panel" data-panel="0">
+          <div class="section-head">
+            <h2>Complete your check-in</h2>
+            <span class="counter"><b>2</b> of 4 done</span>
+          </div>
+          <div class="card" style="overflow:hidden">
+            <div class="cl-progress">
+              <div class="cl-ring">
+                <svg width="60" height="60" viewBox="0 0 60 60">
+                  <defs>
+                    <linearGradient id="clGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#385bf8"/>
+                      <stop offset="100%" stop-color="#6b8cff"/>
+                    </linearGradient>
+                  </defs>
+                  <circle class="track" cx="30" cy="30" r="26"/>
+                  <circle class="arc" cx="30" cy="30" r="26"/>
+                </svg>
+                <span class="pct">50%</span>
+              </div>
+              <div>
+                <div class="cp-title">You're halfway there</div>
+                <div class="cp-sub">2 steps left · about 3 minutes · due before Friday 10 July</div>
+              </div>
+              <button class="btn btn-primary btn-sm cp-cta">Continue check-in <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-right"/></svg></button>
+            </div>
+
+            <div class="task-list">
+              <button class="task-row">
+                <span class="task-badge done"><svg viewBox="0 0 24 24" class="icon"><use href="#i-check"/></svg></span>
+                <span>
+                  <span class="t-title" style="display:block">Register guests</span>
+                  <span class="t-sub">2 of 2 guests verified &amp; registered</span>
+                </span>
+                <span class="t-right"><span class="t-chip done">Done</span></span>
+              </button>
+              <button class="task-row">
+                <span class="task-badge done"><svg viewBox="0 0 24 24" class="icon"><use href="#i-check"/></svg></span>
+                <span>
+                  <span class="t-title" style="display:block">Booking payment</span>
+                  <span class="t-sub">€ 380.00 paid · receipt sent to maria@gmail.com</span>
+                </span>
+                <span class="t-right"><span class="t-chip done">Done</span></span>
+              </button>
+              <button class="task-row is-next">
+                <span class="task-badge next"><svg viewBox="0 0 24 24" class="icon"><use href="#i-shield"/></svg></span>
+                <span>
+                  <span class="t-title" style="display:block">Property protection</span>
+                  <span class="t-sub">Choose a security deposit or premium cover · takes about 1 minute</span>
+                </span>
+                <span class="t-right"><span class="t-chip next">Next up</span><svg viewBox="0 0 24 24" class="icon chev"><use href="#i-chevron-right"/></svg></span>
+              </button>
+              <button class="task-row">
+                <span class="task-badge todo"><svg viewBox="0 0 24 24" class="icon"><use href="#i-coins"/></svg></span>
+                <span>
+                  <span class="t-title" style="display:block">Tourist taxes</span>
+                  <span class="t-sub">€ 8.80 total for 2 guests · 4 nights</span>
+                </span>
+                <span class="t-right"><span class="t-chip todo">To do</span><svg viewBox="0 0 24 24" class="icon chev"><use href="#i-chevron-right"/></svg></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Stage 1 · Check-in ─── -->
+        <div class="stage-panel" data-panel="1">
+          <div class="card open-banner">
+            <div class="ob-icon">🔑</div>
+            <div>
+              <div class="ob-title">Check-in is open — your keys are ready</div>
+              <div class="ob-sub">Head to Carrer de Mallorca 21 anytime after 15:00. Your access code is active now.</div>
+            </div>
+            <a class="btn btn-primary btn-sm" href="flow-remote-access-desktop.html#kd-keys">Open virtual keys <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-right"/></svg></a>
+          </div>
+          <div class="section-head"><h2>Your arrival</h2></div>
+          <div class="stay-grid">
+            <div class="card stay-card">
+              <div class="sc-icon"><svg viewBox="0 0 24 24" class="icon icon-lg"><use href="#i-key"/></svg></div>
+              <div class="sc-title">Virtual keys</div>
+              <div class="sc-desc">Unlock the door straight from your phone</div>
+              <a class="btn btn-dark btn-sm" href="flow-remote-access-desktop.html#kd-keys">Show access code</a>
+            </div>
+            <div class="card stay-card">
+              <div class="sc-icon"><svg viewBox="0 0 24 24" class="icon icon-lg"><use href="#i-map-pin"/></svg></div>
+              <div class="sc-title">Directions</div>
+              <div class="sc-desc">Getting to the apartment &amp; parking</div>
+              <a class="btn btn-outline btn-sm" href="flow-guidebooks-desktop.html">Open map</a>
+            </div>
+            <div class="card stay-card">
+              <div class="sc-icon"><svg viewBox="0 0 24 24" class="icon icon-lg"><use href="#i-message"/></svg></div>
+              <div class="sc-title">Message host</div>
+              <div class="sc-desc">Arriving late? Let María know</div>
+              <a class="btn btn-outline btn-sm" href="flow-chat-desktop.html">Chat</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Stage 2 · Stay ─── -->
+        <div class="stage-panel" data-panel="2">
+          <div class="section-head"><h2>During your stay</h2></div>
+          <div class="stay-grid">
+            <div class="card stay-card">
+              <div class="sc-icon"><svg viewBox="0 0 24 24" class="icon icon-lg"><use href="#i-book-open"/></svg></div>
+              <div class="sc-title">Guidebooks</div>
+              <div class="sc-desc">WiFi, house rules &amp; local tips</div>
+              <a class="btn btn-dark btn-sm" href="flow-guidebooks-desktop.html">Explore</a>
+            </div>
+            <div class="card stay-card">
+              <div class="sc-icon"><svg viewBox="0 0 24 24" class="icon icon-lg"><use href="#i-compass"/></svg></div>
+              <div class="sc-title">Experiences</div>
+              <div class="sc-desc">Tours &amp; activities in Barcelona</div>
+              <a class="btn btn-outline btn-sm" href="flow-upselling-desktop.html">Browse</a>
+            </div>
+            <div class="card stay-card">
+              <div class="sc-icon"><svg viewBox="0 0 24 24" class="icon icon-lg"><use href="#i-message"/></svg></div>
+              <div class="sc-title">Chat with host</div>
+              <div class="sc-desc">María usually replies within 1 hour</div>
+              <a class="btn btn-outline btn-sm" href="flow-chat-desktop.html">Message</a>
+            </div>
+          </div>
+
+          <div class="section-head">
+            <h2>✨ Handpicked for your trip</h2>
+            <a class="counter" href="flow-upselling-desktop.html" style="color:var(--blue-500);font-weight:600">See all extras</a>
+          </div>
+          <div class="home-reco cols-3">
+            <a class="reco-card tap" href="flow-upselling-desktop.html#ud-detail">
+              <span class="reco-photo ph-breakfast">
+                <span class="reco-chip">Food &amp; drinks</span>
+              </span>
+              <span class="reco-body">
+                <span class="reco-title">Breakfast basket</span>
+                <span class="reco-desc">Pastries, juice &amp; coffee at your door on your first morning.</span>
+                <span class="reco-foot"><span class="reco-price">€12.50</span><span class="reco-add"><svg viewBox="0 0 24 24" class="icon"><use href="#i-plus"/></svg> Add</span></span>
+              </span>
+            </a>
+            <a class="reco-card tap" href="flow-upselling-desktop.html#ud-request">
+              <span class="reco-photo ph-checkin">
+                <span class="reco-chip">Check-in &amp; out</span>
+              </span>
+              <span class="reco-body">
+                <span class="reco-title">Early check-in</span>
+                <span class="reco-desc">Get into the apartment from 12:00 instead of 15:00.</span>
+                <span class="reco-foot"><span class="reco-price">€20.00</span><span class="reco-add"><svg viewBox="0 0 24 24" class="icon"><use href="#i-chevron-right"/></svg> View</span></span>
+              </span>
+            </a>
+            <a class="reco-card tap" href="flow-upselling-desktop.html#ud-list">
+              <span class="reco-photo ph-walking">
+                <span class="reco-chip free"><svg viewBox="0 0 24 24" class="icon"><use href="#i-gift"/></svg> Free</span>
+              </span>
+              <span class="reco-body">
+                <span class="reco-title">Gothic Quarter walking tour</span>
+                <span class="reco-desc">2 hours through medieval Barcelona · by GuruWalk.</span>
+                <span class="reco-foot"><span class="reco-rating"><svg viewBox="0 0 24 24" class="icon"><use href="#i-star"/></svg> 4.9 <span class="rc-count">(326)</span></span><span class="reco-add"><svg viewBox="0 0 24 24" class="icon"><use href="#i-external"/></svg> Book</span></span>
+              </span>
+            </a>
+
+            <!-- Mozio transfer banner (WideCard on Home — spans the row) -->
+            <a class="mozio-banner wide col-full" href="flow-upselling-desktop.html#ud-list">
+              <span class="mz-main">
+                <span class="mz-head">
+                  <span class="mz-icon"><svg viewBox="0 0 24 24" class="icon"><use href="#i-car"/></svg></span>
+                  <span class="mz-titles">
+                    <span class="mz-title">Airport &amp; City Transfers</span>
+                    <span class="mz-partner"><svg viewBox="0 0 24 24" class="icon"><use href="#i-external"/></svg> Powered by Mozio · books on the partner site</span>
+                  </span>
+                </span>
+                <span class="mz-sub">Prebook airport shuttles, taxis, buses and private transfers &amp; limousines — anytime, everywhere.</span>
+                <span class="mz-pills">
+                  <span class="mz-pill"><svg viewBox="0 0 24 24" class="icon"><use href="#i-check-circle"/></svg> Free cancellation</span>
+                  <span class="mz-pill"><svg viewBox="0 0 24 24" class="icon"><use href="#i-clock"/></svg> 24/7 support</span>
+                  <span class="mz-pill"><svg viewBox="0 0 24 24" class="icon"><use href="#i-zap"/></svg> Instant confirmation</span>
+                </span>
+                <span class="mz-cta">Book a transfer <svg viewBox="0 0 24 24" class="icon"><use href="#i-external"/></svg></span>
+              </span>
+              <span class="mz-art ph-transfer"></span>
+            </a>
+
+            <!-- Airalo eSIM banner -->
+            <a class="airalo-banner col-full" href="flow-upselling-desktop.html#ud-list">
+              <span class="ai-mark">📶</span>
+              <span class="ai-main">
+                <span class="ai-brand"><svg viewBox="0 0 24 24" class="icon" style="width:12px;height:12px"><use href="#i-external"/></svg> Airalo eSIM</span>
+                <span class="ai-title">Activate your eSIM instantly and forget about roaming — instant mobile data, no physical SIM.</span>
+              </span>
+              <span class="ai-side">
+                <span class="ai-price">€4.00<span class="from">Starting from</span></span>
+                <span class="ai-link">View plans <svg viewBox="0 0 24 24" class="icon"><use href="#i-chevron-right"/></svg></span>
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <!-- ─── Stage 3 · Departure ─── -->
+        <div class="stage-panel" data-panel="3">
+          <div class="card open-banner departure">
+            <div class="ob-icon">🧳</div>
+            <div>
+              <div class="ob-title">Check-out is Tuesday, 14 July at 11:00</div>
+              <div class="ob-sub">Here's how to leave everything ready — or give yourself more time.</div>
+            </div>
+            <button class="btn btn-primary btn-sm">Add late checkout · €25</button>
+          </div>
+          <div class="section-head"><h2>Before you leave</h2></div>
+          <div class="card" style="overflow:hidden">
+            <div class="task-list">
+              <button class="task-row">
+                <span class="task-badge todo"><svg viewBox="0 0 24 24" class="icon"><use href="#i-key"/></svg></span>
+                <span>
+                  <span class="t-title" style="display:block">Return the keys</span>
+                  <span class="t-sub">Leave the keys in the lockbox by the door</span>
+                </span>
+                <span class="t-right"><svg viewBox="0 0 24 24" class="icon chev"><use href="#i-chevron-right"/></svg></span>
+              </button>
+              <button class="task-row">
+                <span class="task-badge todo"><svg viewBox="0 0 24 24" class="icon"><use href="#i-home"/></svg></span>
+                <span>
+                  <span class="t-title" style="display:block">Close up the apartment</span>
+                  <span class="t-sub">Windows shut, lights off, taps closed</span>
+                </span>
+                <span class="t-right"><svg viewBox="0 0 24 24" class="icon chev"><use href="#i-chevron-right"/></svg></span>
+              </button>
+              <button class="task-row">
+                <span class="task-badge todo"><svg viewBox="0 0 24 24" class="icon"><use href="#i-gift"/></svg></span>
+                <span>
+                  <span class="t-title" style="display:block">Take your belongings</span>
+                  <span class="t-sub">Double-check the bathroom, wardrobe &amp; fridge</span>
+                </span>
+                <span class="t-right"><svg viewBox="0 0 24 24" class="icon chev"><use href="#i-chevron-right"/></svg></span>
+              </button>
+            </div>
+          </div>
+          <div class="section-head"><h2>How was your stay?</h2></div>
+          <div class="card review-card">
+            <div class="review-stars">
+              <svg viewBox="0 0 24 24" class="icon"><use href="#i-star"/></svg>
+              <svg viewBox="0 0 24 24" class="icon"><use href="#i-star"/></svg>
+              <svg viewBox="0 0 24 24" class="icon"><use href="#i-star"/></svg>
+              <svg viewBox="0 0 24 24" class="icon"><use href="#i-star"/></svg>
+              <svg viewBox="0 0 24 24" class="icon"><use href="#i-star"/></svg>
+            </div>
+            <div>
+              <div class="rv-title">Leave a review for Villa Serena</div>
+              <div class="rv-sub">Your feedback helps María and future guests</div>
+            </div>
+            <button class="btn btn-outline btn-sm">Write review</button>
+          </div>
+        </div>
+
+        </div>
+      </main>
+
+      <!-- ═══ Right rail ═══ -->
+      <aside class="rail">
+
+        <h3>Make your stay better</h3>
+        <div class="uc-carousel fade-up d1" id="ucCarousel">
+          <div class="uc-viewport">
+            <div class="uc-track" id="ucTrack">
+              <div class="card upsell-card">
+                <div class="uc-img ph-checkout">
+                </div>
+                <div class="uc-body">
+                  <div class="uc-title">Late checkout until 14:00</div>
+                  <div class="uc-sub">Sleep in on your last day</div>
+                  <div class="uc-foot">
+                    <span class="uc-price">€ 25</span>
+                    <button class="btn btn-outline btn-sm" style="height:30px;font-size:12px">Add</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card upsell-card">
+                <div class="uc-img ph-beach">
+                  <span class="uc-tag">Free cancellation</span>
+                </div>
+                <div class="uc-body">
+                  <div class="uc-title">Sailing trip along the coast</div>
+                  <div class="uc-sub">3 hours · drinks included</div>
+                  <div class="uc-foot">
+                    <span class="uc-price">€ 49 <span style="font-weight:500;font-size:11px;color:var(--text-secondary)">/ person</span></span>
+                    <button class="btn btn-outline btn-sm" style="height:30px;font-size:12px">Book</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card upsell-card">
+                <div class="uc-img ph-walking">
+                  <span class="uc-tag">Free</span>
+                </div>
+                <div class="uc-body">
+                  <div class="uc-title">Gothic Quarter walking tour</div>
+                  <div class="uc-sub">2 hours · by GuruWalk</div>
+                  <div class="uc-foot">
+                    <span class="uc-price">Free</span>
+                    <button class="btn btn-outline btn-sm" style="height:30px;font-size:12px">Book</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="uc-nav">
+            <div class="uc-dots" id="ucDots"></div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:8px">Need help?</h3>
+        <a class="card contact-card fade-up d3" href="flow-chat-desktop.html">
+          <div class="cc-icon"><svg viewBox="0 0 24 24" class="icon"><use href="#i-message"/></svg></div>
+          <div>
+            <div class="cc-title">Chat with your host</div>
+            <div class="cc-sub">Usually replies within 1 hour</div>
+          </div>
+        </a>
+        <a class="card contact-card fade-up d4" href="flow-faq-desktop.html">
+          <div class="cc-icon"><svg viewBox="0 0 24 24" class="icon"><use href="#i-help"/></svg></div>
+          <div>
+            <div class="cc-title">FAQ &amp; support</div>
+            <div class="cc-sub">Check-in, keys, house rules</div>
+          </div>
+        </a>
+      </aside>
+
+    </div>
+
+    <!-- Free-offers FAB (GuruWalk) -->
+    <a class="free-fab desk" href="flow-upselling-desktop.html#ud-list">
+      <svg viewBox="0 0 24 24" class="icon" style="fill:none"><use href="#i-gift"/></svg> Free offers
+      <span class="ff-x"><svg viewBox="0 0 24 24" class="icon"><use href="#i-x"/></svg></span>
+    </a>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="i-home"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></g>
+    <g id="i-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g>
+    <g id="i-credit-card"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></g>
+    <g id="i-shield"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></g>
+    <g id="i-coins"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></g>
+    <g id="i-key"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></g>
+    <g id="i-book-open"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></g>
+    <g id="i-compass"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></g>
+    <g id="i-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></g>
+    <g id="i-map-pin"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></g>
+    <g id="i-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></g>
+    <g id="i-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></g>
+    <g id="i-check"><path d="M20 6 9 17l-5-5"/></g>
+    <g id="i-chevron-right"><path d="m9 18 6-6-6-6"/></g>
+    <g id="i-lock-sm"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g>
+    <g id="i-message"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></g>
+    <g id="i-help"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></g>
+    <g id="i-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g>
+    <g id="i-plus"><path d="M5 12h14"/><path d="M12 5v14"/></g>
+    <g id="i-external"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></g>
+    <g id="i-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></g>
+    <g id="i-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></g>
+    <g id="i-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></g>
+    <g id="i-gift"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></g>
+    <g id="i-car"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></g>
+  </defs>
+</svg>
+<script src="chrome.js" defer></script>
+<script src="nav.js" defer></script>
+<script src="stages.js?v=2" defer></script>
+<script src="upsell-carousel.js?v=2" defer></script>
+</body>
+</html>

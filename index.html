@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chekin — UX Prototypes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #161643;
+    --ink-2: #6b6b95;
+    --ink-3: #9696b9;
+    --line: #e5e6ee;
+    --blue: #385bf8;
+    --blue-hover: #5975f5;
+    --surface: #f8f9fc;
+    --card: #ffffff;
+    --brand-gradient: linear-gradient(151deg, #385cf8, #2148ff);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 40px; padding: 40px 20px;
+    background: var(--surface);
+    font-family: 'ProximaNova', 'Montserrat', system-ui, sans-serif;
+    color: var(--ink);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--brand-gradient); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700;
+    box-shadow: 0 8px 20px rgba(56, 92, 248, 0.35);
+  }
+  .brand h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+  .lead { color: var(--ink-2); font-size: 15px; text-align: center; max-width: 520px; line-height: 1.55; margin-top: -26px; }
+
+  .choices { display: grid; grid-template-columns: repeat(2, minmax(280px, 380px)); gap: 24px; width: 100%; max-width: 820px; }
+  @media (max-width: 720px) { .choices { grid-template-columns: minmax(0, 380px); justify-content: center; } }
+
+  .choice {
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 28px;
+    background: var(--card);
+    border: 1px solid var(--line); border-radius: 20px;
+    box-shadow: 0 1px 2px rgba(22, 22, 67, 0.05), 0 8px 24px rgba(22, 22, 67, 0.06);
+    text-decoration: none; color: inherit;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .choice:hover, .choice:focus-visible {
+    transform: translateY(-4px);
+    border-color: rgba(56, 92, 248, 0.35);
+    box-shadow: 0 2px 4px rgba(22, 22, 67, 0.05), 0 18px 44px rgba(56, 92, 248, 0.16);
+  }
+  .choice:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .choice .icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .choice .icon svg { width: 24px; height: 24px; }
+  .choice--dashboard .icon { background: #ececf8; color: var(--blue); }
+  .choice--onboarding .icon { background: #ede9ff; color: #6b4fd8; }
+  .choice--guestapp .icon { background: #e8fcf7; color: #0f9f80; }
+  .choice--sdk .icon { background: #eef0f6; color: #505077; }
+  .choice--sdk-guestapp .icon { background: #e3efff; color: var(--blue); }
+  .choice h2 { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .choice p { font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+  .choice .meta { font-size: 12.5px; font-weight: 600; color: var(--ink-3); }
+
+  .badge-deprecated {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #b23f00; background: #fff1e8; border: 1px solid #ffd9c2;
+    padding: 3px 8px; border-radius: 999px;
+  }
+  .badge-new {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #0f7a5f; background: #e8fcf7; border: 1px solid #b6f0e2;
+    padding: 3px 8px; border-radius: 999px;
+  }
+  .choice--deprecated { opacity: 0.68; }
+  .choice--deprecated:hover, .choice--deprecated:focus-visible { opacity: 1; }
+  .choice--deprecated .icon { background: #f1f1f4; color: var(--ink-3); }
+  .choice--deprecated .cta { color: var(--ink-2); }
+  .choice .cta {
+    display: inline-flex; align-items: center; gap: 7px; margin-top: 4px;
+    font-size: 14px; font-weight: 600; color: var(--blue);
+  }
+  .choice .cta svg { width: 15px; height: 15px; transition: transform 0.18s ease; }
+  .choice:hover .cta svg { transform: translateX(3px); }
+
+  footer { font-size: 12.5px; color: var(--ink-3); text-align: center; }
+  footer a { color: var(--ink-2); }
+</style>
+</head>
+<body>
+
+  <div class="brand">
+    <span class="mark" aria-hidden="true">C</span>
+    <h1>Chekin UX Prototypes</h1>
+  </div>
+  <p class="lead">Static, clickable redesign prototypes built on the Chekin design system — mock data only, no app logic. Pick a surface to explore.</p>
+
+  <div class="choices">
+    <a class="choice choice--dashboard" href="dashboard/index.html">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      </span>
+      <h2>Dashboard <span class="badge-new">New</span></h2>
+      <p>The next host-side dashboard, rebuilt on the Fable design — deep-navy sidebar, welcome hero with a setup ring, today's agenda and Ask&nbsp;Vela. The base we're growing the new prototype from.</p>
+      <span class="meta">In progress · Fable-based rebuild · ProximaNova</span>
+      <span class="cta">Open dashboard <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+    </a>
+
+    <a class="choice choice--onboarding" href="dashboard/auth.html">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8a2 2 0 0 0-3 0Z"/><path d="M12 15 9 12a11 11 0 0 1 5-8c2.5-1.5 5-1.5 6-1 .5 1 .5 3.5-1 6a11 11 0 0 1-8 5Z"/><path d="M9 12H4s.5-2.8 2-4c1.6-1.3 5 0 5 0"/><path d="M12 15v5s2.8-.5 4-2c1.3-1.6 0-5 0-5"/></svg>
+      </span>
+      <h2>Dashboard — Onboarding <span class="badge-new">New</span></h2>
+      <p>The full journey that takes a new host live: login with 2FA and password recovery, the step-per-screen registration wizard, PMS connection (credential forms, OAuth, partner consent, video guides) — then the guided first-run setup.</p>
+      <span class="meta">Login · 2FA · register wizard · PMS 2nd step · guided setup</span>
+      <span class="cta">Start the journey <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+    </a>
+
+    <a class="choice choice--dashboard choice--deprecated" href="dashboard-deprecated/index.html">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      </span>
+      <h2>Dashboard <span class="badge-deprecated">Deprecated</span></h2>
+      <p>The first host-side dashboard redesign — action-queue Home, bookings pipeline, property workspace, unified documents &amp; billing. Kept for reference; a new dashboard prototype is being built on the Fable design and will replace it.</p>
+      <span class="meta">Archived · superseded by the upcoming dashboard prototype</span>
+      <span class="cta">Open archived dashboard <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+    </a>
+
+    <a class="choice choice--guestapp" href="guestapp/index.html">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg>
+      </span>
+      <h2>Guestapp</h2>
+      <p>The guest-side experience, Redesign&nbsp;2.0: online check-in journey, identity verification, upsells, travel guide and payments — mobile-first flows with desktop variants.</p>
+      <span class="meta">55 screens · guest flows &amp; states</span>
+      <span class="cta">Open guestapp <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+    </a>
+
+    <a class="choice choice--sdk" href="guestapp/sdk/index.html">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+      </span>
+      <h2>Guest SDK — neutral</h2>
+      <p>The embeddable check-in widget (ChekinPro) inside a mock partner site, in a neutral hosts-sdk-style skin: system font, muted slate accent, border-first depth. With an integration event console and embed/accent toggles.</p>
+      <span class="meta">11 flows · SDK modes ALL → QR_IV_ON_PROPERTY</span>
+      <span class="cta">Open SDK (neutral) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+    </a>
+
+    <a class="choice choice--sdk-guestapp" href="guestapp/sdk-guestapp/index.html">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9h18"/><path d="M7.5 13.5h4"/><path d="M7.5 17h6"/></svg>
+      </span>
+      <h2>Guest SDK — guestapp style</h2>
+      <p>The same SDK flows, markup-identical, dressed in the guestapp redesign's language — Poppins, Chekin blue, gradients and a glass header. One stylesheet swap; the pair demonstrates surface tokens live.</p>
+      <span class="meta">Same 11 flows · one-click Design toggle between skins</span>
+      <span class="cta">Open SDK (guestapp style) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+    </a>
+  </div>
+
+  <footer>Built on <a href="https://github.com/vlad-svr/guestapp-redesign-prototypes">vlad-svr/guestapp-redesign-prototypes</a> · tokens mirror <code>@chekinapp/tokens</code></footer>
+
+</body>
+</html>

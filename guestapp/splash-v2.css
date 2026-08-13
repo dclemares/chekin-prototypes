@@ -1,0 +1,754 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Splash screen V2 — "the arrival moment"
+   Layered on shared.css only. Loaded by flow-splash-v2.html (mobile) and
+   flow-splash-desktop-v2.html (desktop / SDK / kiosk).
+
+   Maps: apps/guestapp/src/components/SplashScreen/{SplashScreen.tsx,styled.ts}
+
+   The splash stops being a timed gate and becomes a *handoff*: it covers a
+   shape-matched skeleton of the screen it is about to become, and dissolves
+   into it the moment the data lands. Nothing here waits on a fixed clock.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   0 · Accessibility primitives
+   ───────────────────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   0.5 · Screen scaffold
+   Each scenario is a flow.js screen. The splash and the skeleton it covers
+   are two absolutely-positioned siblings, so they occupy the same box and
+   the dissolve is a cross-fade rather than a reflow.
+   ───────────────────────────────────────────────────────────── */
+.sp-screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+/* Splash and app each paint their own status-bar area — only one is ever on
+   screen. Inside the stage it inherits --sp-ink, so it flips with the theme. */
+.sp-stage > .statusbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  color: var(--sp-ink);
+  z-index: 3;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   1 · The splash surface
+   The surface is the one that ships today: a flat brand ground and nothing
+   behind it. This screen exists for well under a second, so there is nothing
+   here worth decorating — and every layer we don't paint is a layer that
+   can't arrive late, reflow, or wash out a host's colour.
+
+   Two theme hooks stand in for the branding CSS vars the app already
+   injects (`--splash-bg`, `--splash-animation-color`). `--sp-ink` is the
+   derived one the app does NOT have today: text colour chosen from the
+   *luminance* of the host's background, so a navy-branded splash can never
+   render navy text on navy, and a white-branded one can never render white.
+   ───────────────────────────────────────────────────────────── */
+.sp-stage {
+  /* Default = `--splash-bg` as the app ships it. Flat, and deliberately so.
+     A host may recolour it; the ink set follows the ground, never the other
+     way round. */
+  --sp-brand: var(--blue-500);
+  --sp-ink: var(--navy);
+  --sp-ink-soft: var(--text-secondary);
+  --sp-ink-faint: var(--text-tertiary);
+  --sp-hairline: var(--border);
+  --sp-badge-ring: #f4f6f8;
+
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* The trust footer is pinned to the bottom, so the centring box has to end
+     above it — otherwise the error screen's actions grow straight into it. */
+  padding: 24px 24px 92px;
+  overflow: hidden;
+  background: #f4f6f8;
+  color: var(--sp-ink);
+  transition: opacity 0.34s ease, visibility 0.34s;
+}
+
+/* `.sp-trust` is deliberately absent: it is already `position: absolute`, and
+   re-declaring `position: relative` here would turn its `bottom: 26px` into a
+   26px upward shift, dragging the footer on top of the error screen's actions.
+   It gets its z-index at its own rule. */
+.sp-stage > .sp-mark,
+.sp-stage > .err-art,
+.sp-stage > .sp-copy,
+.sp-stage > .sp-actions { position: relative; z-index: 2; }
+
+/* Dark host brand: the contrast guard flips the whole ink set the other way.
+   A host whose `splash_screen_background_color` is navy gets white text and a
+   light loader — without anyone hand-picking a second palette, and without the
+   navy-on-navy the component can render today. */
+.sp-stage.on-dark {
+  --sp-brand: #8ca5ff;
+  --sp-ink: #ffffff;
+  --sp-ink-soft: rgba(255, 255, 255, 0.76);
+  --sp-ink-faint: rgba(255, 255, 255, 0.52);
+  --sp-hairline: rgba(255, 255, 255, 0.18);
+  --sp-badge-ring: var(--navy);
+  background: var(--navy);
+}
+
+/* The curtains — V1's signature exit. Two panels of the brand's animation
+   colour sweep in from top and bottom and meet in the middle.
+
+   What changes is *when*. Today they start on mount and run a fixed 5 s
+   animation, fully closed by 86 % (≈4.3 s) — and because the dismissal timer
+   only starts once the data has landed, everything between 4.3 s and
+   `load + 5000 ms` is a solid brand-coloured rectangle with no logo, no
+   loader, no text and no way out. Here they start on *data-ready*: they close
+   over a screen that is already live behind them, and the surface is gone
+   before they have finished. There is no frame in which they cover nothing. */
+.sp-curtain {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  /* 51 %, so the seam can never open a hairline of the ground between them. */
+  height: 51%;
+  z-index: 4;
+  background: var(--sp-brand);
+  pointer-events: none;
+  transition: transform 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sp-curtain.top { top: 0; transform: translateY(-101%); }
+.sp-curtain.bottom { bottom: 0; transform: translateY(101%); }
+.sp-stage.is-closing .sp-curtain { transform: translateY(0); }
+
+/* The handoff. The curtains close, then the whole surface dissolves into the
+   screen it was covering — which has been sitting there, fully rendered, the
+   entire time. */
+.sp-stage.is-gone {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.sp-stage.is-closing .sp-dots,
+.sp-stage.is-closing .sp-copy,
+.sp-stage.is-closing .sp-trust {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2 · Brand mark + the pulsing loader
+   The mark sits in a *reserved box*: the default Chekin mark and the host's
+   logo occupy the same 96px square, so swapping one for the other when
+   branding resolves cross-fades instead of reflowing. V1 shows the logo bare —
+   no plate, no glass — and that is what ships here; the box is invisible, and
+   exists only so the swap can't move anything.
+   ───────────────────────────────────────────────────────────── */
+.sp-mark {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.sp-plate {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+.sp-plate img,
+.sp-plate .sp-logo {
+  max-width: 68px;
+  max-height: 60px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  /* Both marks stack in the same grid cell — no layout shift on swap. */
+  grid-area: 1 / 1;
+  transition: opacity 0.28s ease;
+}
+.sp-plate .sp-logo-default { opacity: 1; }
+.sp-plate .sp-logo-host { opacity: 0; }
+.sp-stage.branded .sp-plate .sp-logo-default { opacity: 0; }
+.sp-stage.branded .sp-plate .sp-logo-host { opacity: 1; }
+
+/* The default Chekin mark, drawn (the prototype must not fetch an asset).
+   Scoped under .sp-plate so it outranks the `width:auto` on the shared
+   `.sp-plate .sp-logo` rule — otherwise the tile collapses to glyph width. */
+.sp-plate .sp-logo-default {
+  width: 66px;
+  height: 66px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--blue-500), #8ca5ff);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 30px;
+  letter-spacing: -0.03em;
+}
+/* A host's logo: a wordmark tile, standing in for splash_screen_logo. It is a
+   deliberately different shape from the Chekin monogram — that is the point of
+   the reserved box. It wraps inside its 80px cap rather than escaping it. */
+.sp-logo-host {
+  box-sizing: border-box;
+  width: 80px;
+  padding: 7px 5px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 10.5px;
+  line-height: 1.25;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--sp-ink);
+  border: 1.5px solid currentColor;
+}
+
+/* The loader is V1's three pulsing dots, and they stay because they are honest
+   by construction: indeterminate, and incapable of claiming a percentage they
+   haven't earned. Drawn as real elements rather than the shipped
+   `box-shadow: 9999px` trick, which assistive tech cannot see at all. */
+.sp-dots {
+  display: flex;
+  gap: 7px;
+  margin-top: 22px;
+  position: relative;
+  z-index: 2;
+}
+.sp-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--sp-brand);
+  animation: sp-dot 1.6s infinite ease-in-out;
+}
+.sp-dots i:nth-child(2) { animation-delay: 0.2s; }
+.sp-dots i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes sp-dot {
+  0%, 60%, 100% { transform: scale(0.55); opacity: 0.35; }
+  30% { transform: scale(1); opacity: 1; }
+}
+
+/* Error / offline: nothing here is still working, so the loader goes. The
+   state badge on the mark says what happened instead. */
+.sp-mark.is-error ~ .sp-dots,
+.sp-mark.is-offline ~ .sp-dots { display: none; }
+.sp-badge {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  border: 2.5px solid var(--sp-badge-ring);
+}
+.sp-badge.err { background: var(--red-500); }
+.sp-badge.warn { background: var(--amber-700); }
+.sp-badge .icon { width: 14px; height: 14px; }
+
+/* ─────────────────────────────────────────────────────────────
+   3 · Copy block — the stage line
+   Silent for the first QUIET_MS. A splash that narrates a 400 ms load is
+   noise; one that says nothing through a 12 s load is a hang.
+   ───────────────────────────────────────────────────────────── */
+.sp-copy {
+  margin-top: 20px;
+  text-align: center;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+/* Scoped to .sp-stage so it outranks `.proto-stage h1` (0,1,1) from shared.css —
+   the terminal screens use a real <h1>, and without this the heading inherits the
+   page's navy and renders navy-on-navy on the branded ground. */
+.sp-stage .sp-title {
+  text-wrap: balance;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.28;
+  color: var(--sp-ink);
+}
+.sp-stage-line {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--sp-ink-soft);
+  min-height: 20px; /* reserved: the line appearing must not nudge the mark */
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.32s ease, transform 0.32s ease;
+}
+.sp-stage-line.is-shown { opacity: 1; transform: none; }
+.sp-stage-line b { font-weight: 600; color: var(--sp-ink); }
+
+/* Elapsed clock — only ever shown once we've admitted we're slow. */
+.sp-elapsed {
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sp-ink-faint);
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--sp-hairline);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4 · Recovery block (slow / error / offline)
+   ───────────────────────────────────────────────────────────── */
+.sp-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+.sp-actions .btn-block { max-width: 300px; }
+/* The ordinary solid controls — the flat ground takes them as they are. */
+.sp-stage .btn-outline {
+  border-color: var(--sp-hairline);
+  color: var(--sp-ink);
+  background: var(--n-0);
+}
+.sp-stage .btn-outline:hover { background: var(--n-50); }
+.sp-stage .btn-ghost { color: var(--sp-ink-soft); }
+.sp-stage .btn-ghost:hover { color: var(--sp-ink); }
+.sp-stage .btn-primary { box-shadow: var(--shadow-brand); }
+
+/* On a dark host ground a white box would punch a hole in the brand colour,
+   so the secondary controls become a translucent tint of it instead. */
+.sp-stage.on-dark .btn-outline { background: rgba(255, 255, 255, 0.1); }
+.sp-stage.on-dark .btn-outline:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* Copyable error reference — the one thing support will ask for. */
+.sp-ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 6px 0 12px;
+  border-radius: 99px;
+  border: 1px dashed var(--sp-hairline);
+  background: var(--n-0);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sp-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.sp-ref code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.04em; }
+.sp-ref button {
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 99px;
+  background: var(--n-50);
+  border: 1px solid var(--sp-hairline);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+.sp-ref button:hover { background: var(--n-100); }
+.sp-stage.on-dark .sp-ref { background: rgba(255, 255, 255, 0.08); }
+.sp-stage.on-dark .sp-ref button { background: rgba(255, 255, 255, 0.14); color: var(--sp-ink); }
+.sp-stage.on-dark .sp-ref button:hover { background: rgba(255, 255, 255, 0.22); }
+
+/* An honest note, not a spinner-with-hope. */
+.sp-note {
+  font-size: 11.5px;
+  line-height: 17px;
+  font-weight: 500;
+  color: var(--sp-ink-faint);
+  text-align: center;
+  max-width: 280px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5 · Trust footer
+   The guest arrived here by tapping a link in an email about money and a
+   passport. Naming the operator is a feature, not a logo drop.
+   ───────────────────────────────────────────────────────────── */
+.sp-trust {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 26px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+/* A bare line on the flat ground — no pill, nothing to frost. */
+.sp-trust-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.sp-trust-row .icon { width: 13px; height: 13px; color: var(--green-700); }
+.sp-stage.on-dark .sp-trust-row { color: var(--sp-ink-soft); }
+.sp-stage.on-dark .sp-trust-row .icon { color: var(--green-500); }
+.sp-trust-sub {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--sp-ink-faint);
+  letter-spacing: 0.01em;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6 · The skeleton underneath
+   The splash is not painted over a void. It sits on the shape of the screen
+   it becomes, so the dissolve lands on furniture that is already there.
+   ───────────────────────────────────────────────────────────── */
+.sp-under {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+  overflow: hidden;
+}
+.sp-skel {
+  background: linear-gradient(90deg, var(--n-100) 25%, var(--n-75) 50%, var(--n-100) 75%);
+  background-size: 220% 100%;
+  animation: sp-shimmer 1.35s ease infinite;
+  border-radius: 8px;
+}
+@keyframes sp-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+.sp-skel-topbar {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--n-0);
+  flex-shrink: 0;
+}
+/* The destination of the flying plate: the real header logo slot. */
+.sp-skel-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--blue-500), #8ca5ff);
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s ease 0.22s;
+}
+.sp-under.is-live .sp-skel-logo { opacity: 1; }
+.sp-skel-body { padding: 18px 16px; display: flex; flex-direction: column; gap: 14px; }
+.sp-skel-hero { height: 128px; border-radius: var(--r-xl); }
+.sp-skel-row {
+  height: 66px;
+  border-radius: var(--r-lg);
+  background: var(--n-0);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+}
+.sp-skel-row .sp-skel { flex-shrink: 0; }
+.sp-skel-avatar { width: 38px; height: 38px; border-radius: 12px; }
+.sp-skel-lines { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+.sp-skel-line { height: 9px; }
+.sp-skel-line.w70 { width: 70%; }
+.sp-skel-line.w45 { width: 45%; }
+.sp-skel-line.w55 { width: 55%; }
+
+/* Once the splash is gone the skeleton becomes real content. */
+.sp-real { display: none; }
+.sp-under.is-live .sp-real { display: block; }
+.sp-under.is-live .sp-skel-stack { display: none; }
+.sp-real { padding: 16px; }
+.sp-real h1 {
+  font-size: 21px;
+  line-height: 27px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--navy);
+  outline: none;
+}
+.sp-real h1:focus-visible { outline: 2px solid var(--blue-500); outline-offset: 4px; border-radius: 4px; }
+.sp-real .sp-real-sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; }
+.sp-real-hero {
+  margin-top: 14px;
+  border-radius: var(--r-xl);
+  padding: 16px;
+  background: var(--gradient-hero);
+  color: #fff;
+}
+.sp-real-hero .h-k { font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--blue-light); }
+.sp-real-hero .h-t { font-size: 16px; font-weight: 600; margin-top: 5px; }
+.sp-real-hero .h-s { font-size: 11.5px; color: rgba(255, 255, 255, 0.72); margin-top: 3px; }
+.sp-real-row {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border-radius: var(--r-lg);
+  background: var(--n-0);
+  border: 1px solid var(--border);
+}
+.sp-real-row .r-ic { width: 34px; height: 34px; border-radius: 11px; background: var(--tint-info); color: var(--blue-500); display: grid; place-items: center; flex-shrink: 0; }
+.sp-real-row .r-t { font-size: 13px; font-weight: 600; color: var(--navy); }
+.sp-real-row .r-s { font-size: 11.5px; color: var(--text-secondary); }
+.sp-topbar-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+.sp-topbar-sub { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+
+/* ─────────────────────────────────────────────────────────────
+   7 · Prototype instrumentation
+   The timing claim is the argument, so the prototype measures it out loud.
+   ───────────────────────────────────────────────────────────── */
+.sp-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 99px;
+  background: var(--n-0);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.sp-clock .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber-500);
+  animation: pulse-ring 1.4s infinite;
+}
+.sp-clock.is-done { color: var(--green-700); border-color: var(--green-500); background: var(--green-50); }
+.sp-clock.is-done .dot { background: var(--green-600); animation: none; }
+.sp-clock.is-bad { color: var(--red-500); border-color: var(--red-soft); background: var(--red-100); }
+.sp-clock.is-bad .dot { background: var(--red-500); animation: none; }
+
+.sp-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+/* The notes column under the phone — the timing contract, spelled out. */
+.sp-buglist { display: flex; flex-direction: column; gap: 8px; width: 390px; max-width: 100%; }
+
+/* ─────────────────────────────────────────────────────────────
+   9 · Desktop, SDK-embedded and kiosk shells
+   ───────────────────────────────────────────────────────────── */
+.sp-desk-frame {
+  position: relative;
+  min-height: 720px;
+  overflow: hidden;
+}
+.sp-desk-frame .sp-mark { width: 156px; height: 156px; }
+.sp-desk-frame .sp-plate { width: 112px; height: 112px; }
+.sp-desk-frame .sp-plate img, .sp-desk-frame .sp-plate .sp-logo { max-width: 86px; max-height: 86px; }
+.sp-desk-frame .sp-plate .sp-logo-default { width: 78px; height: 78px; border-radius: 22px; font-size: 34px; }
+.sp-desk-frame .sp-logo-host { width: 76px; font-size: 10px; }
+.sp-desk-frame .sp-title { font-size: 21px; }
+.sp-desk-frame .sp-copy { max-width: 380px; }
+
+/* The desktop skeleton is the navy-sidebar shell, so the dissolve lands on
+   the app's real furniture rather than a centred spinner over nothing. */
+.sp-skel-shell { display: grid; grid-template-columns: 266px minmax(0, 1fr); min-height: 720px; }
+.sp-real-shell { display: none; }
+.sp-under.is-live .sp-real-shell { display: grid; }
+.sp-real-shell .sp-skel-side { gap: 10px; }
+.sp-real-shell .sd-brand { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 700; font-size: 14px; }
+.sp-real-shell .sd-item { font-size: 12.5px; font-weight: 500; color: rgba(255, 255, 255, 0.62); padding: 9px 10px; border-radius: 9px; }
+.sp-real-shell .sd-item.on { background: rgba(255, 255, 255, 0.1); color: #fff; font-weight: 600; }
+
+/* The mock host page the SDK widget is embedded in. The splash must live
+   inside the widget box, never over the host's own chrome. */
+.sp-sdk-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 720px;
+  padding: 26px;
+  background: #e9ecf5;
+}
+.sp-skel-side { background: var(--navy); padding: 22px 18px; display: flex; flex-direction: column; gap: 14px; }
+.sp-skel-side .sp-skel { background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.13) 50%, rgba(255,255,255,0.06) 75%); background-size: 220% 100%; }
+.sp-skel-side .sp-skel-line { height: 11px; border-radius: 6px; }
+.sp-skel-main { padding: 30px 34px; display: flex; flex-direction: column; gap: 18px; }
+.sp-skel-main .sp-skel-hero { height: 170px; }
+.sp-skel-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* SDK embedded: the splash is scoped to the widget box, never the viewport.
+   `position: absolute; inset: 0` on .sp-stage already does this — the point of
+   the mock host page is to prove it. */
+.sp-host-site {
+  width: min(900px, 94vw);
+  background: var(--n-0);
+  border-radius: 12px;
+  border: 1px solid var(--n-200);
+  overflow: hidden;
+}
+.sp-host-nav {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.sp-host-nav .brand { font-weight: 800; color: var(--navy); font-size: 15px; letter-spacing: -0.01em; margin-right: auto; }
+.sp-host-body { padding: 26px 24px 34px; display: flex; flex-direction: column; gap: 16px; }
+.sp-host-body h4 { font-size: 17px; font-weight: 700; color: var(--navy); }
+.sp-host-body p { font-size: 12.5px; line-height: 19px; color: var(--text-secondary); max-width: 620px; }
+.sp-widget {
+  position: relative;
+  height: 480px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--bg-page);
+}
+.sp-widget-tag {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 60;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 99px;
+  background: rgba(22, 22, 67, 0.72);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Kiosk: one-metre reading distance (same convention as keycards.css). */
+.sp-kiosk { position: relative; min-height: 640px; overflow: hidden; }
+.sp-kiosk .sp-mark { width: 240px; height: 240px; }
+.sp-kiosk .sp-plate { width: 176px; height: 176px; }
+/* The shared 68px cap on `.sp-plate .sp-logo` would otherwise shrink the mark
+   back to phone size — at a metre away it has to be read, not glanced at. */
+.sp-kiosk .sp-plate img, .sp-kiosk .sp-plate .sp-logo { max-width: 120px; max-height: 120px; }
+.sp-kiosk .sp-plate .sp-logo-default { width: 104px; height: 104px; border-radius: 28px; font-size: 46px; }
+.sp-kiosk .sp-logo-host { width: 120px; font-size: 14px; }
+.sp-kiosk .sp-title { font-size: 34px; }
+.sp-kiosk .sp-stage-line { font-size: 20px; min-height: 30px; }
+.sp-kiosk .sp-copy { max-width: 620px; margin-top: 40px; }
+.sp-kiosk .sp-trust-row { font-size: 16px; }
+.sp-kiosk .sp-trust-row .icon { width: 18px; height: 18px; }
+.sp-kiosk .sp-trust-sub { font-size: 13px; }
+.sp-kiosk .sp-stage { padding-bottom: 130px; }
+.sp-kiosk .sp-dots { margin-top: 34px; }
+.sp-kiosk .sp-dots i { width: 14px; height: 14px; }
+
+/* ─────────────────────────────────────────────────────────────
+   10 · Error & recovery — the other end of the same arrival
+   The three full-page ErrorView cases live in this flow: everything that
+   can happen between opening the link and landing on Home belongs to the
+   arrival moment, and the watchdog above already lands on one of them.
+   They keep the pre-auth surface they were built on (search.css
+   `.sr-state` / `.sr-standalone` / `.sr-card`, plus err.css for the
+   variant art), so all that is needed here is flow-screen sizing inside
+   the phone and browser frames. Both splash pages load
+   shared.css → search.css → err.css → splash-v2.css and carry
+   `html.glass-lite`, which is what keeps search.css off `.phone`.
+   ───────────────────────────────────────────────────────────── */
+.sp-err-screen { flex: 1; flex-direction: column; min-height: 0; }
+.sp-err-frame { flex: 1; flex-direction: column; min-height: 720px; }
+
+/* On desktop the error views take the Can't-load stage's treatment: the same
+   flat ground with no card between the guest and the message, and the same
+   type scale. They are the same surface reached for a different reason, so
+   there is no reason for one of them to be a panel and the other bare ground.
+   `.sr-brandmark` / `.sr-lang` stay — that header is the point of the shell.
+   The three-class selectors are deliberate: they have to outrank
+   `html.glass-lite .sr-*` (0,2,1) from search.css. */
+.sp-col .sp-err-frame .sr-standalone { background: #f4f6f8; }
+.sp-col .sp-err-frame .sr-card {
+  max-width: 520px;
+  min-height: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+/* The footnote duplicated what the card already said; the stage next door
+   carries the trust line, so here it is just noise under a message. */
+.sp-col .sp-err-frame .sr-foot-note { display: none; }
+/* Matches `.sp-desk-frame` — 21px title, 13.5/20 body, 380px measure. */
+.sp-err-frame .sr-state .ss-title {
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.28;
+}
+.sp-err-frame .sr-state .ss-sub {
+  font-size: 13.5px;
+  line-height: 20px;
+  max-width: 380px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   11 · Reduced motion
+   shared.css already disables all animation/transition under
+   prefers-reduced-motion. These rules make the *result* correct rather than
+   merely still: the mark must not be frozen mid-flight, and the dots must
+   settle visible rather than stopping at whatever scale the pulse was on.
+   Today's component ignores the preference entirely — the 3 s fade, the 2 s
+   dot pulse and the 5 s curtains all run regardless.
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .sp-skel { background: var(--n-100); }
+  .sp-clock .dot { background: var(--n-500); }
+  .sp-dots i { animation: none; opacity: 1; transform: none; }
+}

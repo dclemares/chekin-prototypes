@@ -1,0 +1,202 @@
+/* ============================================================
+   Taxes flow — shared styles (flow-taxes-mobile.html + desktop)
+   Loaded AFTER pay.css: reuses its ledger / pay-sec / pi-* /
+   hc-chip / pay-toast primitives (the desktop page also layers
+   payd.css for the grid/stage/cta helpers).
+   Signature element: the per-guest MATH CARD — every guest is a
+   row (taxed nights × rate = amount); exempt guests stay visible
+   as dashed €0.00 rows, echoing the payments rule that dashed
+   means "never charged". All values from shared.css tokens.
+   ============================================================ */
+
+/* ---------- The math card (TaxesTouristView breakdown) ---------- */
+.tax-math {
+  background: var(--n-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-card);
+}
+/* Season pricing rule pinned on top of the card */
+.tax-math .season-note {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 11px 16px;
+  background: var(--n-50);
+  border-bottom: 1px dashed var(--n-200);
+  font-size: 11px; line-height: 15px;
+  color: var(--text-secondary);
+}
+.tax-math .season-note .icon { color: var(--blue-500); flex-shrink: 0; margin-top: 1px; }
+.tax-math .season-note b { color: var(--navy); }
+
+.tm-row { display: flex; align-items: center; gap: 12px; padding: 13px 14px 13px 16px; }
+.tm-row + .tm-row,
+.tm-row + .add-row { border-top: 1px solid var(--border); }
+/* the add-row is the last thing in the card, so it takes the card's radius */
+.tax-math .add-row:last-child { border-radius: 0 0 var(--r-xl) var(--r-xl); }
+.tm-ava {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--tint-info);
+  color: var(--blue-500);
+  display: grid; place-items: center;
+  font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+.tm-main { flex: 1; min-width: 0; }
+.tm-name { display: block; font-size: 13.5px; font-weight: 700; color: var(--navy); }
+.tm-meta { display: block; font-size: 11.5px; line-height: 16px; color: var(--text-secondary); margin-top: 2px; }
+.tm-side { flex-shrink: 0; display: flex; align-items: center; gap: 4px; }
+.tm-price { text-align: right; }
+.tm-amount { font-size: 14px; font-weight: 700; color: var(--navy); font-variant-numeric: tabular-nums; }
+.tm-calc { display: block; font-size: 10.5px; color: var(--text-tertiary); margin-top: 2px; font-variant-numeric: tabular-nums; }
+/* Exempt guest — the €0.00 is the OUTCOME, so it is green and stated, not a
+   dashed grey chip. Dashed means "not charged yet" in the payments flow; an
+   exemption is not pending, it is free. The row keeps full contrast: an exempt
+   guest is not a demoted one. */
+.tm-row.exempt .tm-ava { background: var(--green-50); color: var(--green-700); }
+.tm-zero {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 25px; padding: 0 10px;
+  border-radius: 999px;
+  background: var(--green-50);
+  color: var(--green-800);
+  font-size: 12px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.tm-zero .icon { width: 11px; height: 11px; stroke-width: 3; }
+.tm-saved { display: block; font-size: 10.5px; color: var(--green-700); margin-top: 3px; text-align: right; }
+
+/* Unregistered guest — the tax is owed per PERSON on the reservation, and the
+   reservation already knows how many people and their age bracket. What it does
+   not know yet is who they are, so the row keeps its amount and loses only the
+   name. Real model: GuestTaxExemption carries a required `age` but an OPTIONAL
+   `guest_id`, and the app renders t('unregistered_guest') for those rows. */
+.tm-row.unregistered .tm-ava {
+  background: transparent;
+  border: 1.5px dashed var(--n-300);
+  color: var(--n-500);
+}
+.tm-row.unregistered .tm-name { color: var(--text-secondary); }
+.tm-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 4px; padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--amber-50);
+  color: var(--amber-700);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+}
+
+/* Per-guest ⋯ — the only way to claim, change or drop an exemption. Replaces
+   the page-level "add a guest with an exemption" row: the action belongs to
+   the guest it applies to. */
+.tm-menu {
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  color: var(--n-500);
+  display: grid; place-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+.tm-menu:hover { background: var(--n-50); color: var(--navy); }
+
+/* Where the page-level "add exemption" row used to be: one line explaining
+   that some guests pay nothing and that claiming costs nothing. */
+.tax-hint {
+  display: flex; gap: 9px; align-items: flex-start;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px dashed var(--n-300);
+  font-size: 11.5px; line-height: 16px;
+  color: var(--text-secondary);
+}
+.tax-hint .icon { color: var(--blue-500); flex-shrink: 0; margin-top: 1px; }
+.tax-hint b { color: var(--navy); }
+.tax-hint .lnk { color: var(--blue-500); font-weight: 600; }
+.tax-hint .lnk:hover { text-decoration: underline; }
+
+/* The exempt line in the ledger is green for the same reason as the row. */
+.ledger .lg-row.zero .lr-label,
+.ledger .lg-row.zero .lr-amount { color: var(--green-700); }
+
+/* ---------- Form fields (Select / Input stand-ins for @chekinapp/ui) ---------- */
+.tx-field { display: flex; flex-direction: column; gap: 6px; }
+.tx-field label { font-size: 12px; font-weight: 600; color: var(--n-600); }
+.tx-control {
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--n-0);
+  padding: 0 14px;
+  font-size: 13.5px; font-weight: 600;
+  color: var(--navy);
+  display: flex; align-items: center; gap: 9px;
+}
+.tx-control.select { justify-content: space-between; }
+.tx-control .placeholder { color: var(--n-500); font-weight: 400; }
+.tx-control .icon { color: var(--n-500); flex-shrink: 0; }
+.tx-help {
+  display: flex; gap: 6px; align-items: flex-start;
+  font-size: 11px; line-height: 15px;
+  color: var(--text-tertiary);
+}
+.tx-help .icon { color: var(--blue-500); flex-shrink: 0; margin-top: 1px; }
+
+/* Who this picker is about — the guest arrived from her own ⋯, so the screen
+   names her instead of asking again. */
+.tax-for {
+  display: flex; align-items: center; gap: 11px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--tint-info);
+}
+.tax-for .tm-ava { background: var(--n-0); }
+.tax-for .tf-name { display: block; font-size: 13px; font-weight: 700; color: var(--navy); }
+.tax-for .tf-meta { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+/* Amber "proof required" callout */
+.tax-warn {
+  display: flex; gap: 9px; align-items: flex-start;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: var(--amber-50);
+  font-size: 11.5px; line-height: 16px;
+  color: var(--amber-700);
+}
+.tax-warn .icon { flex-shrink: 0; margin-top: 1px; }
+
+/* Live "new total if confirmed" preview */
+.tax-delta {
+  border-radius: var(--r-xl);
+  background: var(--green-50);
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.tax-delta .td-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.tax-delta .td-label { font-size: 12px; font-weight: 700; color: var(--green-800); }
+.tax-delta .td-new { font-size: 20px; font-weight: 700; color: var(--green-800); font-variant-numeric: tabular-nums; }
+.tax-delta .td-sub { font-size: 11px; line-height: 15px; color: var(--green-700); }
+
+/* ---------- Paid / locked state ---------- */
+.tax-paid {
+  display: flex; gap: 12px; align-items: center;
+  padding: 14px 16px;
+  border-radius: var(--r-xl);
+  background: var(--green-50);
+  border: 1px solid rgba(15, 159, 128, 0.22);
+}
+.tax-paid .tp-ring {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-500), var(--green-700));
+  color: #fff;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.tax-paid .tp-title { display: block; font-size: 13.5px; font-weight: 700; color: var(--navy); }
+.tax-paid .tp-meta { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.tax-lock {
+  display: flex; gap: 7px; align-items: flex-start;
+  padding: 0 6px;
+  font-size: 11px; line-height: 15px;
+  color: var(--text-tertiary);
+}
+.tax-lock .icon { color: var(--n-500); flex-shrink: 0; margin-top: 1px; }

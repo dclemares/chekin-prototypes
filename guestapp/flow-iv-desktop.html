@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IV Flow (Desktop, interactive) — Redesign Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="ivd.css">
+<style>
+  .flow-screen { flex-direction: column; }
+  .done-panel {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 40px;
+    background:
+      radial-gradient(circle 300px at 50% 26%, rgba(53, 229, 188, 0.14), transparent 70%),
+      var(--bg-page);
+  }
+  .done-ring {
+    width: 104px; height: 104px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-500), var(--green-700));
+    display: grid; place-items: center;
+    box-shadow: 0 14px 40px rgba(15,159,128,0.35), 0 0 0 14px rgba(53,229,188,0.12);
+  }
+</style>
+</head>
+<body>
+<div class="proto-stage">
+  <h1>Identity Verification — Interactive Flow (Desktop)</h1>
+  <p class="lede">Document selection is the main flow: pick nationality &amp; document, then scan with the webcam — or upload a file (the picker opens directly; the photo goes straight to crop &amp; confirm, one file per side). The QR phone handoff is secondary, living in the Vela rail (sync is simulated live). Click through; camera and sync steps advance automatically. Mock data only.</p>
+
+  <div class="flow-hud">
+    <button class="fh-chip on" data-scenario="d-choice">▶ Start (document selection)</button>
+    <button class="fh-chip" data-scenario="d-qr">Continue on phone (QR)</button>
+    <button class="fh-chip" data-scenario="d-cam" data-doc="passport">Webcam — passport + liveness</button>
+    <button class="fh-chip" data-scenario="d-cam" data-doc="dni">Webcam — ID card + selfie</button>
+    <button class="fh-chip" data-scenario="d-crop">Upload — crop &amp; confirm</button>
+    <button class="fh-chip" data-scenario="d-contact-email">Contacts — email + SMS</button>
+    <button class="fh-chip" data-scenario="d-front-failed">Validation failed</button>
+    <button class="fh-chip" data-scenario="d-cam-denied">Webcam blocked</button>
+    <button class="fh-chip" data-scenario="d-unavailable">Outside check-in window</button>
+    <button class="fh-restart" data-restart>↺ Restart</button>
+    <span class="fh-label"></span>
+  </div>
+
+  <div class="browser" style="min-height:820px;display:flex;flex-direction:column">
+    <div class="browser-bar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="url"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-lock-sm"/></svg> guest.chekin.com/villa-serena/verification</span>
+      <span style="width:52px"></span>
+    </div>
+
+    <!-- ═══ d-choice ═══ -->
+    <div class="flow-screen" id="d-choice" data-start data-label="Document selection" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back to registration</button>
+          <div class="desk-col">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration"
+                 data-title="Verify your {identity}"
+                 data-intro="Takes about 2 minutes. Choose your document, then scan it with your webcam."></div>
+            <div style="display:flex;flex-direction:column;gap:18px;margin-top:22px">
+              <div class="card">
+                <div class="card-header">
+                  <span class="ch-icon"><svg viewBox="0 0 24 24" class="icon"><use href="#i-globe"/></svg></span>
+                  <span class="ch-label">Nationality</span>
+                </div>
+                <button class="nat-row">
+                  <span class="nat-lbl">Nationality</span>
+                  <span class="nat-val">🇪🇸 <b>Spain</b> <svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--n-500)"><use href="#i-chevron-down"/></svg></span>
+                </button>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="ch-icon"><svg viewBox="0 0 24 24" class="icon"><use href="#i-id-card"/></svg></span>
+                  <span class="ch-label">Document type</span>
+                </div>
+                <div class="doc-list">
+                  <div class="doc-row selected" data-set-doc="passport">
+                    <span class="dr-ic"><svg viewBox="0 0 24 24" class="icon"><use href="#i-book"/></svg></span>
+                    <span class="dr-text">
+                      <span class="dr-name">Passport</span>
+                      <span class="dr-desc">Single-sided · liveness selfie</span>
+                      <span class="dr-flag"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-zap"/></svg> Recommended</span>
+                    </span>
+                    <span class="radio"></span>
+                  </div>
+                  <div class="doc-row" data-set-doc="dni">
+                    <span class="dr-ic"><svg viewBox="0 0 24 24" class="icon"><use href="#i-id-card"/></svg></span>
+                    <span class="dr-text">
+                      <span class="dr-name">National ID card (DNI)</span>
+                      <span class="dr-desc">Front and back · quick selfie</span>
+                    </span>
+                    <span class="radio"></span>
+                  </div>
+                  <div class="doc-row" data-set-doc="dni">
+                    <span class="dr-ic"><svg viewBox="0 0 24 24" class="icon"><use href="#i-car"/></svg></span>
+                    <span class="dr-text">
+                      <span class="dr-name">Driving license</span>
+                      <span class="dr-desc">Front and back · quick selfie</span>
+                    </span>
+                    <span class="radio"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <button class="btn btn-primary" data-goto="d-cam">Start scanning <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-right"/></svg></button>
+              </div>
+
+              <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--tint-pressed);font-size:11.5px;line-height:16px;color:var(--n-600)">
+                <svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--blue-500);margin-top:1px"><use href="#i-shield"/></svg>
+                <span><strong>Privacy protected.</strong> Photos are encrypted, used only for this verification, and deleted afterwards per GDPR.</span>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <p class="vela-intro">I'll guide you through verification — which documents work, and why we ask for each step.</p>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 1 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:18%"></div></div>
+              <div class="vela-steps">
+                <div class="vs active"><span class="vs-dot"></span> Choose your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie &amp; liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Quick actions</div>
+            <div class="vela-actions" style="margin-top:10px">
+              <button class="vela-action" data-modal="m-share">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-share"/></svg></span>
+                <span>Share booking link<span class="va-sub">Let co-travellers register themselves</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">No camera?</div>
+            <div class="iv-qr" style="margin-top:10px">
+              <div class="vq-row">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-smartphone"/></svg></span>
+                <span class="vq-title">Use your phone instead<span class="va-sub">Scan this code to continue the verification on your mobile.</span></span>
+              </div>
+              <button class="vq-box" data-goto="d-qr" title="Prototype: click to simulate scanning with your phone">
+                <div class="qr-mock"><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i class="off"></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i></i></div>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ═══ d-qr · ScanQRCodeView (desktop shows QR, waits for phone) ═══ -->
+    <div class="flow-screen" id="d-qr" data-label="QR handoff — waiting for phone (simulated)" data-autonext="d-qr-done" data-autodelay="4200" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration"
+                 data-title="Continue on your {phone}"
+                 data-intro="This page updates live — as soon as you finish on the phone, you&#x27;ll continue right here."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="card">
+                <div class="qr-panel">
+                  <div class="qr-box">
+                    <div class="qr-mock"><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i class="off"></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i></i></div>
+                  </div>
+                  <div class="qr-steps">
+                    <div class="qs-row">
+                      <span class="qs-num">1</span>
+                      <span class="qs-text">Open the <b>camera app</b> on your phone</span>
+                    </div>
+                    <div class="qs-row">
+                      <span class="qs-num">2</span>
+                      <span class="qs-text">Point it at this QR code and tap the link</span>
+                    </div>
+                    <div class="qs-row">
+                      <span class="qs-num">3</span>
+                      <span class="qs-text">Scan your <b>passport</b> and take a selfie there</span>
+                    </div>
+                    <span class="qr-wait"><span class="spinner"></span> Waiting for your phone… code expires in 9:41</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card sync-card">
+                <div class="sc-phone"><svg viewBox="0 0 24 24" class="icon icon-lg"><use href="#i-smartphone"/></svg></div>
+                <div class="sync-steps">
+                  <div class="ss done"><span class="ss-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></span> Phone connected</div>
+                  <div class="ss active"><span class="ss-dot"></span> Scanning document on phone…</div>
+                  <div class="ss todo"><span class="ss-dot"></span> Selfie &amp; liveness check</div>
+                </div>
+                <span class="badge badge-info" style="flex-shrink:0"><span style="width:6px;height:6px;border-radius:50%;background:var(--blue-500);display:inline-block"></span> Live</span>
+              </div>
+
+              <div style="display:flex;justify-content:center;gap:18px">
+                <span class="sim-note">simulating the phone finishing…</span>
+              </div>
+              <div style="display:flex;justify-content:center;gap:18px">
+                <button class="btn-ghost">Send link by email instead</button>
+                <button class="btn-ghost" style="color:var(--blue-500)" data-goto="d-cam">Use this computer's webcam</button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 1 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:18%"></div></div>
+              <div class="vela-steps">
+                <div class="vs active"><span class="vs-dot"></span> Choose your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">While your phone connects</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-eye"/></svg></span><span><span class="vt-title" style="display:block">Keep this window open</span><span class="vt-desc">It updates live — you’ll see each step tick off here as you progress on your phone.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-shield"/></svg></span><span><span class="vt-title" style="display:block">Same secure session</span><span class="vt-desc">The QR links your phone to this verification — nothing is shared with any other device.</span></span></div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Quick actions</div>
+            <div class="vela-actions" style="margin-top:10px">
+              <button class="vela-action" data-goto="d-cam">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-camera"/></svg></span>
+                <span>Use the webcam instead<span class="va-sub">If your phone isn’t handy</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+              <button class="vela-action" data-goto="d-crop">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-upload"/></svg></span>
+                <span>Upload a photo<span class="va-sub">Pick a file from this computer</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-qr-done ═══ -->
+    <div class="flow-screen" id="d-qr-done" data-label="Phone finished — synced live" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <div class="desk-col">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration"
+                 data-title="Phone {finished} ✓"
+                 data-accent="ok"
+                 data-intro="Your document and selfie were verified on the phone — everything synced here instantly."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="card sync-card" style="border-color:rgba(53,229,188,0.45)">
+                <div class="sc-phone" style="background:var(--green-50);color:var(--green-700)"><svg viewBox="0 0 24 24" class="icon icon-lg"><use href="#i-smartphone"/></svg></div>
+                <div class="sync-steps">
+                  <div class="ss done"><span class="ss-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></span> Phone connected</div>
+                  <div class="ss done"><span class="ss-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></span> Document scanned — Passport · Spain</div>
+                  <div class="ss done"><span class="ss-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></span> Selfie &amp; liveness check passed</div>
+                </div>
+                <span class="badge badge-success" style="flex-shrink:0">Complete</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto="d-complete">Continue to guest details <svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 1 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:18%"></div></div>
+              <div class="vela-steps">
+                <div class="vs active"><span class="vs-dot"></span> Choose your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">While your phone connects</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-eye"/></svg></span><span><span class="vt-title" style="display:block">Keep this window open</span><span class="vt-desc">It updates live — you’ll see each step tick off here as you progress on your phone.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-shield"/></svg></span><span><span class="vt-title" style="display:block">Same secure session</span><span class="vt-desc">The QR links your phone to this verification — nothing is shared with any other device.</span></span></div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Quick actions</div>
+            <div class="vela-actions" style="margin-top:10px">
+              <button class="vela-action" data-goto="d-cam">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-camera"/></svg></span>
+                <span>Use the webcam instead<span class="va-sub">If your phone isn’t handy</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+              <button class="vela-action" data-goto="d-crop">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-upload"/></svg></span>
+                <span>Upload a photo<span class="va-sub">Pick a file from this computer</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-cam · webcam ═══ -->
+    <div class="flow-screen" id="d-cam" data-label="Webcam capture (auto)" data-autonext="d-cam-captured" data-autodelay="3200" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 2 of 4"
+                 data-title="Photo of the {front}"
+                 data-intro="Hold your passport up to the webcam — the photo is taken automatically when it&#x27;s in focus."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-cam">
+                <div class="mock-doc">
+                  <div class="photo"></div>
+                  <div class="lines"><span></span><span></span><span></span><span></span></div>
+                </div>
+                <div class="brackets"><i></i><i></i><i></i><i></i></div>
+                <div class="scan-line"></div>
+                <div class="status-pill"><span class="dot"></span> Place document inside frame</div>
+              </div>
+              <div class="cam-hint-row">
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg> Good lighting</span>
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-eye-off"/></svg> No glare</span>
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-maximize"/></svg> All corners visible</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <span class="sim-note">auto-capture simulating…</span>
+                <div style="display:flex;gap:18px">
+                  <button class="btn-ghost" data-goto="d-crop"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-upload"/></svg> Upload a file instead</button>
+                  <button class="btn-ghost" style="color:var(--blue-500)" data-goto="d-qr"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-smartphone"/></svg> Switch to phone</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 2 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:45%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Getting a sharp photo</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg></span><span><span class="vt-title" style="display:block">Good light, no glare</span><span class="vt-desc">Face a window if you can — tilt the card slightly if lamps reflect off it.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-maximize"/></svg></span><span><span class="vt-title" style="display:block">Fill the frame</span><span class="vt-desc">Hold it steady inside the brackets with all four corners visible — capture is automatic.</span></span></div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Quick actions</div>
+            <div class="vela-actions" style="margin-top:10px">
+              <button class="vela-action" data-goto="d-qr">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-smartphone"/></svg></span>
+                <span>Continue on your phone<span class="va-sub">Phone cameras scan sharper</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-cam-captured ═══ -->
+    <div class="flow-screen" id="d-cam-captured" data-label="Webcam photo captured" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 2 of 4"
+                 data-title="Photo {captured}"
+                 data-accent="ok"
+                 data-intro="Sharp image, data readable — you can continue."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-cam">
+                <div class="mock-doc">
+                  <div class="photo"></div>
+                  <div class="lines"><span></span><span></span><span></span><span></span></div>
+                </div>
+                <div class="brackets" style="--capture-bracket:1"><i style="border-color:var(--green-500)"></i><i style="border-color:var(--green-500)"></i><i style="border-color:var(--green-500)"></i><i style="border-color:var(--green-500)"></i></div>
+                <div class="status-pill" style="background:rgba(15,159,128,0.55);border-color:rgba(53,229,188,0.4)"><svg viewBox="0 0 24 24" class="icon" style="width:13px;height:13px;stroke-width:3;color:#fff"><use href="#i-check"/></svg> Capture complete</div>
+              </div>
+              <div class="cam-hint-row">
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--green-700)"><use href="#i-check"/></svg> Sharp image</span>
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--green-700)"><use href="#i-check"/></svg> Data readable</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto-doc-passport="d-live-1" data-goto-doc-dni="d-back">Continue <svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></button>
+                <div style="display:flex;gap:18px">
+                  <button class="btn-ghost" data-goto="d-cam">Retake photo</button>
+                  <button class="btn-ghost" style="color:var(--red-soft)" data-goto="d-front-failed">⚠ Simulate a failed validation</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 2 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:45%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Getting a sharp photo</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg></span><span><span class="vt-title" style="display:block">Good light, no glare</span><span class="vt-desc">Face a window if you can — tilt the card slightly if lamps reflect off it.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-maximize"/></svg></span><span><span class="vt-title" style="display:block">Fill the frame</span><span class="vt-desc">Hold it steady inside the brackets with all four corners visible — capture is automatic.</span></span></div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Quick actions</div>
+            <div class="vela-actions" style="margin-top:10px">
+              <button class="vela-action" data-goto="d-qr">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-smartphone"/></svg></span>
+                <span>Continue on your phone<span class="va-sub">Phone cameras scan sharper</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-front-failed ═══ -->
+    <div class="flow-screen" id="d-front-failed" data-label="Validation failed — retry detour" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 2 of 4"
+                 data-title="Let’s try that {again}"
+                 data-accent="bad"
+                 data-intro="The photo was too blurry to read. It happens — one more try."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-cam">
+                <div class="mock-doc blurry">
+                  <div class="photo"></div>
+                  <div class="lines"><span></span><span></span><span></span><span></span></div>
+                </div>
+                <div class="brackets error"><i></i><i></i><i></i><i></i></div>
+                <div class="frame-overlay error">
+                  <div class="ov-badge"><svg viewBox="0 0 24 24" class="icon" style="width:28px;height:28px;color:#fff"><use href="#i-alert-triangle"/></svg></div>
+                  <div class="ov-title">Photo is too blurry</div>
+                  <div class="ov-desc">We couldn't read the document data from this image</div>
+                  <div class="ov-actions">
+                    <button class="btn btn-primary btn-sm" data-goto="d-cam"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-rotate"/></svg> Try again</button>
+                  </div>
+                </div>
+              </div>
+              <div class="fail-card">
+                <div class="fc-title">Quick fixes</div>
+                <div class="fc-item"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-x"/></svg> The document moved during capture</div>
+                <div class="fc-item tip"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg> Hold it still against a plain background, facing a window</div>
+                <div class="fc-item tip"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-upload"/></svg> Or skip the webcam — upload a photo from your files instead</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <div style="display:flex;gap:18px">
+                  <button class="btn-ghost" data-goto="d-crop"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-upload"/></svg> Upload a file instead</button>
+                  <button class="btn-ghost" data-goto="d-choice">Verify later</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 2 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:45%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Why photos get rejected</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-alert-triangle"/></svg></span><span><span class="vt-title" style="display:block">Glare and blur</span><span class="vt-desc">Reflections and camera shake are the most common causes — try tilting the card.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-maximize"/></svg></span><span><span class="vt-title" style="display:block">Check the corners</span><span class="vt-desc">The whole document must be inside the frame — nothing cropped.</span></span></div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Quick actions</div>
+            <div class="vela-actions" style="margin-top:10px">
+              <button class="vela-action" data-goto="d-qr">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-smartphone"/></svg></span>
+                <span>Continue on your phone<span class="va-sub">Phone cameras scan sharper</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+              <button class="vela-action" data-goto="d-crop">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-upload"/></svg></span>
+                <span>Upload a file instead<span class="va-sub">Pick a photo from this computer</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-back ═══ -->
+    <div class="flow-screen" id="d-back" data-label="Webcam — back side (auto)" data-autonext="d-back-captured" data-autodelay="3000" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 2 of 4"
+                 data-title="Now the {back} side"
+                 data-intro="Flip your ID card over — we need the machine-readable zone at the bottom."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-cam">
+                <div class="mock-doc backside">
+                  <div class="chipline"></div>
+                  <div class="mrz"></div>
+                  <div class="mrz"></div>
+                </div>
+                <div class="brackets"><i></i><i></i><i></i><i></i></div>
+                <div class="scan-line"></div>
+                <div class="status-pill"><span class="dot"></span> Flip your document over</div>
+              </div>
+              <div class="cam-hint-row">
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-flip"/></svg> Same position, other side</span>
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-eye-off"/></svg> No glare on the code</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <span class="sim-note">auto-capture simulating… front side ✓ saved</span>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 2 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:45%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Now the back side</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-flip"/></svg></span><span><span class="vt-title" style="display:block">Why we need the back</span><span class="vt-desc">The machine-readable lines confirm your document is genuine — and fill your form automatically.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg></span><span><span class="vt-title" style="display:block">Same tips apply</span><span class="vt-desc">Good light, no glare, all four corners inside the frame.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-back-captured ═══ -->
+    <div class="flow-screen" id="d-back-captured" data-label="Back captured" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 2 of 4"
+                 data-title="Both sides {captured}"
+                 data-accent="ok"
+                 data-intro="Document read successfully — one quick selfie to go."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-cam">
+                <div class="mock-doc backside">
+                  <div class="chipline"></div>
+                  <div class="mrz"></div>
+                  <div class="mrz"></div>
+                </div>
+                <div class="brackets success"><i></i><i></i><i></i><i></i></div>
+                <div class="frame-overlay success">
+                  <div class="ov-badge"><svg viewBox="0 0 24 24" class="icon" style="width:30px;height:30px;stroke-width:3;color:#fff"><use href="#i-check"/></svg></div>
+                  <div class="ov-title">Document complete!</div>
+                  <div class="ov-desc">Front and back captured successfully</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto="d-selfie">Continue to selfie <svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></button>
+                <button class="btn-ghost" data-goto="d-back">Retake back side</button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 2 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:45%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Now the back side</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-flip"/></svg></span><span><span class="vt-title" style="display:block">Why we need the back</span><span class="vt-desc">The machine-readable lines confirm your document is genuine — and fill your form automatically.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg></span><span><span class="vt-title" style="display:block">Same tips apply</span><span class="vt-desc">Good light, no glare, all four corners inside the frame.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-selfie ═══ -->
+    <div class="flow-screen" id="d-selfie" data-label="Quick selfie (SelfieScanView, no liveness)" data-autonext="d-contact-email" data-autodelay="3200" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 3 of 4"
+                 data-title="Take a quick {selfie}"
+                 data-intro="We match it with your document photo — the picture is taken automatically."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-face">
+                <div class="mock-face"></div>
+                <div class="face-dim"></div>
+                <div class="face-ring">
+                  <svg viewBox="0 0 400 300"><ellipse class="ring-track dashed" cx="200" cy="150" rx="92" ry="118"/></svg>
+                </div>
+                <div class="cue-pill"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--blue-light)"><use href="#i-scan-face"/></svg> Look at the camera</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+                <span class="sim-note">auto-capture simulating…</span>
+                <span class="sim-note" style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--n-500)"><use href="#i-shield"/></svg> Selfie is blurred &amp; encrypted before upload</span>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 3 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:70%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Getting a good selfie</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg></span><span><span class="vt-title" style="display:block">Even light on your face</span><span class="vt-desc">Face the light — avoid windows or lamps behind you.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-eye"/></svg></span><span><span class="vt-title" style="display:block">Nothing covering your face</span><span class="vt-desc">Remove glasses, hats or masks so we can match you to your document photo.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-shield"/></svg></span><span><span class="vt-title" style="display:block">Your selfie stays private</span><span class="vt-desc">It’s encrypted, compared only with your document photo, then deleted.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-live-1 ═══ -->
+    <div class="flow-screen" id="d-live-1" data-label="Liveness 1 · position your face" data-autonext="d-live-2" data-autodelay="2600" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 3 of 4"
+                 data-title="Center your {face}"
+                 data-intro="Keep your face inside the oval. The check starts automatically."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-face">
+                <div class="mock-face"></div>
+                <div class="face-dim"></div>
+                <div class="face-ring">
+                  <svg viewBox="0 0 400 300"><ellipse class="ring-track dashed" cx="200" cy="150" rx="92" ry="118"/></svg>
+                </div>
+                <div class="cue-pill"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--blue-light)"><use href="#i-scan-face"/></svg> Looking for your face…</div>
+                <div class="challenge-dots"><span class="ls"></span><span class="ls"></span><span class="ls"></span><span class="ls"></span></div>
+              </div>
+              <div style="display:flex;justify-content:center">
+                <span class="sim-note" style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--n-500)"><use href="#i-shield"/></svg> Selfie is blurred &amp; encrypted before upload</span>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 3 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:70%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Liveness check</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-scan-face"/></svg></span><span><span class="vt-title" style="display:block">Follow the prompts</span><span class="vt-desc">Keep your face inside the oval — about 10 seconds. This proves it’s really you, not a photo.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-live-2 ═══ -->
+    <div class="flow-screen" id="d-live-2" data-label="Liveness 2 · turn your head" data-autonext="d-live-3" data-autodelay="2600" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 3 of 4"
+                 data-title="Follow the {prompts}"
+                 data-intro="This proves it’s really you, live."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-face">
+                <div class="mock-face"></div>
+                <div class="face-dim"></div>
+                <div class="face-ring">
+                  <svg viewBox="0 0 400 300">
+                    <ellipse class="ring-track" cx="200" cy="150" rx="92" ry="118"/>
+                    <ellipse class="ring-arc" cx="200" cy="150" rx="92" ry="118" stroke-dasharray="662" stroke-dashoffset="331"/>
+                  </svg>
+                </div>
+                <div class="cue-pill"><svg viewBox="0 0 24 24" class="icon arrow-anim" style="color:var(--blue-light)"><use href="#i-arrow-left"/></svg> Turn your head left</div>
+                <div class="challenge-dots"><span class="ls done"></span><span class="ls active"></span><span class="ls"></span><span class="ls"></span></div>
+              </div>
+              <div style="display:flex;justify-content:center">
+                <span class="sim-note" style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--n-500)"><use href="#i-shield"/></svg> Selfie is blurred &amp; encrypted before upload</span>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 3 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:70%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Liveness check</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-scan-face"/></svg></span><span><span class="vt-title" style="display:block">Follow the prompts</span><span class="vt-desc">Keep your face inside the oval — about 10 seconds. This proves it’s really you, not a photo.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-live-3 ═══ -->
+    <div class="flow-screen" id="d-live-3" data-label="Liveness 3 · blink" data-autonext="d-live-passed" data-autodelay="2600" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 3 of 4"
+                 data-title="Almost {there}"
+                 data-intro="Last challenge — blink slowly, twice."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-face">
+                <div class="mock-face"></div>
+                <div class="face-dim"></div>
+                <div class="face-ring">
+                  <svg viewBox="0 0 400 300">
+                    <ellipse class="ring-track" cx="200" cy="150" rx="92" ry="118"/>
+                    <ellipse class="ring-arc" cx="200" cy="150" rx="92" ry="118" stroke-dasharray="662" stroke-dashoffset="99"/>
+                  </svg>
+                </div>
+                <div class="cue-pill"><svg viewBox="0 0 24 24" class="icon blink-anim" style="color:var(--blue-light)"><use href="#i-eye"/></svg> Blink twice</div>
+                <div class="challenge-dots"><span class="ls done"></span><span class="ls done"></span><span class="ls active"></span><span class="ls"></span></div>
+              </div>
+              <div style="display:flex;justify-content:center">
+                <span class="sim-note" style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:var(--n-500)"><use href="#i-shield"/></svg> Selfie is blurred &amp; encrypted before upload</span>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 3 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:70%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Liveness check</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-scan-face"/></svg></span><span><span class="vt-title" style="display:block">Follow the prompts</span><span class="vt-desc">Keep your face inside the oval — about 10 seconds. This proves it’s really you, not a photo.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-live-passed ═══ -->
+    <div class="flow-screen" id="d-live-passed" data-label="Liveness passed" data-autonext="d-contact-email" data-autodelay="2600" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 3 of 4"
+                 data-title="Liveness {passed}"
+                 data-accent="ok"
+                 data-intro="Matching your face with the document photo…"></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="desk-face">
+                <div class="mock-face" style="filter:blur(4px)"></div>
+                <div class="face-dim" style="background:rgba(11,58,48,0.5)"></div>
+                <div class="face-ring success">
+                  <svg viewBox="0 0 400 300"><ellipse class="ring-track" cx="200" cy="150" rx="92" ry="118"/></svg>
+                </div>
+                <div class="face-center-badge">
+                  <div class="fb-circle ok"><svg viewBox="0 0 24 24" class="icon" style="width:30px;height:30px;stroke-width:3;color:#fff"><use href="#i-check"/></svg></div>
+                  <div class="fb-title">All challenges passed</div>
+                </div>
+                <div class="cue-pill success"><svg viewBox="0 0 24 24" class="icon icon-sm" style="color:#fff"><use href="#i-check"/></svg> Verifying face match…</div>
+                <div class="challenge-dots"><span class="ls done"></span><span class="ls done"></span><span class="ls done"></span><span class="ls done"></span></div>
+              </div>
+              <div style="display:flex;justify-content:center">
+                <span class="sim-note"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:2px solid rgba(56,91,248,0.25);border-top-color:var(--blue-500);animation:spin 0.9s linear infinite;vertical-align:-2px;margin-right:5px"></span> This takes a few seconds — don't close the page</span>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 3 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:70%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Liveness check</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-scan-face"/></svg></span><span><span class="vt-title" style="display:block">Follow the prompts</span><span class="vt-desc">Keep your face inside the oval — about 10 seconds. This proves it’s really you, not a photo.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-contact-email ═══ -->
+    <div class="flow-screen" id="d-contact-email" data-label="Verify your email — enter address (ContactsVerificationView)" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 4 of 4 · contact 1 of 2"
+                 data-title="Verify your {email}"
+                 data-intro="Booking updates and your virtual keys go here — let’s make sure it’s right."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="field">
+                <label>Email</label>
+                <div class="input">maria@gmail.com</div>
+              </div>
+              <div class="privacy-note">
+                <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-mail"/></svg>
+                <span>We'll send a 6-digit verification code by <b>email</b>.</span>
+              </div>
+              <button class="btn btn-primary btn-block" data-goto="d-code-email">Send verification code <svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></button>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 4 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:90%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Selfie & liveness</div>
+                <div class="vs active"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Why we verify this</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-mail"/></svg></span><span><span class="vt-title" style="display:block">Your host uses this address</span><span class="vt-desc">Check-in instructions and your virtual keys are sent here — a typo would lock you out.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-shield"/></svg></span><span><span class="vt-title" style="display:block">Never shared</span><span class="vt-desc">Your contact details go to your host only — never to third parties.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-code-email ═══ -->
+    <div class="flow-screen" id="d-code-email" data-label="Enter email code (ContactsVerificationCodes)" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 4 of 4 · contact 1 of 2"
+                 data-title="Check your {email}">
+              <p class="page-intro">Enter the 6-digit code we sent to <b style="color:var(--navy)">m•••a@gmail.com</b>.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="privacy-note">
+                <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-clock"/></svg>
+                <span>The code expires in <b>2 minutes</b>.</span>
+              </div>
+              <div class="card" style="padding:26px 20px;display:flex;flex-direction:column;gap:16px;align-items:center">
+                <div class="otp-row">
+                  <span class="otp">4</span>
+                  <span class="otp">8</span>
+                  <span class="otp">2</span>
+                  <span class="otp focus">7</span>
+                  <span class="otp empty">•</span>
+                  <span class="otp empty">•</span>
+                </div>
+                <div style="font-size:12px;color:var(--text-tertiary)">Didn't get it? <b style="color:var(--blue-500)">Resend code</b></div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto="d-contact-phone">Verify code <svg viewBox="0 0 24 24" class="icon"><use href="#i-check"/></svg></button>
+                <div style="display:flex;gap:18px">
+                  <button class="btn-ghost" style="color:var(--blue-500)" data-goto="d-contact-email"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-pen-line"/></svg> Change email</button>
+                  <button class="btn-ghost" style="color:var(--red-soft)" data-goto="d-code-email-error">⚠ Simulate a wrong code</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 4 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:90%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Selfie & liveness</div>
+                <div class="vs active"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">About your code</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-mail"/></svg></span><span><span class="vt-title" style="display:block">Nothing arrived?</span><span class="vt-desc">Check your spam folder — or tap Resend code under the boxes.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-rotate"/></svg></span><span><span class="vt-title" style="display:block">Codes expire quickly</span><span class="vt-desc">Each code lasts 2 minutes — request a fresh one if it lapsed.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-code-email-error ═══ -->
+    <div class="flow-screen" id="d-code-email-error" data-label="Wrong code — retry (invalid_verification_code)" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 4 of 4 · contact 1 of 2"
+                 data-title="Check your {email}">
+              <p class="page-intro">Enter the 6-digit code we sent to <b style="color:var(--navy)">m•••a@gmail.com</b>.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="card" style="padding:26px 20px;display:flex;flex-direction:column;gap:16px;align-items:center">
+                <div class="otp-row">
+                  <span class="otp" style="border-color:var(--red-soft)">4</span>
+                  <span class="otp" style="border-color:var(--red-soft)">8</span>
+                  <span class="otp" style="border-color:var(--red-soft)">2</span>
+                  <span class="otp" style="border-color:var(--red-soft)">1</span>
+                  <span class="otp" style="border-color:var(--red-soft)">0</span>
+                  <span class="otp" style="border-color:var(--red-soft)">9</span>
+                </div>
+                <div style="font-size:12.5px;font-weight:600;color:var(--red-soft);text-align:center">That code didn't match — check the newest email and try again.</div>
+                <div style="font-size:12px;color:var(--text-tertiary)">Didn't get it? <b style="color:var(--blue-500)">Resend code</b></div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto="d-code-email">Try again <svg viewBox="0 0 24 24" class="icon"><use href="#i-rotate"/></svg></button>
+                <button class="btn-ghost" style="color:var(--blue-500)" data-goto="d-contact-email"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-pen-line"/></svg> Change email</button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 4 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:90%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Selfie & liveness</div>
+                <div class="vs active"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Wrong code?</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-alert-triangle"/></svg></span><span><span class="vt-title" style="display:block">Typos happen</span><span class="vt-desc">Double-check the latest email — an older code may have expired already.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-rotate"/></svg></span><span><span class="vt-title" style="display:block">Start fresh</span><span class="vt-desc">Request a new code, or change the email address if it’s wrong.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-contact-phone ═══ -->
+    <div class="flow-screen" id="d-contact-phone" data-label="Verify your phone — enter number (SMS)" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 4 of 4 · contact 2 of 2"
+                 data-title="Verify your {phone}"
+                 data-intro="Email verified ✓ — one more: your host uses this number only for urgent arrival updates."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="field">
+                <label>Phone number</label>
+                <div class="input" style="gap:10px"><span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-secondary)">🇪🇸 +34 <svg viewBox="0 0 24 24" class="icon" style="width:12px;height:12px;color:var(--n-500)"><use href="#i-chevron-down"/></svg></span> 612 345 678</div>
+              </div>
+              <div class="privacy-note">
+                <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-smartphone"/></svg>
+                <span>We'll send a 6-digit verification code by <b>SMS</b>.</span>
+              </div>
+              <button class="btn btn-primary btn-block" data-goto="d-code-phone">Send verification code <svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></button>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 4 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:90%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Selfie & liveness</div>
+                <div class="vs active"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Why we verify this</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-smartphone"/></svg></span><span><span class="vt-title" style="display:block">Your host texts this number</span><span class="vt-desc">Arrival updates and door codes arrive by SMS — use the phone you’ll travel with.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-code-phone ═══ -->
+    <div class="flow-screen" id="d-code-phone" data-label="Enter SMS code" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 4 of 4 · contact 2 of 2"
+                 data-title="Check your {messages}">
+              <p class="page-intro">Enter the 6-digit code we sent by SMS to <b style="color:var(--navy)">+34 6•• ••• •78</b>.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="privacy-note">
+                <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-clock"/></svg>
+                <span>The code expires in <b>2 minutes</b>.</span>
+              </div>
+              <div class="card" style="padding:26px 20px;display:flex;flex-direction:column;gap:16px;align-items:center">
+                <div class="otp-row">
+                  <span class="otp">9</span>
+                  <span class="otp">1</span>
+                  <span class="otp focus">3</span>
+                  <span class="otp empty">•</span>
+                  <span class="otp empty">•</span>
+                  <span class="otp empty">•</span>
+                </div>
+                <div style="font-size:12px;color:var(--text-tertiary)">Didn't get it? <b style="color:var(--blue-500)">Resend code</b></div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto="d-complete">Verify code <svg viewBox="0 0 24 24" class="icon"><use href="#i-check"/></svg></button>
+                <button class="btn-ghost" style="color:var(--blue-500)" data-goto="d-contact-phone"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-pen-line"/></svg> Change phone number</button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 4 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:90%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Scan your document</div>
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Selfie & liveness</div>
+                <div class="vs active"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">About your code</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-smartphone"/></svg></span><span><span class="vt-title" style="display:block">SMS can take a minute</span><span class="vt-desc">Wait a moment before requesting a new one — codes expire after 2 minutes.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+    <!-- ═══ d-unavailable ═══ -->
+    <div class="flow-screen" id="d-unavailable" data-label="Verification unavailable (IVUnavailableView)" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration"
+                 data-title="Verification {unavailable}"
+                 data-intro="This property verifies guests on the day of check-in."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="card">
+                <div class="card-header">
+                  <span class="ch-icon"><svg viewBox="0 0 24 24" class="icon"><use href="#i-calendar"/></svg></span>
+                  <span class="ch-label">Outside check-in period</span>
+                </div>
+                <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+                  <p style="font-size:13.5px;line-height:20px;color:var(--text-secondary)">Identity verification opens on <b style="color:var(--navy)">Friday, 10 July</b> — the day you arrive at the property.</p>
+                  <p style="font-size:13.5px;line-height:20px;color:var(--text-secondary)">Everything else on your checklist can be completed now.</p>
+                </div>
+              </div>
+              <div class="privacy-note">
+                <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-id-card"/></svg>
+                <span><b>Be ready on the day:</b> you'll need your ID document and a device with a camera.</span>
+              </div>
+              <button class="btn btn-outline btn-block" data-goto="d-choice">Back to summary</button>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Why you can’t start yet</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-calendar"/></svg></span><span><span class="vt-title" style="display:block">Opens closer to arrival</span><span class="vt-desc">Your host enables verification 3 days before check-in — we’ll email you the moment it opens.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-key"/></svg></span><span><span class="vt-title" style="display:block">Why it’s worth it</span><span class="vt-desc">Finishing early unlocks your virtual keys for instant check-in.</span></span></div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Quick actions</div>
+            <div class="vela-actions" style="margin-top:10px">
+              <button class="vela-action" data-modal="m-share">
+                <span class="va-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-share"/></svg></span>
+                <span>Share booking link<span class="va-sub">Let co-travellers register themselves</span></span>
+                <svg viewBox="0 0 24 24" class="icon icon-sm va-chev"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-cam-denied ═══ -->
+    <div class="flow-screen" id="d-cam-denied" data-label="Webcam blocked (permission denied)" style="flex:1">
+      <div class="desktop-shell" style="min-height:0;flex:1;grid-template-columns:266px minmax(0,1fr)">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 2 of 4"
+                 data-title="Camera access {needed}"
+                 data-intro="Your browser blocked the webcam. Allow access to scan your document — it takes 10 seconds."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="denied-illustration">
+                <svg viewBox="0 0 24 24" class="icon" style="width:40px;height:40px"><use href="#i-camera-off"/></svg>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <span class="ch-icon"><svg viewBox="0 0 24 24" class="icon"><use href="#i-settings"/></svg></span>
+                  <span class="ch-label">How to enable</span>
+                </div>
+                <div class="perm-steps">
+                  <div class="ps-row">
+                    <span class="ps-num">1</span>
+                    <span class="ps-text">Click the <b>🔒 lock icon</b> in your browser's address bar</span>
+                  </div>
+                  <div class="ps-row">
+                    <span class="ps-num">2</span>
+                    <span class="ps-text">Set <b>Camera</b> to <b>Allow</b></span>
+                  </div>
+                  <div class="ps-row">
+                    <span class="ps-num">3</span>
+                    <span class="ps-text">Come back here and click <b>Try again</b></span>
+                  </div>
+                </div>
+              </div>
+              <div class="privacy-note">
+                <svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-shield"/></svg>
+                <span>The camera is used only during scanning. Nothing is recorded.</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto="d-cam"><svg viewBox="0 0 24 24" class="icon"><use href="#i-rotate"/></svg> Try again</button>
+                <div style="display:flex;gap:18px">
+                  <button class="btn-ghost" style="color:var(--blue-500)" data-goto="d-qr"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-smartphone"/></svg> Continue on your phone instead</button>
+                  <button class="btn-ghost" data-goto="d-crop"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-upload"/></svg> Upload a file instead</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+
+      </div>
+    </div>
+
+    <!-- ═══ d-crop (front) — upload goes straight here from the native file picker ═══ -->
+    <div class="flow-screen" id="d-crop" data-label="Upload — crop &amp; confirm (front)" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 2 of 4"
+                 data-title="Check the {front} side"
+                 data-intro="Your photo is loaded — drag the corners so the document fills the frame."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="crop-stage">
+                <div class="mock-doc">
+                  <div class="photo"></div>
+                  <div class="lines"><span></span><span></span><span></span><span></span></div>
+                </div>
+                <div class="crop-frame"><i class="ch tl"></i><i class="ch tr"></i><i class="ch bl"></i><i class="ch br"></i></div>
+              </div>
+              <div class="crop-zoom">
+                <span class="cz-sign">−</span>
+                <span class="cz-track"><i></i><b></b></span>
+                <span class="cz-sign">+</span>
+              </div>
+              <div class="cam-hint-row">
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-maximize"/></svg> All corners visible</span>
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-eye-off"/></svg> No glare</span>
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg> Text readable</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto="d-crop-back">Confirm front side <svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></button>
+                <div style="display:flex;gap:18px">
+                  <button class="btn-ghost"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-upload"/></svg> Choose a different file</button>
+                  <button class="btn-ghost" style="color:var(--blue-500)" data-goto="d-cam"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-camera"/></svg> Use the webcam instead</button>
+                </div>
+                <span class="sim-note">in the real app "Upload a file" opens the native file picker directly — this screen appears once a photo is chosen (one file per side · PhotoUpload + ImageCropper)</span>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 2 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:45%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Uploading a file</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-file"/></svg></span><span><span class="vt-title" style="display:block">Use an original photo</span><span class="vt-desc">Sharp and well lit, straight from your camera — screenshots and photocopies are usually rejected.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-id-card"/></svg></span><span><span class="vt-title" style="display:block">One file per side</span><span class="vt-desc">ID cards need a separate photo of the back — we’ll ask for it next.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-crop-back ═══ -->
+    <div class="flow-screen" id="d-crop-back" data-label="Upload — crop &amp; confirm (back)" style="flex:1">
+      <div class="desktop-shell with-rail" style="min-height:0;flex:1">
+        <aside class="sidebar" data-sidebar data-active="guests"></aside>
+
+        <main class="desk-page">
+          <button class="back-pill" data-back><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back</button>
+          <div class="desk-col" style="max-width:560px">
+            <div class="page-head" style="padding:0 0 4px" data-page-head
+                 data-kicker="Registration · Step 2 of 4"
+                 data-title="Now the {back} side"
+                 data-intro="Front side saved ✓ — pick one more file and adjust the frame the same way."></div>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+              <div class="crop-stage">
+                <div class="mock-doc">
+                  <div class="lines"><span></span><span></span><span></span><span></span></div>
+                </div>
+                <div class="crop-frame"><i class="ch tl"></i><i class="ch tr"></i><i class="ch bl"></i><i class="ch br"></i></div>
+              </div>
+              <div class="crop-zoom">
+                <span class="cz-sign">−</span>
+                <span class="cz-track"><i></i><b></b></span>
+                <span class="cz-sign">+</span>
+              </div>
+              <div class="cam-hint-row">
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-maximize"/></svg> All corners visible</span>
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-eye-off"/></svg> No glare</span>
+                <span class="cam-hint-lite"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-sun"/></svg> Text readable</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                <button class="btn btn-primary btn-block" data-goto="d-selfie">Confirm back side <svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></button>
+                <div style="display:flex;gap:18px">
+                  <button class="btn-ghost"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-upload"/></svg> Choose a different file</button>
+                  <button class="btn-ghost" style="color:var(--blue-500)" data-goto="d-cam"><svg viewBox="0 0 24 24" class="icon icon-sm" style="vertical-align:-3px"><use href="#i-camera"/></svg> Use the webcam instead</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="vela-rail">
+          <div class="vela-head">
+            <div class="vela-avatar"><svg viewBox="0 0 24 24" class="icon" style="fill:#fff;stroke:none"><use href="#i-sparkle-fill"/></svg></div>
+            <div>
+              <div class="vela-name">Vela</div>
+              <div class="vela-status"><span style="width:6px;height:6px;border-radius:50%;background:var(--green-600)"></span> Here to help</div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Your verification</div>
+            <div class="vela-progress" style="margin-top:10px">
+              <div class="vp-row"><span class="vp-title">Guest registration</span><span class="vp-count">Step 2 of 4</span></div>
+              <div class="vp-track"><div class="vp-fill" style="width:45%"></div></div>
+              <div class="vela-steps">
+                <div class="vs done"><span class="vs-dot"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-check"/></svg></span> Choose your document</div>
+                <div class="vs active"><span class="vs-dot"></span> Scan your document</div>
+                <div class="vs todo"><span class="vs-dot"></span> Selfie & liveness</div>
+                <div class="vs todo"><span class="vs-dot"></span> Confirm details</div>
+              </div>
+            </div>
+          </div>
+          <div class="vela-section">
+            <div class="vela-eyebrow">Uploading a file</div>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-file"/></svg></span><span><span class="vt-title" style="display:block">Use an original photo</span><span class="vt-desc">Sharp and well lit, straight from your camera — screenshots and photocopies are usually rejected.</span></span></div>
+              <div class="vela-tip"><span class="vt-icon"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-id-card"/></svg></span><span><span class="vt-title" style="display:block">One file per side</span><span class="vt-desc">ID cards need a separate photo of the back — we’ll ask for it next.</span></span></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ═══ d-complete ═══ -->
+    <div class="flow-screen" id="d-complete" data-label="Verification complete" style="flex:1">
+      <div class="done-panel">
+        <div class="done-ring">
+          <svg viewBox="0 0 24 24" class="icon" style="width:50px;height:50px;stroke-width:2.6;color:#fff"><use href="#i-check"/></svg>
+        </div>
+        <div style="font-size:24px;font-weight:700;letter-spacing:-0.015em;color:var(--navy);margin-top:26px">You're verified!</div>
+        <p style="font-size:14px;line-height:22px;color:var(--text-secondary);margin-top:10px;max-width:380px">Identity verification is completed. Your details were pre-filled from your document — just confirm them in the next step.</p>
+        <div style="display:flex;gap:12px;margin-top:28px">
+          <a class="btn btn-primary" href="flow-registration.html">Confirm my details <svg viewBox="0 0 24 24" class="icon"><use href="#i-arrow-right"/></svg></a>
+          <button class="btn btn-outline" data-restart>Restart this flow</button>
+        </div>
+      </div>
+    </div>
+
+<div class="proto-modal" id="m-share"><div class="pm-scrim"></div><div class="pm-card"><button class="pm-close" data-modal-close>✕</button><div class="pm-title">Share booking link</div><div class="pm-desc">Anyone with this link can register guests for booking <b style="color:var(--navy)">CHK-58291</b>. It stops working after check-in.</div><div class="pm-link">guest.chekin.com/r/chk-58291<button class="pm-copy"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copy</button></div><div class="pm-share-grid"><button class="pm-share-opt"><span class="so-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span> WhatsApp</button><button class="pm-share-opt"><span class="so-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span> Email</button><button class="pm-share-opt"><span class="so-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg></span> More</button></div></div></div>
+<div class="proto-modal" id="m-privacy"><div class="pm-scrim"></div><div class="pm-card"><button class="pm-close" data-modal-close>✕</button><div class="pm-title">How we treat your photos</div><div class="pm-desc">Identity photos are required by local law — here is exactly what happens to them.</div><div class="pm-list"><div class="pl-row"><span class="pl-ic"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><span><b>Encrypted end to end.</b> In transit and at rest — nobody at the property sees the raw images.</span></div><div class="pl-row"><span class="pl-ic"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M14 9h5"/><path d="M14 13h4"/></svg></span><span><b>Used only for this verification.</b> Matching your face to your document, nothing else.</span></div><div class="pl-row"><span class="pl-ic"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></span><span><b>Deleted after your stay.</b> Removed automatically per GDPR retention rules.</span></div><div class="pl-row"><span class="pl-ic"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span><span><b>Never shared</b> — except with authorities where the law requires guest registration.</span></div></div><div class="pm-actions"><button class="btn btn-primary" data-modal-close>Got it</button></div></div></div>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="i-home"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></g>
+    <g id="i-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g>
+    <g id="i-credit-card"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></g>
+    <g id="i-shield"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></g>
+    <g id="i-coins"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></g>
+    <g id="i-key"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></g>
+    <g id="i-book-open"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></g>
+    <g id="i-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></g>
+    <g id="i-arrow-left"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></g>
+    <g id="i-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></g>
+    <g id="i-arrow-up"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></g>
+    <g id="i-chevron-down"><path d="m6 9 6 6 6-6"/></g>
+    <g id="i-chevron-right"><path d="m9 18 6-6-6-6"/></g>
+    <g id="i-globe"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></g>
+    <g id="i-camera"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></g>
+    <g id="i-smartphone"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></g>
+    <g id="i-zap"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></g>
+    <g id="i-check"><path d="M20 6 9 17l-5-5"/></g>
+    <g id="i-lock-sm"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g>
+    <g id="i-sparkle-fill"><path d="M9.9 3.6a.75.75 0 0 1 1.4 0l1.2 3.2a2 2 0 0 0 1.2 1.2l3.2 1.2a.75.75 0 0 1 0 1.4l-3.2 1.2a2 2 0 0 0-1.2 1.2l-1.2 3.2a.75.75 0 0 1-1.4 0l-1.2-3.2a2 2 0 0 0-1.2-1.2l-3.2-1.2a.75.75 0 0 1 0-1.4l3.2-1.2a2 2 0 0 0 1.2-1.2z"/><path d="M19 3v4M21 5h-4M5 17v2M6 18H4"/></g>
+    <g id="i-share"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></g>
+    <g id="i-help"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></g>
+    <g id="i-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></g>
+    <g id="i-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></g>
+    <g id="i-eye-off"><path d="M10.7 5.1A9.6 9.6 0 0 1 12 5c7 0 10 7 10 7a13.2 13.2 0 0 1-1.7 2.7"/><path d="M6.6 6.6A13.5 13.5 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="m2 2 20 20"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></g>
+    <g id="i-maximize"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></g>
+    <linearGradient id="dOvalGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#385bf8"/><stop offset="100%" stop-color="#8ca5ff"/></linearGradient>
+    <g id="i-id-card"><rect width="20" height="14" x="2" y="5" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M8 15c-1.5 0-2.5.5-3 1.5"/><path d="M8 15c1.5 0 2.5.5 3 1.5"/><path d="M14 9h5"/><path d="M14 13h4"/></g>
+    <g id="i-book"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></g>
+    <g id="i-car"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></g>
+    <g id="i-scan-face"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></g>
+    <g id="i-eye"><path d="M2.06 12.35a1 1 0 0 1 0-.7C3.42 8.1 7.28 5 12 5s8.58 3.1 9.94 6.65a1 1 0 0 1 0 .7C20.58 15.9 16.72 19 12 19s-8.58-3.1-9.94-6.65"/><circle cx="12" cy="12" r="3"/></g>
+    <g id="i-flip"><path d="M3 8h13a4 4 0 0 1 4 4v1"/><path d="m7 4-4 4 4 4"/><path d="M21 16H8a4 4 0 0 1-4-4v-1"/><path d="m17 20 4-4-4-4"/></g>
+    <g id="i-alert-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></g>
+    <g id="i-rotate"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></g>
+    <g id="i-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g>
+    <g id="i-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></g>
+    <g id="i-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></g>
+    <g id="i-camera-off"><line x1="2" x2="22" y1="2" y2="22"/><path d="M7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16"/><path d="M9.5 4h5L17 7h3a2 2 0 0 1 2 2v7.5"/><path d="M14.121 15.121A3 3 0 1 1 9.88 10.88"/></g>
+    <g id="i-mail"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></g>
+    <g id="i-pen-line"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></g>
+    <g id="i-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></g>
+    <g id="i-file"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></g>
+  </defs>
+</svg>
+<script src="modals.js" defer></script>
+<script src="flow.js" defer></script>
+<script src="chrome.js" defer></script>
+<script src="nav.js" defer></script>
+</body>
+</html>
