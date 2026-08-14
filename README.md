@@ -2,7 +2,7 @@
 
 Static HTML/CSS mockups (no build, no app logic, mock data) of redesigned Chekin surfaces, layered on top of the existing `@chekinapp/tokens` design system.
 
-Four prototypes live here, behind a common chooser at the root `index.html` ([GitHub Pages](https://vlad-svr.github.io/guestapp-redesign-prototypes/)):
+Four prototypes live here, behind a common chooser at the root `index.html` ([GitHub Pages](https://invibeme.github.io/chekin-prototypes/)):
 
 - **`dashboard-deprecated/`** — _(deprecated)_ the first host-side dashboard redesign: action-queue Home, bookings pipeline with clickable KPI filters, table-based properties, property workspace and workspace settings with separated views, unified documents hub, billing, 7 switchable design variants. See `dashboard-deprecated/UX-AUDIT.md` for the audit and "what changed and why". Kept for reference — a new dashboard prototype is being built on the Fable design and will supersede it.
 - **`guestapp/`** — the guest-side Redesign 2.0 flows. See **[`guestapp/README.md`](guestapp/README.md)** for the file-by-file index and the ground rules, and **[`guestapp/SPEC.md`](guestapp/SPEC.md)** for the flow spec.
