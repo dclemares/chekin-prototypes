@@ -134,6 +134,22 @@
   .captcha .okmark svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3.4}
   .captcha.ok .okmark{display:grid}
   .captcha .cf{margin-left:auto;font:700 10px var(--font-primary);letter-spacing:.05em;color:var(--text-gray-medium)}
+  /* Compact variant: no chrome, sits under the CTA as a status line */
+  .captcha.compact{border:none;background:none;padding:10px 0 0;margin:0;justify-content:center;gap:8px;font-size:12px}
+  .captcha.compact .cf{margin-left:0}
+  .captcha.compact .spin,.captcha.compact .okmark{width:14px;height:14px}
+  .captcha.compact .okmark svg{width:8px;height:8px}
+
+  /* Authentication failure — distinct from per-field validation */
+  .authbanner{display:none;align-items:flex-start;gap:9px;border:1.5px solid rgba(255,36,103,.28);background:rgba(255,36,103,.06);border-radius:10px;padding:11px 13px;margin:0 0 16px;font:500 13px/18px var(--font-primary);color:var(--text-danger)}
+  .authbanner.on{display:flex;animation:shake .32s ease}
+  .authbanner svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;flex-shrink:0;margin-top:1px}
+  @keyframes shake{10%,90%{transform:translateX(-1px)}30%,70%{transform:translateX(2px)}50%{transform:translateX(-2px)}}
+
+  .remember{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--font-primary);color:var(--text-gray-dark);cursor:pointer;user-select:none}
+  .remember input{width:16px;height:16px;accent-color:var(--text-brand);cursor:pointer;margin:0}
+
+  .btn.primary.loading{pointer-events:none;opacity:.85}
 
   /* OTP */
   .otp{display:flex;gap:10px;margin:2px 0 4px}
@@ -244,7 +260,8 @@
     .topalt{padding:14px 20px 0;font-size:12.5px}
     h1{font:700 24px/31px var(--font-primary)}
     .lead{font:400 14px/20px var(--font-primary);margin-bottom:24px}
-    .screen{justify-content:flex-start}
+    /* Centre what little there is instead of stranding the CTA below a gap */
+    .screen{justify-content:center}
     /* The card's chrome costs ~56px of a 375px screen — drop it and let the
        form run full-bleed. Boxed and Plain converge here by design. */
     .screen.boxed{align-items:stretch;text-align:left;justify-content:flex-start;padding-bottom:0;max-width:none;margin:0}
@@ -328,34 +345,45 @@
             Log in with Google
           </button>
           <div class="or">or log in with email</div>
-          <div class="field">
-            <div class="fs">
-              <input id="li-email" type="email" placeholder="name@company.com" autocomplete="username">
-              <fieldset><legend><span>Email</span></legend></fieldset>
-              <label for="li-email">Email</label>
+          <!-- A real form: Enter submits, password managers recognise the save,
+               and mobile keyboards show "Go" instead of a newline. -->
+          <form id="li-form" novalidate>
+            <p class="authbanner" id="li-banner" role="alert">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+              <span id="li-banner-text"></span>
+            </p>
+            <div class="field" id="li-email-field">
+              <div class="fs">
+                <input id="li-email" type="email" placeholder="name@company.com" autocomplete="username" autofocus>
+                <fieldset><legend><span>Email</span></legend></fieldset>
+                <label for="li-email">Email</label>
+              </div>
+              <p class="err" id="li-email-err">Enter a valid email address.</p>
             </div>
-          </div>
-          <div class="field">
-            <div class="fs has-eye">
-              <input id="li-pass" type="password" placeholder="Enter password" autocomplete="current-password">
-              <fieldset><legend><span>Password</span></legend></fieldset>
-              <label for="li-pass">Password</label>
-              <button class="eye" data-eye="li-pass" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <div class="field" id="li-pass-field">
+              <div class="fs has-eye">
+                <input id="li-pass" type="password" placeholder="Enter password" autocomplete="current-password">
+                <fieldset><legend><span>Password</span></legend></fieldset>
+                <label for="li-pass">Password</label>
+                <button class="eye" data-eye="li-pass" type="button" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              </div>
+              <p class="err" id="li-pass-err">Enter your password.</p>
             </div>
-          </div>
-          <div class="row-between">
-            <span></span>
-            <button class="linklike" data-go="recovery">Forgot password?</button>
-          </div>
-          <div class="captcha" id="captcha">
-            <span class="spin"></span>
-            <span class="okmark"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
-            <span class="ct">Verifying…</span>
-            <span class="cf">CLOUDFLARE</span>
-          </div>
-          <div class="cta">
-            <button class="btn primary block" id="li-submit" disabled>Login</button>
-          </div>
+            <div class="row-between">
+              <label class="remember"><input type="checkbox" id="li-remember" checked>Keep me signed in</label>
+              <button class="linklike" type="button" data-go="recovery">Forgot password?</button>
+            </div>
+            <div class="cta">
+              <button class="btn primary block" id="li-submit" type="submit">Login</button>
+            </div>
+            <!-- Turnstile resolves itself; it earns a line, not a boxed row. -->
+            <div class="captcha compact" id="captcha">
+              <span class="spin"></span>
+              <span class="okmark"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <span class="ct">Verifying…</span>
+              <span class="cf">CLOUDFLARE</span>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -628,6 +656,10 @@
       r.classList.toggle('on', r.getAttribute('data-railmode') === mode);
     });
     document.getElementById('topalt').style.display = mode === 'auth' ? 'flex' : 'none';
+    /* Nobody arrives here to read — put the caret where the typing starts.
+       The markup's autofocus never fires because the screen is hidden at parse. */
+    var firstField = target.querySelector('input:not([type=checkbox]):not([type=hidden])');
+    if (firstField && !firstField.value) setTimeout(function () { firstField.focus(); }, 0);
     if (mode === 'register') {
       var done = id === 'r-welcome';
       var accountStep = document.querySelector('.rstep[data-rail="account"]');
@@ -690,22 +722,65 @@
   var liEmail = document.getElementById('li-email');
   var liPass = document.getElementById('li-pass');
   var liSubmit = document.getElementById('li-submit');
+  var liForm = document.getElementById('li-form');
+  var liBanner = document.getElementById('li-banner');
+  var liBannerText = document.getElementById('li-banner-text');
+  var liEmailField = document.getElementById('li-email-field');
+  var liPassField = document.getElementById('li-pass-field');
   var captchaOk = false;
   setTimeout(function () {
     captcha.classList.add('ok');
     captcha.querySelector('.ct').textContent = 'Success';
     captchaOk = true;
-    updateLogin();
   }, 1400);
-  function updateLogin() {
-    liSubmit.disabled = !(validEmail(liEmail.value) && liPass.value.length > 0 && captchaOk);
+
+  /* The button stays enabled. A dead grey button tells you something is wrong
+     but never which of the three things it is; validating on submit can. */
+  function clearLoginErrors() {
+    liEmailField.classList.remove('invalid');
+    liPassField.classList.remove('invalid');
+    liBanner.classList.remove('on');
   }
-  liEmail.addEventListener('input', updateLogin);
-  liPass.addEventListener('input', updateLogin);
-  liSubmit.addEventListener('click', function () {
-    state.email = liEmail.value.trim();
-    show('twofactor');
-    otpInputs[0].focus();
+  liEmail.addEventListener('input', function () { liEmailField.classList.remove('invalid'); liBanner.classList.remove('on'); });
+  liPass.addEventListener('input', function () { liPassField.classList.remove('invalid'); liBanner.classList.remove('on'); });
+
+  function failLogin(msg) {
+    liBannerText.textContent = msg;
+    liBanner.classList.add('on');
+    liSubmit.classList.remove('loading');
+    liSubmit.textContent = 'Login';
+  }
+
+  liForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    clearLoginErrors();
+
+    var okEmail = validEmail(liEmail.value);
+    var okPass = liPass.value.length > 0;
+    if (!okEmail) liEmailField.classList.add('invalid');
+    if (!okPass) liPassField.classList.add('invalid');
+    if (!okEmail || !okPass) { (okEmail ? liPass : liEmail).focus(); return; }
+
+    if (!captchaOk) { failLogin('Still verifying you are human — try again in a moment.'); return; }
+
+    liSubmit.classList.add('loading');
+    liSubmit.textContent = 'Signing in…';
+    setTimeout(function () {
+      /* Prototype stand-in for the credential check: anything under 8
+         characters comes back as a rejection, so the failure state is
+         reachable without a backend. */
+      if (liPass.value.length < 8) {
+        failLogin('Incorrect email or password. Check them and try again.');
+        liPass.select();
+        return;
+      }
+      liSubmit.classList.remove('loading');
+      liSubmit.textContent = 'Login';
+      state.email = liEmail.value.trim();
+      state.remember = document.getElementById('li-remember').checked;
+      show('twofactor');
+      otpInputs[0].focus();
+    }, 650);
   });
   var liGoogle = document.getElementById('li-google');
   liGoogle.addEventListener('click', function () {
