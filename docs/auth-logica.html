@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Lógica de las siete pantallas de autenticación de Chekin y los grafos de navegación entre ellas.">
+<meta name="description" content="How Chekin's seven authentication screens work, and the navigation graphs between them.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%94%90</text></svg>">
-<title>Chekin · Lógica del flujo de autenticación</title>
+<title>Chekin · How the authentication flow works</title>
 
 <style>
   :root{
@@ -150,55 +150,54 @@
 <div class="wrap">
 
   <header>
-    <p class="kicker">Chekin · Prototipo de acceso</p>
-    <h1>Lógica del flujo de autenticación</h1>
+    <p class="kicker">Chekin · Sign-in prototype</p>
+    <h1>How the authentication flow works</h1>
     <p class="standfirst">
-      Siete pantallas que se comportan como un grafo, no como una secuencia. Todo el bloque
-      cuelga de una sola decisión —qué resuelve la dirección de correo— y de una regla que se
-      repite en cada pantalla: nunca revelar si una cuenta existe hasta que alguien demuestre
-      que es suya.
+      Seven screens that behave like a graph, not a sequence. The whole block hangs off a single
+      decision — what the email address turns out to be — and off one rule repeated everywhere:
+      never confirm that an account exists until someone has proved it is theirs.
     </p>
   </header>
 
-  <!-- ─────────── La decisión ─────────── -->
+  <!-- ─────────── The decision ─────────── -->
   <section>
-    <h2>La decisión que manda</h2>
+    <h2>The decision everything hangs off</h2>
     <p class="sec-note">
-      El correo se escribe una vez. Lo que pase después no lo elige el usuario: lo determina en
-      qué estado está esa dirección. Son tres, y son excluyentes.
+      The address is typed once. What happens next is not the user's choice — it is determined by
+      the state that address is in. There are three, and they are mutually exclusive.
     </p>
     <div class="states">
       <div class="state">
         <span class="tag">No account</span>
-        <h3>No existe</h3>
-        <p>Nadie ha registrado esa dirección. El camino es crear la cuenta, no reintentar el acceso.</p>
+        <h3>Does not exist</h3>
+        <p>Nobody has registered it. The way forward is creating the account, not retrying the sign-in.</p>
       </div>
       <div class="state">
         <span class="tag">Has account</span>
-        <h3>Existe con contraseña</h3>
-        <p>Se creó por email. La contraseña es la única llave; el proveedor externo no la abre.</p>
+        <h3>Exists, with a password</h3>
+        <p>Created by email. The password is the only key; the provider does not open it.</p>
       </div>
       <div class="state">
         <span class="tag">Google only</span>
-        <h3>Existe sin contraseña</h3>
-        <p>Se creó con Google. No hay contraseña que pedir, así que pedirla sería mentir.</p>
+        <h3>Exists, no password</h3>
+        <p>Created with Google. There is no password to ask for, so asking for one would be a lie.</p>
       </div>
     </div>
   </section>
 
-  <!-- ─────────── Figura 1 ─────────── -->
+  <!-- ─────────── Figure 1 ─────────── -->
   <section>
-    <h2>Una puerta, tres salidas</h2>
+    <h2>One door, three ways out</h2>
     <p class="sec-note">
-      Email y Google son dos formas de identificar a la misma persona, así que ramifican por el
-      mismo valor. Antes no: el botón de Google entraba al panel pasara lo que pasara, y dos de
-      los tres estados eran inalcanzables por esa vía.
+      Email and Google are two ways of identifying the same person, so they branch on the same
+      value. They did not before: the Google button went to the dashboard whatever the address
+      turned out to be, which left two of the three states unreachable through it.
     </p>
 
     <figure>
       <div class="canvas">
         <svg viewBox="0 0 720 330" role="img"
-             aria-label="El paso de identificación resuelve la dirección en tres estados. Sin cuenta lleva al registro; con cuenta y contraseña lleva a la etapa de contraseña y de ahí al doble factor; solo Google lleva a la pantalla sso-only. Email y Google entran por la misma decisión.">
+             aria-label="The identification step resolves the address into three states. No account leads to registration; an account with a password leads to the password stage and then two-factor; a Google-only account leads to the sso-only screen. Email and Google enter through the same decision.">
           <defs>
             <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
@@ -209,61 +208,61 @@
           </defs>
 
           <rect x="10" y="138" width="140" height="40" rx="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
-          <text x="80" y="163" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">Escribe el email</text>
+          <text x="80" y="163" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">Types the email</text>
 
           <rect x="10" y="218" width="140" height="40" rx="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
-          <text x="80" y="243" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">Pulsa Google</text>
+          <text x="80" y="243" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">Presses Google</text>
 
           <path d="M150 158 L186 158" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
           <path d="M150 238 L172 238 L172 168 L186 168" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
 
           <rect x="190" y="128" width="146" height="62" rx="10" fill="#385CF8" stroke="#385CF8"/>
-          <text x="263" y="152" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">¿Qué es esta</text>
-          <text x="263" y="170" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">dirección?</text>
+          <text x="263" y="152" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">What is this</text>
+          <text x="263" y="170" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">address?</text>
 
           <path d="M336 148 L372 148 L372 68 L516 68" fill="none" stroke="#385CF8" stroke-width="1.6" marker-end="url(#arB)"/>
-          <text x="446" y="59" text-anchor="middle" font-size="11" font-weight="600" fill="#385CF8">no existe</text>
+          <text x="446" y="59" text-anchor="middle" font-size="11" font-weight="600" fill="#385CF8">no account</text>
 
           <path d="M336 158 L516 158" fill="none" stroke="#385CF8" stroke-width="1.6" marker-end="url(#arB)"/>
-          <text x="446" y="149" text-anchor="middle" font-size="11" font-weight="600" fill="#385CF8">con contraseña</text>
+          <text x="446" y="149" text-anchor="middle" font-size="11" font-weight="600" fill="#385CF8">has a password</text>
 
           <path d="M336 168 L372 168 L372 262 L516 262" fill="none" stroke="#385CF8" stroke-width="1.6" marker-end="url(#arB)"/>
-          <text x="446" y="253" text-anchor="middle" font-size="11" font-weight="600" fill="#385CF8">solo Google</text>
+          <text x="446" y="253" text-anchor="middle" font-size="11" font-weight="600" fill="#385CF8">Google only</text>
 
           <rect x="520" y="48" width="188" height="40" rx="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
           <text x="614" y="73" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">#r-account</text>
-          <text x="614" y="104" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".62">crear la cuenta</text>
+          <text x="614" y="104" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".62">create the account</text>
 
           <rect x="520" y="138" width="188" height="40" rx="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
-          <text x="614" y="163" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">Contraseña</text>
-          <text x="614" y="194" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".62">luego #twofactor, luego el panel</text>
+          <text x="614" y="163" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">Password</text>
+          <text x="614" y="194" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".62">then #twofactor, then the dashboard</text>
 
           <rect x="520" y="242" width="188" height="40" rx="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
           <text x="614" y="267" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">#sso-only</text>
-          <text x="614" y="298" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".62">entra con el proveedor</text>
+          <text x="614" y="298" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".62">signs in with the provider</text>
         </svg>
       </div>
       <figcaption>
-        Los dos métodos de entrada convergen en la misma pregunta antes de ramificar. La única
-        asimetría: si pulsas Google en una cuenta creada con contraseña, el flujo te deja en el
-        campo de contraseña con un aviso, en vez de fallar sin explicación.
+        Both ways in converge on the same question before anything branches. The one asymmetry:
+        press Google on an account made with a password and the flow drops you into the password
+        field with a notice, rather than failing without explanation.
       </figcaption>
     </figure>
   </section>
 
-  <!-- ─────────── Figura 2 ─────────── -->
+  <!-- ─────────── Figure 2 ─────────── -->
   <section>
-    <h2>La cadena de recuperación</h2>
+    <h2>The recovery chain</h2>
     <p class="sec-note">
-      Cuatro pantallas encadenadas por un correo que sale de la aplicación y vuelve. El usuario
-      abandona el navegador a mitad de camino, y esa interrupción explica casi todas las
-      decisiones de estas pantallas.
+      Four screens linked by an email that leaves the app and comes back. The user abandons the
+      browser halfway through, and that interruption explains almost every decision on these
+      screens.
     </p>
 
     <figure>
       <div class="canvas">
         <svg viewBox="0 0 760 268" role="img"
-             aria-label="Recovery envía siempre a check-email escribas lo que escribas. Check-email lleva al correo del usuario, que trae de vuelta a reset mediante un enlace que caduca en 30 minutos. Reset lleva a reset-success, que devuelve al login con la dirección ya puesta. Reset-success también ofrece volver a recovery si el restablecimiento no fue cosa tuya.">
+             aria-label="Recovery always leads to check-email whatever is typed. Check-email sends the user to their inbox, which brings them back to reset through a link that expires in 30 minutes. Reset leads to reset-success, which returns to login with the address already filled in. Reset-success also offers a way back to recovery if the reset was not requested by the account owner.">
           <defs>
             <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
@@ -277,50 +276,47 @@
           <text x="73" y="112" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">#recovery</text>
 
           <line x1="136" y1="107" x2="192" y2="107" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
-          <text x="164" y="99" text-anchor="middle" font-size="10" fill="currentColor">siempre</text>
+          <text x="164" y="99" text-anchor="middle" font-size="10" fill="currentColor">always</text>
 
           <rect x="196" y="86" width="132" height="42" rx="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
           <text x="262" y="112" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">#check-email</text>
 
-          <!-- salida al correo y vuelta -->
           <path d="M262 86 C 262 34, 350 34, 350 34" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3"/>
           <rect x="354" y="14" width="104" height="40" rx="9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="4 3"/>
-          <text x="406" y="39" text-anchor="middle" font-size="11.5" fill="currentColor">Su bandeja</text>
+          <text x="406" y="39" text-anchor="middle" font-size="11.5" fill="currentColor">Their inbox</text>
           <path d="M458 34 C 470 34, 470 86, 470 86" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#ar2)"/>
-          <text x="524" y="62" text-anchor="middle" font-size="10" fill="currentColor">enlace · 30 min</text>
+          <text x="524" y="62" text-anchor="middle" font-size="10" fill="currentColor">link · 30 min</text>
 
           <rect x="404" y="86" width="126" height="42" rx="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
           <text x="467" y="112" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">#reset</text>
 
           <line x1="530" y1="107" x2="586" y2="107" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
-          <text x="558" y="99" text-anchor="middle" font-size="10" fill="currentColor">4 reglas</text>
+          <text x="558" y="99" text-anchor="middle" font-size="10" fill="currentColor">4 rules</text>
 
           <rect x="590" y="86" width="158" height="42" rx="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
           <text x="669" y="112" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">#reset-success</text>
 
-          <!-- vuelta al login -->
           <path d="M669 128 C 669 182, 73 182, 73 128" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
-          <text x="371" y="199" text-anchor="middle" font-size="10.5" fill="currentColor">Log in · vuelve a #login con la dirección puesta</text>
+          <text x="371" y="199" text-anchor="middle" font-size="10.5" fill="currentColor">Log in · back to #login with the address filled in</text>
 
-          <!-- si no fuiste tú -->
           <path d="M620 128 C 560 236, 140 236, 76 132" fill="none" stroke="#C8394F" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#ar2s)"/>
-          <text x="348" y="255" text-anchor="middle" font-size="10.5" font-weight="600" fill="#C8394F">si no fuiste tú · vuelve a empezar</text>
+          <text x="348" y="255" text-anchor="middle" font-size="10.5" font-weight="600" fill="#C8394F">if that wasn't you · start over</text>
         </svg>
       </div>
       <figcaption>
-        El tramo discontinuo ocurre fuera de la aplicación: por eso <code>#check-email</code> ofrece
-        abrir la bandeja y <code>#reset</code> nombra la cuenta —llegas desde otro dispositivo y
-        necesitas saber qué estás cambiando.
+        The dashed leg happens outside the app. That is why <code>#check-email</code> offers to open
+        the inbox and <code>#reset</code> names the account — you arrive from another device and
+        need to know what you are changing.
       </figcaption>
     </figure>
   </section>
 
-  <!-- ─────────── Pantalla a pantalla ─────────── -->
+  <!-- ─────────── Screen by screen ─────────── -->
   <section>
-    <h2>Pantalla a pantalla</h2>
+    <h2>Screen by screen</h2>
     <p class="sec-note">
-      Cada bloque recoge qué hace la pantalla, en qué se bifurca y por dónde se sale. El
-      identificador es el fragmento real de la URL.
+      Each block covers what the screen does, what it branches on and where it leads. The
+      identifier is the real URL fragment.
     </p>
 
     <div class="screens">
@@ -329,37 +325,37 @@
       <article class="screen">
         <div class="head">
           <span class="hash">#login</span>
-          <h3>Entrada</h3>
-          <p class="role">Una sola puerta para entrar y para registrarse. Pide el correo y decide.</p>
+          <h3>The way in</h3>
+          <p class="role">One door for signing in and for signing up. Takes the email and decides.</p>
         </div>
         <div class="body">
           <div class="block">
-            <h4>Se bifurca en</h4>
+            <h4>Branches into</h4>
             <dl class="rules">
-              <div class="rule"><dt>no existe</dt><dd>Salta a <b>#r-account</b> con el correo ya escrito. Nunca se teclea dos veces.</dd></div>
-              <div class="rule"><dt>con contraseña</dt><dd>Revela el campo de contraseña <b>en la misma pantalla</b>, sin navegar. El gestor de contraseñas no pierde el hilo.</dd></div>
-              <div class="rule"><dt>solo Google</dt><dd>Va a <b>#sso-only</b>. No pide una contraseña que no existe.</dd></div>
+              <div class="rule"><dt>no account</dt><dd>Jumps to <b>#r-account</b> with the address carried across. It is never typed twice.</dd></div>
+              <div class="rule"><dt>has a password</dt><dd>Reveals the password field <b>in place</b>, with no navigation, so password managers keep up.</dd></div>
+              <div class="rule"><dt>Google only</dt><dd>Goes to <b>#sso-only</b>. It does not ask for a password that does not exist.</dd></div>
             </dl>
           </div>
           <div class="block">
-            <h4>Al revelar la contraseña</h4>
+            <h4>Once the password shows</h4>
             <ul class="plain">
-              <li>Desaparecen el botón de Google y su separador: esa cuenta <b>no se abre con el proveedor</b>, así que ofrecerlo lleva por la vía equivocada.</li>
-              <li>Desaparece el aviso legal. Quien ya tiene cuenta <b>no acepta términos otra vez</b> por escribir su contraseña.</li>
-              <li>La dirección queda como ficha con acción <b>Change</b>, corregible sin volver a empezar.</li>
+              <li>The Google button and its divider stand down: that account <b>is not opened by the provider</b>, so offering it leads down the wrong path.</li>
+              <li>The terms line goes too. Someone who already has an account <b>is not accepting terms again</b> by typing their password.</li>
+              <li>The address stays as a chip with a <b>Change</b> action, correctable without starting over.</li>
             </ul>
           </div>
           <p class="note">
-            <b>Enumeración de cuentas:</b> este es el punto donde el sistema revela si una dirección
-            está registrada. Es la contrapartida del patrón, y conviene cerrarla con quien lleve
-            seguridad antes de producción.
+            <b>Account enumeration:</b> this is the point where the system reveals whether an address
+            is registered. It is the trade-off the pattern carries, and worth settling with whoever
+            owns security before production.
           </p>
           <div class="block">
-            <h4>Sale hacia</h4>
+            <h4>Leads to</h4>
             <div class="exits">
-              <span class="exit"><span class="to">#r-account</span> sin cuenta</span>
-              <span class="exit"><span class="to">#sso-only</span> solo Google</span>
-              <span class="exit good"><span class="to">#twofactor</span> contraseña correcta</span>
+              <span class="exit"><span class="to">#r-account</span> no account</span>
+              <span class="exit"><span class="to">#sso-only</span> Google only</span>
+              <span class="exit good"><span class="to">#twofactor</span> password correct</span>
               <span class="exit"><span class="to">#recovery</span> Forgot password</span>
             </div>
           </div>
@@ -370,23 +366,23 @@
       <article class="screen">
         <div class="head">
           <span class="hash">#sso-only</span>
-          <h3>Cuenta sin contraseña</h3>
-          <p class="role">La dirección existe pero se creó con Google. Explica por qué no hay contraseña que pedir.</p>
+          <h3>Account with no password</h3>
+          <p class="role">The address exists but was created with Google. Says why there is no password to ask for.</p>
         </div>
         <div class="body">
           <div class="block">
-            <h4>Por qué existe</h4>
+            <h4>Why it exists</h4>
             <ul class="plain">
-              <li>El registro ofrece Google, luego <b>estas cuentas existen</b>. Sin esta pantalla la única respuesta posible era un error de contraseña incorrecta sobre una contraseña que nunca se creó.</li>
-              <li>Nombra la dirección de la que habla, con acción <b>Change</b>.</li>
+              <li>Registration offers Google, so <b>these accounts exist</b>. Without this screen the only possible answer was a wrong-password error about a password that was never set.</li>
+              <li>Names the address it is talking about, with a <b>Change</b> action.</li>
             </ul>
           </div>
           <div class="block">
-            <h4>Sale hacia</h4>
+            <h4>Leads to</h4>
             <div class="exits">
-              <span class="exit good"><span class="to">Panel</span> continuar con Google</span>
-              <span class="exit"><span class="to">#recovery</span> perdió acceso a esa cuenta</span>
-              <span class="exit"><span class="to">#login</span> volver</span>
+              <span class="exit good"><span class="to">Dashboard</span> continue with Google</span>
+              <span class="exit"><span class="to">#recovery</span> lost access to that account</span>
+              <span class="exit"><span class="to">#login</span> back</span>
             </div>
           </div>
         </div>
@@ -396,26 +392,26 @@
       <article class="screen">
         <div class="head">
           <span class="hash">#twofactor</span>
-          <h3>Código de verificación</h3>
-          <p class="role">Segundo factor tras una contraseña correcta. Seis dígitos que llegan por correo.</p>
+          <h3>Verification code</h3>
+          <p class="role">Second factor after a correct password. Six digits, sent by email.</p>
         </div>
         <div class="body">
           <div class="block">
-            <h4>Comportamiento</h4>
+            <h4>Behaviour</h4>
             <dl class="rules">
-              <div class="rule"><dt>autoenvío</dt><dd>Al sexto dígito se envía solo. Buscar un botón después de teclear el código es un paso que sobra.</dd></div>
-              <div class="rule"><dt>one-time-code</dt><dd>La primera casilla lo declara: el móvil ofrece el código recibido sin cambiar de app.</dd></div>
-              <div class="rule"><dt>pegado</dt><dd>Pegar los seis dígitos en cualquier casilla los reparte por todas.</dd></div>
-              <div class="rule"><dt>navegación</dt><dd>Flechas entre casillas y borrado que limpia al retroceder. Corregir el tercer dígito no obliga a borrar el resto.</dd></div>
-              <div class="rule"><dt>código erróneo</dt><dd>Vacía las casillas y devuelve el foco a la primera.</dd></div>
-              <div class="rule"><dt>caducidad</dt><dd>10 minutos, dicho en pantalla. Es la razón de que un código correcto deje de servir.</dd></div>
+              <div class="rule"><dt>auto-submit</dt><dd>The sixth digit sends it. Reaching for a button after typing the code is a step nobody needs.</dd></div>
+              <div class="rule"><dt>one-time-code</dt><dd>Declared on the first box, so phones offer the code they just received without switching apps.</dd></div>
+              <div class="rule"><dt>paste</dt><dd>Pasting six digits into any box distributes them across all of them.</dd></div>
+              <div class="rule"><dt>navigation</dt><dd>Arrows move between boxes and backspace clears as it steps back. Fixing the third digit does not mean deleting the rest.</dd></div>
+              <div class="rule"><dt>wrong code</dt><dd>Clears the boxes and returns focus to the first.</dd></div>
+              <div class="rule"><dt>expiry</dt><dd>10 minutes, said on screen. It is the reason a correct code stops working.</dd></div>
             </dl>
           </div>
           <div class="block">
-            <h4>Sale hacia</h4>
+            <h4>Leads to</h4>
             <div class="exits">
-              <span class="exit good"><span class="to">Panel</span> código válido</span>
-              <span class="exit"><span class="to">#login</span> volver</span>
+              <span class="exit good"><span class="to">Dashboard</span> valid code</span>
+              <span class="exit"><span class="to">#login</span> back</span>
             </div>
           </div>
         </div>
@@ -425,23 +421,23 @@
       <article class="screen">
         <div class="head">
           <span class="hash">#recovery</span>
-          <h3>Solicitar enlace</h3>
-          <p class="role">Recoge la dirección a la que enviar el enlace de restablecimiento.</p>
+          <h3>Request a link</h3>
+          <p class="role">Takes the address the reset link should go to.</p>
         </div>
         <div class="body">
           <div class="block">
-            <h4>Comportamiento</h4>
+            <h4>Behaviour</h4>
             <ul class="plain">
-              <li><b>Misma respuesta siempre.</b> Escribas lo que escribas, va a <code>#check-email</code>. Si una cuenta existe o no, un formulario de recuperación no debería confirmárselo a quien lo rellena.</li>
-              <li>Llega con <b>el correo ya puesto</b> si vienes del login: acabas de escribirlo una pantalla antes.</li>
-              <li>Es un formulario real: <b>Enter envía</b>.</li>
+              <li><b>The same answer every time.</b> Whatever is typed, it goes to <code>#check-email</code>. Whether an account exists is not something a recovery form should confirm to whoever filled it in.</li>
+              <li>Arrives with <b>the address already filled</b> when you come from login — you typed it one screen ago.</li>
+              <li>It is a real form: <b>Enter submits</b>.</li>
             </ul>
           </div>
           <div class="block">
-            <h4>Sale hacia</h4>
+            <h4>Leads to</h4>
             <div class="exits">
-              <span class="exit"><span class="to">#check-email</span> siempre</span>
-              <span class="exit"><span class="to">#login</span> volver</span>
+              <span class="exit"><span class="to">#check-email</span> always</span>
+              <span class="exit"><span class="to">#login</span> back</span>
             </div>
           </div>
         </div>
@@ -451,24 +447,24 @@
       <article class="screen">
         <div class="head">
           <span class="hash">#check-email</span>
-          <h3>Correo enviado</h3>
-          <p class="role">Pantalla de espera. Su trabajo es sacar al usuario de aquí y llevarlo a su bandeja.</p>
+          <h3>Email sent</h3>
+          <p class="role">A waiting screen. Its job is to get the user out of here and into their inbox.</p>
         </div>
         <div class="body">
           <div class="block">
-            <h4>Comportamiento</h4>
+            <h4>Behaviour</h4>
             <dl class="rules">
-              <div class="rule"><dt>acción principal</dt><dd>Abre la bandeja. Si el dominio delata el proveedor lo <b>nombra y enlaza</b> —Gmail, Outlook, Yahoo, iCloud, Proton—; con dominios corporativos no adivina y delega en el sistema.</dd></div>
-              <div class="rule"><dt>reenvío</dt><dd>Con 30 s de espera. Sin ella el botón invita a machacarlo y cada pulsación es otro correo.</dd></div>
-              <div class="rule"><dt>orden</dt><dd>El aviso del spam va <b>antes</b> del reenvío: es lo barato que probar primero.</dd></div>
-              <div class="rule"><dt>caducidad</dt><dd>30 minutos, dicho aquí y no descubierto al volver.</dd></div>
+              <div class="rule"><dt>primary action</dt><dd>Opens the inbox. Where the domain gives the provider away it <b>names and links it</b> — Gmail, Outlook, Yahoo, iCloud, Proton; for work domains it does not guess and hands off to the OS.</dd></div>
+              <div class="rule"><dt>resend</dt><dd>On a 30s cooldown. Without one the button invites hammering, and every press is another email.</dd></div>
+              <div class="rule"><dt>order</dt><dd>The spam hint sits <b>before</b> the resend: it is the cheaper thing to try first.</dd></div>
+              <div class="rule"><dt>expiry</dt><dd>30 minutes, said here rather than discovered on the way back.</dd></div>
             </dl>
           </div>
           <div class="block">
-            <h4>Sale hacia</h4>
+            <h4>Leads to</h4>
             <div class="exits">
-              <span class="exit"><span class="to">#reset</span> desde el enlace del correo</span>
-              <span class="exit"><span class="to">#login</span> volver</span>
+              <span class="exit"><span class="to">#reset</span> from the link in the email</span>
+              <span class="exit"><span class="to">#login</span> back</span>
             </div>
           </div>
         </div>
@@ -478,24 +474,24 @@
       <article class="screen">
         <div class="head">
           <span class="hash">#reset</span>
-          <h3>Nueva contraseña</h3>
-          <p class="role">Se llega desde el correo, a menudo en otro dispositivo. Fija la contraseña nueva.</p>
+          <h3>New password</h3>
+          <p class="role">Reached from the email, often on another device. Sets the new password.</p>
         </div>
         <div class="body">
           <div class="block">
-            <h4>Comportamiento</h4>
+            <h4>Behaviour</h4>
             <dl class="rules">
-              <div class="rule"><dt>cuatro reglas</dt><dd>8+ caracteres, mayúscula, número y símbolo, en una fila de casillas que se marcan por separado. <b>Se exige lo que se muestra.</b></dd></div>
-              <div class="rule"><dt>confirmación vacía</dt><dd>Dice <b>«repite la contraseña»</b>, no «no coinciden». Sin segunda contraseña no hay nada que discrepe.</dd></div>
-              <div class="rule"><dt>nombra la cuenta</dt><dd>Llegas desde un enlace: saber qué cuenta cambias no es un detalle.</dd></div>
-              <div class="rule"><dt>consecuencia</dt><dd>Avisa de que cierra el resto de sesiones antes de hacerlo.</dd></div>
+              <div class="rule"><dt>four rules</dt><dd>8+ characters, uppercase, number and symbol, on one row of slots that tick independently. <b>What is shown is what is enforced.</b></dd></div>
+              <div class="rule"><dt>empty confirm</dt><dd>Says <b>"repeat the password"</b>, not "they don't match". With no second password there is nothing to disagree.</dd></div>
+              <div class="rule"><dt>names the account</dt><dd>You arrive from a link: knowing which account you are changing is not a detail.</dd></div>
+              <div class="rule"><dt>consequence</dt><dd>Warns that it signs you out everywhere else, before it does it.</dd></div>
             </dl>
           </div>
           <div class="block">
-            <h4>Sale hacia</h4>
+            <h4>Leads to</h4>
             <div class="exits">
-              <span class="exit good"><span class="to">#reset-success</span> contraseña válida</span>
-              <span class="exit"><span class="to">#login</span> volver</span>
+              <span class="exit good"><span class="to">#reset-success</span> valid password</span>
+              <span class="exit"><span class="to">#login</span> back</span>
             </div>
           </div>
         </div>
@@ -505,23 +501,23 @@
       <article class="screen">
         <div class="head">
           <span class="hash">#reset-success</span>
-          <h3>Confirmación</h3>
-          <p class="role">Cierra la cadena y, sin decirlo así, es la única alarma de seguridad del flujo.</p>
+          <h3>Confirmation</h3>
+          <p class="role">Closes the chain and, without calling itself one, is the flow's only security alert.</p>
         </div>
         <div class="body">
           <div class="block">
-            <h4>Comportamiento</h4>
+            <h4>Behaviour</h4>
             <ul class="plain">
-              <li>Nombra <b>qué cuenta</b> cambió y confirma que <b>el resto de sesiones se cerró</b>.</li>
-              <li>Ofrece <b>volver a empezar si no fuiste tú</b>. Un restablecimiento que no pediste es cómo te enteras de que alguien tiene acceso a tu correo, y esta es la única pantalla que puede avisarte.</li>
-              <li>Devuelve al login <b>con la dirección puesta</b>.</li>
+              <li>Names <b>which account</b> changed and confirms that <b>every other session was signed out</b>.</li>
+              <li>Offers to <b>start over if it wasn't you</b>. A reset you did not ask for is how you find out someone else has your inbox, and this is the only screen that can tell you.</li>
+              <li>Returns to login <b>with the address filled in</b>.</li>
             </ul>
           </div>
           <div class="block">
-            <h4>Sale hacia</h4>
+            <h4>Leads to</h4>
             <div class="exits">
-              <span class="exit good"><span class="to">#login</span> entrar con la nueva</span>
-              <span class="exit stop"><span class="to">#recovery</span> no fuiste tú</span>
+              <span class="exit good"><span class="to">#login</span> sign in with the new one</span>
+              <span class="exit stop"><span class="to">#recovery</span> that wasn't you</span>
             </div>
           </div>
         </div>
@@ -530,41 +526,41 @@
     </div>
   </section>
 
-  <!-- ─────────── Reglas transversales ─────────── -->
+  <!-- ─────────── Cross-cutting ─────────── -->
   <section>
-    <h2>Lo que se repite en las siete</h2>
+    <h2>What repeats across all seven</h2>
     <p class="sec-note">
-      Cuatro decisiones que no pertenecen a ninguna pantalla concreta y explican por qué el
-      conjunto se comporta igual en todas.
+      Four decisions that belong to no single screen and explain why the set behaves the same
+      way throughout.
     </p>
     <div class="states">
       <div class="state">
         <span class="tag">01</span>
-        <h3>Ningún botón muerto</h3>
-        <p>Nada se queda gris esperando. Se valida al enviar y se señala el campo que falla, porque un botón apagado nunca dice cuál es.</p>
+        <h3>No dead buttons</h3>
+        <p>Nothing sits greyed out waiting. Validation happens on submit and points at the field that failed, because a disabled button never says which one it is.</p>
       </div>
       <div class="state">
         <span class="tag">02</span>
-        <h3>Cada pantalla se nombra</h3>
-        <p>Toda pantalla que hable de una cuenta dice cuál. Se llega desde correos y desde otros dispositivos, y el contexto no viaja solo.</p>
+        <h3>Every screen names itself</h3>
+        <p>Any screen that talks about an account says which. People arrive from emails and from other devices, and context does not travel on its own.</p>
       </div>
       <div class="state">
         <span class="tag">03</span>
-        <h3>La salida va fuera</h3>
-        <p>La tarjeta contiene lo que ayuda a terminar. «Back to login» queda debajo: es abandonar la tarea, no parte de ella.</p>
+        <h3>The exit sits outside</h3>
+        <p>The card holds what helps you finish. "Back to login" goes below it: that is abandoning the task, not part of it.</p>
       </div>
       <div class="state">
         <span class="tag">04</span>
-        <h3>El andamiaje no se mezcla</h3>
-        <p>Notas y atajos de demo viven en la barra lateral del prototipo, no dentro de las tarjetas donde se leen como producto.</p>
+        <h3>Scaffolding stays out</h3>
+        <p>Demo notes and shortcuts live in the prototype's own bar, not inside the cards where they read as product.</p>
       </div>
     </div>
   </section>
 
   <footer>
-    Prototipo navegable en
+    Live prototype at
     <a href="https://dclemares.github.io/chekin-prototypes/dashboard/auth.html#login">dclemares.github.io/chekin-prototypes</a>.
-    El selector <b>Account</b> de la esquina fuerza cualquiera de los tres estados sobre cualquier dirección.
+    The <b>Account</b> switch in the corner forces any of the three states onto any address.
   </footer>
 
 </div>
