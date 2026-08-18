@@ -64,9 +64,31 @@
     body.centred .trustline{display:block}
   }
   @media (max-width:640px){
-    body.centred h1{font:700 28px/34px var(--font-primary)}
-    body.centred .screen{max-width:none}
-    body.centred .trustline{margin-top:26px}
+    body.centred .screen{max-width:none;text-align:center;justify-content:flex-start}
+    /* Top-aligned on phones: vertically centred content jumps when the
+       keyboard opens. */
+    body.centred .cwrap{justify-content:flex-start;padding:36px 20px 32px}
+    body.centred .brandmark{height:22px;margin:0 auto 20px}
+    body.centred h1{font:700 26px/32px var(--font-primary);margin-bottom:8px}
+    body.centred .lead{font:400 14.5px/21px var(--font-primary);margin-bottom:22px}
+
+    /* Undock. The dock keeps a long form's action reachable, but these
+       screens are one or two fields — anchoring the button to the bottom of
+       the viewport just parked it 400px below the input it belongs to. */
+    body.centred .cta{position:static;padding:0;background:none;border-top:none;z-index:auto}
+    body.centred .cta .btn{width:100%;height:50px}
+
+    /* Card chrome comes back: full-bleed fields with a detached button had
+       nothing holding the form together. */
+    body.centred .acard{background:#fff;border:1px solid var(--stroke-gray-lighter);border-radius:14px;padding:18px 16px 16px}
+    body.centred .acard .terms{text-align:center}
+    body.centred .field{margin-bottom:14px}
+    body.centred .or{margin:12px 0}
+
+    body.centred .aftercard{margin-top:18px;font-size:12.5px}
+    body.centred .trustline{margin-top:18px;font-size:11.5px}
+    body.centred .scr-fab{bottom:18px!important}
+    body.centred .scr-menu{bottom:68px!important}
   }
 
   /* ───────── Left rail ───────── */
