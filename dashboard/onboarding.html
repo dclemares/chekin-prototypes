@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chekin — Welcome onboarding</title>
 <link rel="stylesheet" href="ds/colors_and_type.css">
 <style>
@@ -89,17 +90,44 @@
   .card.dim:hover{transform:none;border-color:var(--stroke-gray-lighter);box-shadow:var(--shadow-card)}
 
   /* Step 1 — countries */
+  .multihint{display:flex;align-items:center;gap:7px;font:500 13px var(--font-primary);color:var(--text-gray-dark);margin:-20px 0 18px}
+  .multihint svg{width:14px;height:14px;stroke:var(--text-brand);fill:none;stroke-width:2.2;flex-shrink:0}
+  .csearch{position:relative;margin-bottom:18px;max-width:340px}
+  .csearch svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--text-gray-medium);fill:none;stroke-width:2.2}
+  .csearch input{width:100%;height:42px;padding:0 14px 0 38px;border-radius:var(--radius-md);border:1.5px solid var(--stroke-gray-light);background:#fff;font:500 14px var(--font-primary);color:var(--text-dark)}
+  .csearch input::placeholder{color:var(--text-gray-medium)}
+  .csearch input:focus{outline:none;border-color:var(--text-brand);box-shadow:0 0 0 3px rgba(56,92,248,.12)}
+  .cgroup{margin-bottom:20px}
+  .cgroup.hide{display:none}
+  .cgroup .gh{display:flex;align-items:center;gap:9px;font:700 10.5px var(--font-primary);text-transform:uppercase;letter-spacing:.08em;color:var(--text-gray-medium);margin-bottom:10px}
+  .cgroup .gh::after{content:"";flex:1;height:1px;background:var(--stroke-gray-lighter)}
   .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  .country{display:flex;flex-direction:column;gap:8px;padding:14px}
+  .country{display:flex;flex-direction:column;gap:7px;padding:14px}
+  .country.hide{display:none}
   .country .flag{font-size:26px;line-height:1}
-  .country .n{font:600 14px var(--font-primary)}
-  .country .tag{font:600 10.5px var(--font-primary);padding:3px 8px;border-radius:999px;align-self:flex-start;white-space:nowrap}
-  .country .tag.reg{background:var(--warn-bg);color:var(--text-warn)}
-  .country .tag.free{background:var(--bg-success-light);color:var(--success)}
-  .regions{margin-top:22px;display:none}
-  .regions.on{display:block;animation:stepIn .3s ease}
-  .regions .rh{font:600 13px var(--font-primary);color:var(--text-gray-dark);margin-bottom:10px}
-  .regions .rchips{display:flex;flex-wrap:wrap;gap:8px}
+  .country .n{font:600 14px var(--font-primary);padding-right:22px}
+  .country .tag{font:600 10.5px/14px var(--font-primary);padding:3px 8px;border-radius:999px;align-self:flex-start}
+  .country .tag.legal{background:var(--bg-blue-light);color:var(--text-brand)}
+  .country .tag.tax{background:var(--warn-bg);color:var(--text-warn)}
+  .country .tag.base{background:var(--bg-neutral-light);color:var(--text-gray-dark)}
+  .country .sch{font:500 10.5px/14px var(--font-primary);color:var(--text-gray-medium)}
+  /* Square tick on multi-select cards — a circle reads as "pick one" */
+  .cgrid .card .tick{border-radius:5px}
+  .locals{margin-top:22px;display:none}
+  .locals.on{display:block;animation:stepIn .3s ease}
+  .lblock + .lblock{margin-top:16px}
+  .lblock .rh{font:600 13px var(--font-primary);color:var(--text-gray-dark);margin-bottom:10px}
+  .lblock .note{font:400 12.5px/18px var(--font-primary);color:var(--text-gray-medium);display:flex;gap:8px;align-items:flex-start}
+  .lblock .note svg{width:13px;height:13px;stroke:var(--text-gray-medium);fill:none;stroke-width:2.2;flex-shrink:0;margin-top:2.5px}
+  .rchips{display:flex;flex-wrap:wrap;gap:8px}
+  .primary{margin-top:24px;padding-top:22px;border-top:1px solid var(--stroke-gray-lighter);display:none}
+  .primary.on{display:block;animation:stepIn .3s ease}
+  .primary .ph{font:600 14px var(--font-primary);color:var(--text-dark);margin-bottom:4px}
+  .primary .pd{font:400 12.5px/17px var(--font-primary);color:var(--text-gray-medium);margin-bottom:11px}
+  .pmchips{display:flex;flex-wrap:wrap;gap:8px}
+  .pmchip{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--stroke-gray-light);background:#fff;font:600 13px var(--font-primary);color:var(--text-gray-dark);cursor:pointer;transition:all .13s}
+  .pmchip:hover{border-color:var(--stroke-gray-medium);color:var(--text-dark)}
+  .pmchip.sel{background:var(--bg-blue-light);border-color:var(--text-brand);color:var(--text-brand)}
   /* Escape hatch for markets outside the twelve cards — mirrors OtherCountriesPicker */
   .others{margin-top:26px}
   .others .rh{font:600 13px var(--font-primary);color:var(--text-gray-dark);margin-bottom:10px}
@@ -257,6 +285,21 @@
     .cards.c2,.cards.c3{grid-template-columns:1fr}
     .plan-grid{grid-template-columns:1fr}
   }
+  @media (max-width:760px){
+    .cwrap{padding:34px 20px 32px}
+    h1{font:700 24px/31px var(--font-primary)}
+    .lead{font-size:14.5px;margin-bottom:26px}
+    .multihint{margin-top:-16px}
+    .cgrid,.pmsgrid{grid-template-columns:repeat(2,1fr)}
+    .csearch{max-width:none}
+  }
+  @media (max-width:430px){
+    .pmsgrid{grid-template-columns:1fr}
+    .cgrid{gap:10px}
+    .country{padding:12px;gap:6px}
+    .country .flag{font-size:22px}
+    .country .n{font-size:13.5px;padding-right:20px}
+  }
 </style>
 </head>
 <body>
@@ -290,20 +333,31 @@
         <div class="stepno">Step 1 of 5</div>
         <h1>Where are your properties?</h1>
         <p class="lead">Guest registration rules change by country. Tell us where you operate and we'll switch on exactly what the law requires — nothing more.</p>
-        <div class="cgrid" id="countryGrid"></div>
-        <div class="regions" id="regionsES">
-          <div class="rh">Spain — any properties in these regions? They have their own police systems.</div>
-          <div class="rchips">
-            <button class="rchip" data-region="Catalonia">Catalonia · Mossos d'Esquadra</button>
-            <button class="rchip" data-region="Basque Country">Basque Country · Ertzaintza</button>
-            <button class="rchip" data-region="Navarre">Navarre · Policía Foral</button>
-          </div>
+        <div class="multihint">
+          <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Select every country where you operate — you can pick more than one.
         </div>
+
+        <div class="csearch">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input type="search" id="countrySearch" placeholder="Search for a country…" autocomplete="off" aria-label="Search for a country">
+        </div>
+
+        <div id="countryGroups" role="group" aria-label="Countries where you operate"></div>
+
+        <div class="locals" id="locals"></div>
+
         <div class="others">
           <div class="rh">Operating somewhere else?</div>
           <input class="other-search" id="otherSearch" list="otherCountryList" placeholder="Search for a country" autocomplete="off">
           <datalist id="otherCountryList"></datalist>
           <div class="ochips" id="otherChips"></div>
+        </div>
+
+        <div class="primary" id="primaryMarket">
+          <div class="ph">Which is your main market?</div>
+          <div class="pd">Where most of your properties are. We lead the setup with that country so you're compliant where it counts first.</div>
+          <div class="pmchips" id="primaryChips"></div>
         </div>
       </section>
 
@@ -485,7 +539,8 @@
 (function(){
   /* ───── Data ───── */
   const COUNTRIES = [
-    { code:'ES', flag:'🇪🇸', name:'Spain',       reg:true,  scheme:'SES.HOSPEDAJES', tax:true  },
+    { code:'ES', flag:'🇪🇸', name:'Spain',       reg:true,  scheme:'SES.HOSPEDAJES', tax:true,
+      subs:[ { n:'Catalonia', s:"Mossos d'Esquadra" }, { n:'Basque Country', s:'Ertzaintza' }, { n:'Navarre', s:'Policía Foral' } ] },
     { code:'IT', flag:'🇮🇹', name:'Italy',       reg:true,  scheme:'Alloggiati Web', tax:true  },
     { code:'PT', flag:'🇵🇹', name:'Portugal',    reg:true,  scheme:'SIBA / AIMA',    tax:true  },
     { code:'FR', flag:'🇫🇷', name:'France',      reg:false, scheme:null,             tax:true  },
@@ -498,6 +553,24 @@
     { code:'US', flag:'🇺🇸', name:'United States', reg:false, scheme:null,           tax:false },
     { code:'MX', flag:'🇲🇽', name:'Mexico',      reg:false, scheme:null,             tax:false },
   ];
+
+  /* The badge names what we switch ON. It never leads with an absence —
+     "No registration" told a host we were of no use to them. */
+  function badgeFor(c){
+    if (c.reg && c.tax) return { t:'Police + tourist tax', k:'legal' };
+    if (c.reg)          return { t:'Police registration',  k:'legal' };
+    if (c.tax)          return { t:'Tourist tax',          k:'tax'   };
+    return { t:'Check-in & ID', k:'base' };
+  }
+  /* Symmetry: every picked country gets a word about local variation, not just
+     Spain. Generated from the data so it cannot drift out of sync. */
+  function localNote(c){
+    if (c.subs) return null;
+    if (c.reg && c.tax) return `${c.scheme} covers registration nationwide. Tourist tax is set locally — we'll configure the rate for each property you add.`;
+    if (c.reg)          return `${c.scheme} covers registration nationwide, so there's nothing to set per region.`;
+    if (c.tax)          return `Tourist tax in ${c.name} is set locally — we'll configure the exact rate for each property you add.`;
+    return null;
+  }
   const PMS = [
     { id:'guesty',   name:'Guesty',    bg:'#0B3954', kind:'none',  video:'Z3eAVpF5xkY', site:'guesty.com',
       desc:'Guesty simplifies managing hospitality businesses with its all-in-one platform, automating operations to save time and increase revenue.',
@@ -531,7 +604,7 @@
   ];
 
   /* ───── State ───── */
-  const state = { countries:[], regions:[], ptype:null, ptypeOther:'', size:null, sizeTier:null, manage:null, pms:null, prios:[] };
+  const state = { countries:[], regions:[], primary:null, ptype:null, ptypeOther:'', size:null, sizeTier:null, manage:null, pms:null, prios:[] };
   const PTYPE_LABELS = { vr:'Vacation rentals', hotel:'Hotel / aparthotel', camping:'Camping / glamping', other:'Other' };
   const UNITS = { vr:'properties', hotel:'rooms', camping:'units', other:'properties' };
   const SIZE_Q = { vr:'How many properties?', hotel:'How many rooms across your hotels?', camping:'How many units or pitches?', other:'How many properties?' };
@@ -574,35 +647,131 @@
   const schemes    = () => state.countries.filter(c => c.reg).map(c => c.scheme);
 
   /* ───── Build step 1 grid ───── */
-  const grid = $('#countryGrid');
-  COUNTRIES.forEach(c => {
+  /* Two groups, alphabetical inside each: the regulated markets carry our
+     reason to exist, so they lead. Markets outside these twelve stay in the
+     "Operating somewhere else?" picker below. */
+  const GROUPS = [
+    { id:'reg',  label:'Guest registration required by law', items: COUNTRIES.filter(c => c.reg) },
+    { id:'free', label:'No police registration',             items: COUNTRIES.filter(c => !c.reg) },
+  ];
+  const groupsBox = $('#countryGroups');
+  const byName = (a, b) => a.name.localeCompare(b.name);
+
+  function cardFor(c){
     const el = document.createElement('div');
+    const b = badgeFor(c);
     el.className = 'card country';
     el.tabIndex = 0;
+    el.setAttribute('role', 'checkbox');
+    el.setAttribute('aria-checked', 'false');
     el.dataset.code = c.code;
     el.innerHTML = `<span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>
       <span class="flag">${c.flag}</span><span class="n">${c.name}</span>
-      <span class="tag ${c.reg?'reg':'free'}">${c.reg ? 'Legal compliance' : 'No registration'}</span>`;
+      <span class="tag ${b.k}">${b.t}</span>
+      ${c.scheme ? `<span class="sch">${c.scheme}</span>` : ''}`;
     const toggle = () => {
-      el.classList.toggle('sel');
-      const on = el.classList.contains('sel');
+      const on = !el.classList.contains('sel');
+      el.classList.toggle('sel', on);
+      el.setAttribute('aria-checked', String(on));
       if (on) state.countries.push(c);
       else state.countries = state.countries.filter(x => x.code !== c.code);
-      $('#regionsES').classList.toggle('on', state.countries.some(x => x.code === 'ES'));
-      if (!state.countries.some(x => x.code === 'ES')) { state.regions = []; $$('#regionsES .rchip').forEach(r => r.classList.remove('sel')); }
+      syncStep1();
       refresh();
     };
     el.addEventListener('click', toggle);
     el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
-    grid.appendChild(el);
+    return el;
+  }
+
+  GROUPS.forEach(g => {
+    const wrap = document.createElement('div');
+    wrap.className = 'cgroup';
+    wrap.dataset.group = g.id;
+    const grid = document.createElement('div');
+    grid.className = 'cgrid';
+    g.items.slice().sort(byName).forEach(c => grid.appendChild(cardFor(c)));
+    wrap.innerHTML = `<div class="gh">${g.label}</div>`;
+    wrap.appendChild(grid);
+    groupsBox.appendChild(wrap);
   });
-  $$('#regionsES .rchip').forEach(r => r.addEventListener('click', () => {
-    r.classList.toggle('sel');
-    const name = r.dataset.region;
-    if (r.classList.contains('sel')) state.regions.push(name);
-    else state.regions = state.regions.filter(x => x !== name);
-    refresh();
-  }));
+
+  /* Search — filters cards and folds away any group left with no matches. */
+  $('#countrySearch').addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    $$('.cgroup').forEach(g => {
+      let shown = 0;
+      g.querySelectorAll('.country').forEach(card => {
+        const c = COUNTRIES.find(x => x.code === card.dataset.code);
+        const hit = !q || c.name.toLowerCase().includes(q) || (c.scheme || '').toLowerCase().includes(q);
+        card.classList.toggle('hide', !hit);
+        if (hit) shown++;
+      });
+      g.classList.toggle('hide', shown === 0);
+    });
+  });
+
+  /* Everything that depends on which countries are ticked. */
+  function syncStep1(){
+    const picked = state.countries;
+
+    // Local / regional detail, one block per picked country
+    const box = $('#locals');
+    box.innerHTML = '';
+    picked.forEach(c => {
+      const block = document.createElement('div');
+      block.className = 'lblock';
+      if (c.subs){
+        block.innerHTML = `<div class="rh">${c.name} — any properties in these regions? They file with their own police system.</div>`;
+        const chips = document.createElement('div');
+        chips.className = 'rchips';
+        c.subs.forEach(sb => {
+          const btn = document.createElement('button');
+          btn.className = 'rchip' + (state.regions.includes(sb.n) ? ' sel' : '');
+          btn.type = 'button';
+          btn.setAttribute('aria-pressed', String(state.regions.includes(sb.n)));
+          btn.textContent = `${sb.n} · ${sb.s}`;
+          btn.addEventListener('click', () => {
+            const on = !state.regions.includes(sb.n);
+            state.regions = on ? state.regions.concat(sb.n) : state.regions.filter(x => x !== sb.n);
+            btn.classList.toggle('sel', on);
+            btn.setAttribute('aria-pressed', String(on));
+            refresh();
+          });
+          chips.appendChild(btn);
+        });
+        block.appendChild(chips);
+      } else {
+        const note = localNote(c);
+        if (!note) return;
+        block.innerHTML = `<div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>${c.flag} ${note}</span></div>`;
+      }
+      box.appendChild(block);
+    });
+    box.classList.toggle('on', box.children.length > 0);
+
+    // Drop regions belonging to countries that are no longer selected
+    const liveRegions = picked.flatMap(c => (c.subs || []).map(sb => sb.n));
+    state.regions = state.regions.filter(r => liveRegions.includes(r));
+
+    // Main market — only a real question once there is more than one
+    const multi = picked.length > 1;
+    $('#primaryMarket').classList.toggle('on', multi);
+    if (!multi){ state.primary = picked.length ? picked[0].code : null; }
+    else {
+      if (!picked.some(c => c.code === state.primary)) state.primary = picked[0].code;
+      const pc = $('#primaryChips');
+      pc.innerHTML = '';
+      picked.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'pmchip' + (c.code === state.primary ? ' sel' : '');
+        btn.type = 'button';
+        btn.setAttribute('aria-pressed', String(c.code === state.primary));
+        btn.innerHTML = `<span>${c.flag}</span>${c.name}`;
+        btn.addEventListener('click', () => { state.primary = c.code; syncStep1(); refresh(); });
+        pc.appendChild(btn);
+      });
+    }
+  }
 
   /* ───── Step 1: any other market (mirrors OtherCountriesPicker) ───── */
   const OTHER_COUNTRIES = [
@@ -646,6 +815,7 @@
       el.addEventListener('click', () => {
         state.countries = state.countries.filter(x => x.code !== c.code);
         renderOtherChips();
+        syncStep1();
         refresh();
       });
       otherChips.appendChild(el);
@@ -659,6 +829,7 @@
     if (state.countries.some(c => c.code === picked.code)) return;
     state.countries.push({ ...picked, reg:false, scheme:null, tax:false });
     renderOtherChips();
+    syncStep1();
     refresh();
   });
 
@@ -867,8 +1038,12 @@
       steps.push({ k:'team', phase:'Import', t:'Invite your team', d:'Owners, managers and front desk — each with the right permissions.', eta:3 });
     }
     // One police step per regulated country — schemes differ, credentials differ
-    state.countries.filter(c => c.reg).forEach(c => {
-      const extra = c.code === 'ES' && state.regions.length ? ' + ' + state.regions.join(', ') : '';
+    // The main market goes first: that's where being non-compliant costs most.
+    state.countries.filter(c => c.reg)
+      .sort((a, b) => (b.code === state.primary) - (a.code === state.primary))
+      .forEach(c => {
+      const mine = (c.subs || []).map(sb => sb.n).filter(n => state.regions.includes(n));
+      const extra = mine.length ? ' + ' + mine.join(', ') : '';
       steps.push({ k:'police', phase:'Legal', t:`Police reporting — ${c.scheme}`, d:`${c.name}${extra} — every guest submitted automatically, within the legal deadline.`, eta:4, scheme:c.scheme, country:c.name });
     });
     if (anyTax()) steps.push({ k:'tax', phase:'Legal', t:'Enable tourist tax auto-calculation', d:'Calculated and collected per stay, per your local rates.', eta:2 });
@@ -961,6 +1136,10 @@
     const chips = [];
     state.countries.forEach(c => chips.push(`${c.flag} ${c.name}${c.reg ? ' · compliance' : ''}`));
     state.regions.forEach(r => chips.push(`+ ${r}`));
+    if (state.countries.length > 1 && state.primary){
+      const pm = state.countries.find(c => c.code === state.primary);
+      if (pm) chips.push(`★ ${pm.name} · main market`);
+    }
     if (state.ptype) chips.push(state.ptype === 'other' && state.ptypeOther ? state.ptypeOther : PTYPE_LABELS[state.ptype]);
     if (state.size) chips.push(`${state.size} ${unit()}`);
     if (state.manage === 'pms') chips.push(state.pms && state.pms.id !== 'other' ? `${state.pms.name} sync` : 'PMS sync');
@@ -1034,6 +1213,7 @@
       localStorage.setItem('chekin_onboarding', JSON.stringify({
         countries: state.countries.map(c => ({ code:c.code, name:c.name, flag:c.flag, reg:c.reg, scheme:c.scheme, tax:c.tax })),
         regions: state.regions,
+        primary: state.primary,
         ptype: state.ptype, ptypeOther: state.ptypeOther,
         unit: unit(),
         size: state.size, sizeTier: state.sizeTier, manage: state.manage,
@@ -1078,6 +1258,13 @@
       state.countries = [byCode('ES'), byCode('IT'), byCode('PT')]; state.regions = ['Catalonia'];
       state.ptype = 'vr'; state.size = '21-100'; state.sizeTier = 2; state.manage = 'pms'; state.pms = PMS[0]; state.prios = ['compliance'];
     }
+    // Reflect the preset in the step-1 UI too, so going Back from the plan
+    // shows the countries actually ticked instead of an empty grid.
+    state.countries.forEach(c => {
+      const card = groupsBox.querySelector('.country[data-code="' + c.code + '"]');
+      if (card){ card.classList.add('sel'); card.setAttribute('aria-checked', 'true'); }
+    });
+    syncStep1();
     if (new URLSearchParams(location.search).get('go')){
       savePlan();
       goTop('firstrun');
@@ -1085,6 +1272,7 @@
       show(5);
     }
   } else {
+    syncStep1();
     // Debug: ?step=N jumps straight to a step (no validation)
     const stepParam = parseInt(new URLSearchParams(location.search).get('step') || '1', 10);
     show(isNaN(stepParam) ? 1 : stepParam);
