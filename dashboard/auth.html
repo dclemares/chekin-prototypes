@@ -712,8 +712,9 @@
               <fieldset><legend><span>Full name</span></legend></fieldset>
               <label for="rn-name">Full name</label>
             </div>
+            <p class="err">Enter your full name.</p>
           </div>
-          <div class="field">
+          <div class="field" id="rp-phone-field">
             <div class="phone-row">
               <div class="fs dial">
                 <!-- No preselected country: guessing +34 for a product sold in
@@ -730,6 +731,7 @@
                 <label for="rp-phone">Phone number (optional)</label>
               </div>
             </div>
+            <p class="err" id="rp-phone-err">Pick the country code for that number.</p>
             <p class="hint">Only for account security and urgent check-in alerts — never marketing.</p>
           </div>
           <div class="field" id="rn-pass-field">
@@ -745,6 +747,7 @@
               <span class="req" id="req-num"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Number</span>
               <span class="req" id="req-sym"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Symbol</span>
             </div>
+            <p class="err">Your password needs all four.</p>
           </div>
           <div class="field">
             <div class="ptq">What type of property do you manage?</div>
@@ -1377,6 +1380,9 @@
       email: validEmail(reEmail.value),
       name:  rnName.value.trim().length >= 2,
       pass:  racctCard.classList.contains('from-google') || passOk(rnPass.value),
+      /* A number with no country code cannot be dialled, and this one is
+         collected to reach people about their own account. */
+      phone: !rpPhone.value.trim() || !!document.getElementById('rp-code').value,
       ptype: !!state.ptype
     };
   }
@@ -1451,7 +1457,7 @@
 
   acctNext.addEventListener('click', function () {
     var r = accountRules();
-    ['re-email','rn-name','rn-pass'].forEach(function (id) {
+    ['re-email','rn-name','rn-pass','rp-phone'].forEach(function (id) {
       document.getElementById(id + '-field').classList.remove('invalid');
     });
     document.getElementById('ptype-err').classList.remove('on');
@@ -1459,6 +1465,7 @@
     if (!r.name)  { document.getElementById('rn-name-field').classList.add('invalid');  rnName.focus();  return; }
     if (!r.ptype) { document.getElementById('ptype-err').classList.add('on'); document.getElementById('rp-ptypes').scrollIntoView({block:'center'}); return; }
     if (!r.pass)  { document.getElementById('rn-pass-field').classList.add('invalid');  rnPass.focus();  updateAccount(); return; }
+    if (!r.phone) { document.getElementById('rp-phone-field').classList.add('invalid'); document.getElementById('rp-code').focus(); return; }
 
     state.email = reEmail.value.trim();
     state.name = rnName.value.trim().split(' ')[0];
