@@ -236,6 +236,12 @@
   .remember input{width:16px;height:16px;accent-color:var(--text-brand);cursor:pointer;margin:0}
 
   .btn.primary.loading{pointer-events:none;opacity:.85}
+  /* Signed in with a provider: it supplies the email, the name and the
+     credential, so those fields step aside and the form keeps only what
+     Google cannot answer. */
+  .from-google #racct-google,.from-google #racct-or,
+  .from-google #re-email-field,.from-google #rn-name-field,.from-google #rn-pass-field{display:none}
+  .from-google #racct-identity{display:flex}
 
   /* Identifier-first: password and options are revealed in place, so the
      password manager never sees a page transition between the two fields. */
@@ -621,7 +627,11 @@
             <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.09 3.57-5.16 3.57-8.81Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.93-2.91l-3.87-3c-1.07.72-2.44 1.14-4.06 1.14-3.13 0-5.78-2.11-6.72-4.95H1.28v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.28 14.28a7.2 7.2 0 0 1 0-4.56v-3.1H1.28a12 12 0 0 0 0 10.76l4-3.1Z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.35.61 4.6 1.8l3.43-3.43A11.97 11.97 0 0 0 12 0 12 12 0 0 0 1.28 6.62l4 3.1C6.22 6.88 8.87 4.77 12 4.77Z"/></svg>
             Sign up with Google
           </button>
-          <div class="or">or register with email</div>
+          <div class="or" id="racct-or">or register with email</div>
+          <div class="identity" id="racct-identity">
+            <span class="who"><span class="av" id="racct-initial"></span><span id="racct-who"></span></span>
+            <button type="button" class="linklike" id="racct-change">Change</button>
+          </div>
           <div class="field" id="re-email-field">
             <div class="fs">
               <input id="re-email" type="email" placeholder="name@company.com" autocomplete="email" data-autofocus>
@@ -640,7 +650,10 @@
           <div class="field">
             <div class="phone-row">
               <div class="fs dial">
+                <!-- No preselected country: guessing +34 for a product sold in
+                     20+ markets silently attaches the wrong prefix. -->
                 <select id="rp-code" aria-label="Country code">
+                  <option value="" selected>Code</option>
                   <option>+34</option><option>+39</option><option>+351</option><option>+33</option><option>+49</option><option>+43</option><option>+385</option><option>+30</option><option>+44</option><option>+1</option>
                 </select>
                 <fieldset><legend></legend></fieldset>
@@ -652,16 +665,6 @@
               </div>
             </div>
             <p class="hint">Only for account security and urgent check-in alerts — never marketing.</p>
-          </div>
-          <div class="field">
-            <div class="ptq">What type of property do you manage?</div>
-            <div class="ptypes" id="rp-ptypes">
-              <button class="ptype" type="button" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
-              <button class="ptype" type="button" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
-              <button class="ptype" type="button" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
-              <button class="ptype" type="button" data-ptype="other"><span class="em">✳️</span>Other</button>
-            </div>
-            <p class="err" id="ptype-err">Pick the one closest to your business.</p>
           </div>
           <div class="field" id="rn-pass-field">
             <div class="fs has-eye">
@@ -676,6 +679,16 @@
               <span class="req" id="req-mix"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Letters &amp; numbers</span>
               <span class="slabel" id="rn-slabel" aria-live="polite"></span>
             </div>
+          </div>
+          <div class="field">
+            <div class="ptq">What type of property do you manage?</div>
+            <div class="ptypes" id="rp-ptypes">
+              <button class="ptype" type="button" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
+              <button class="ptype" type="button" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
+              <button class="ptype" type="button" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
+              <button class="ptype" type="button" data-ptype="other"><span class="em">✳️</span>Other</button>
+            </div>
+            <p class="err" id="ptype-err">Pick the one closest to your business.</p>
           </div>
           <div class="cta">
             <button class="btn primary block" id="racct-next">Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
@@ -1141,7 +1154,8 @@
     return {
       email: validEmail(reEmail.value),
       name:  rnName.value.trim().length >= 2,
-      pass:  rnPass.value.length >= 8 && /[A-Za-z]/.test(rnPass.value) && /\d/.test(rnPass.value),
+      pass:  racctCard.classList.contains('from-google') ||
+             (rnPass.value.length >= 8 && /[A-Za-z]/.test(rnPass.value) && /\d/.test(rnPass.value)),
       ptype: !!state.ptype
     };
   }
@@ -1180,14 +1194,33 @@
 
   /* Google SSO (simulated) — skips the form entirely */
   var gBtn = document.getElementById('racct-google');
+  var racctCard = gBtn.closest('.acard');
+  var googleLabel = gBtn.innerHTML;
+  function exitGoogle() {
+    racctCard.classList.remove('from-google');
+    gBtn.disabled = false;
+    gBtn.innerHTML = googleLabel;
+    reEmail.value = ''; rnName.value = '';
+    reEmail.dispatchEvent(new Event('input'));
+    reEmail.focus();
+  }
+  document.getElementById('racct-change').addEventListener('click', exitGoogle);
+
   gBtn.addEventListener('click', function () {
     gBtn.disabled = true;
     gBtn.innerHTML = 'Connecting to Google…';
     setTimeout(function () {
-      state.name = 'Marta';
-      document.getElementById('welcome-title').textContent = 'Hey Marta, welcome to Chekin! 👋';
-      try { localStorage.setItem('chekin_account_name', 'Marta'); } catch (err) {}
-      show('r-welcome');
+      /* Google gives us the identity but not the property type, and that is
+         what decides the subscription — so the form stays, minus everything
+         the provider already answered. */
+      var email = 'marta@sonder.com', name = 'Marta Ferreira';
+      reEmail.value = email; rnName.value = name;
+      reEmail.dispatchEvent(new Event('input'));
+      document.getElementById('racct-initial').textContent = name.charAt(0);
+      document.getElementById('racct-who').textContent = email;
+      racctCard.classList.add('from-google');
+      var q = document.getElementById('rp-ptypes');
+      if (q) q.scrollIntoView({ block: 'center' });
     }, 1100);
   });
 
