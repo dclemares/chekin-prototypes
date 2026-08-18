@@ -257,8 +257,11 @@
   .identity #li-who{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
   /* OTP */
-  .otp{display:flex;gap:10px;margin:2px 0 4px}
-  .otp input{width:52px;height:60px;text-align:center;font:700 22px var(--font-primary);border:1.5px solid var(--stroke-gray-light);border-radius:12px;outline:none;color:var(--text-dark);background:#fff;transition:border-color .12s}
+  /* The six boxes share the row rather than carrying a fixed 52px width:
+     at that width they added up to 362px inside a 338px card and ran past
+     both the button below and the card's own padding. */
+  .otp{display:flex;gap:8px;margin:2px 0 4px}
+  .otp input{flex:1 1 0;min-width:0;width:auto;height:60px;padding:0;text-align:center;font:700 22px var(--font-primary);border:1.5px solid var(--stroke-gray-light);border-radius:12px;outline:none;color:var(--text-dark);background:#fff;transition:border-color .12s}
   .otp input:focus{border-color:var(--text-brand);border-width:2px}
   .otp.error input{border-color:var(--text-danger);animation:shake .3s ease}
   @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
