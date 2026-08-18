@@ -43,6 +43,9 @@
   body.centred h1{font:700 36px/43px var(--font-primary);letter-spacing:-.03em;margin:0 0 10px}
   body.centred .lead{font:400 15.5px/23px var(--font-primary);color:var(--text-gray-dark);margin:0 0 28px;max-width:none}
   body.centred .acard{border-radius:16px;padding:22px 22px 20px}
+  /* The rows inside the card were the only thing not on the centre axis */
+  body.centred .resend-row{justify-content:center}
+  body.centred .reqs{justify-content:center}
   body.centred .or{margin:14px 0}
   body.centred .stepno{display:none}
 
@@ -515,10 +518,8 @@
             <span>Didn't receive a code?</span>
             <button class="linklike" id="resend">Resend code</button>
           </div>
-          <div class="resend-row">
-            <button class="linklike" data-go="login" style="color:var(--text-gray-medium);">Back to login</button>
-          </div>
         </div>
+        <p class="muted-note acard-alt"><button class="linklike" data-go="login">Back to login</button></p>
       </section>
 
       <!-- ── Password recovery ── -->
@@ -538,10 +539,8 @@
           <div class="cta">
             <button class="btn primary block" id="rec-send">Send recovery link</button>
           </div>
-          <div class="resend-row">
-            <button class="linklike" data-go="login" style="color:var(--text-gray-medium);">Back to login</button>
-          </div>
         </div>
+        <p class="muted-note acard-alt"><button class="linklike" data-go="login">Back to login</button></p>
       </section>
 
       <!-- ── Check email ── -->
@@ -596,10 +595,8 @@
           <div class="cta">
             <button class="btn primary block" id="rp-submit">Reset password</button>
           </div>
-          <div class="resend-row">
-            <button class="linklike" data-go="login" style="color:var(--text-gray-medium);">Back to login</button>
-          </div>
         </div>
+        <p class="muted-note acard-alt"><button class="linklike" data-go="login">Back to login</button></p>
       </section>
 
       <!-- ── Reset success ── -->
