@@ -65,15 +65,20 @@
   .mlegal{display:none;margin:10px 0 0;font:400 12px var(--font-primary);color:var(--text-gray-medium);text-align:center;width:100%}
   .mlegal a{color:var(--text-gray-medium);text-decoration:underline;text-underline-offset:2px}
   .mlegal span{margin:0 10px;opacity:.5}
+  /* From here down there is no rail, so the screen carries the wordmark and
+     the proof itself — and the block stops floating: content from the top,
+     footer against the bottom edge. Centring it as a whole left a void above
+     and below with the footer stranded in between. */
   @media (max-width:1100px){
+    body.centred .cwrap{justify-content:flex-start;min-height:100vh;padding-top:56px}
     body.centred .brandmark{display:block;height:26px;margin:0 auto 30px}
-    body.centred .trustline{display:block}
+    body.centred .trustline{display:block;margin-top:auto;padding-top:32px}
   }
   @media (max-width:640px){
     body.centred .screen{max-width:none;text-align:center;justify-content:flex-start}
     /* Top-aligned on phones: vertically centred content jumps when the
        keyboard opens. */
-    body.centred .cwrap{justify-content:flex-start;padding:36px 20px 32px}
+    body.centred .cwrap{padding:36px 20px 32px}
     /* Modelled on the ChatGPT sign-in: wordmark small and out of the way,
        one line of copy, and the controls themselves as the interface. */
     body.centred .brandmark{height:20px;margin:0 0 48px;align-self:flex-start}
@@ -108,11 +113,7 @@
     body.centred .aftercard{display:none}
     body.centred .acard .terms{display:none}
 
-    /* Proof and legal sit at the bottom edge, the way the reference does.
-       They are children of .cwrap now, so the auto margin pushes against the
-       wrapper rather than against a single screen. */
-    body.centred .cwrap{min-height:100vh}
-    body.centred .trustline{display:block;margin-top:auto;padding-top:32px;font-size:11.5px}
+    body.centred .trustline{font-size:11.5px}
     body.centred .mlegal{display:block}
     /* Prototype chrome out of the way of the footer it was covering */
     body.centred .scr-fab{bottom:auto!important;top:12px!important;right:12px!important;transform:scale(.85);transform-origin:top right}
