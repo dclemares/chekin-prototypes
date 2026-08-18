@@ -39,7 +39,7 @@
      centred, a headline with room to breathe, and the legal note held
      inside the card instead of floating under it. */
   body.centred .cwrap{justify-content:center;align-items:center}
-  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:440px;width:100%;margin:0}
+  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:384px;width:100%;margin:0}
   body.centred h1{font:700 36px/43px var(--font-primary);letter-spacing:-.03em;margin:0 0 10px}
   body.centred .lead{font:400 15.5px/23px var(--font-primary);color:var(--text-gray-dark);margin:0 0 28px;max-width:none}
   body.centred .acard{border-radius:16px;padding:22px 22px 20px}
@@ -94,11 +94,8 @@
     /* No card on phones: the buttons stand straight on the background, which
        is what makes the reference read as calm at this width. */
     body.centred .acard{background:none;border:none;box-shadow:none;padding:0;border-radius:0}
-    /* Taller for the thumb, but the design system's radius — the pill shape
-       borrowed from the reference did not belong next to the rest of Chekin. */
-    body.centred .sso{height:54px;font-size:15px}
-    body.centred .fs input{height:54px}
-    body.centred .cta .btn{height:54px;font-size:15px}
+    body.centred .sso{font-size:15px}
+    body.centred .cta .btn{font-size:15px}
     body.centred .field{margin-bottom:18px}
     body.centred .or{margin:18px 0}
 
@@ -181,7 +178,10 @@
   .fs > fieldset{position:absolute;top:-5px;left:0;right:0;bottom:0;margin:0;padding:0 13px;border:1px solid var(--field-line);border-radius:10px;pointer-events:none;transition:border-color .12s}
   .fs > fieldset > legend{visibility:hidden;display:block;float:none;width:auto;max-width:.01px;height:11px;padding:0;white-space:nowrap;font-size:.75em;transition:max-width 50ms ease-out}
   .fs > fieldset > legend > span{visibility:visible;display:inline-block;padding:0 5px;font:600 14px var(--font-primary);opacity:0}
-  .fs > label{position:absolute;top:12px;left:13px;padding:0 3px;max-width:calc(100% - 26px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text-gray-dark);font:500 16px var(--font-primary);cursor:text;transition:top .1s ease-in,font-size .1s ease-in,color .12s}
+  /* 14px, not 12: the label's line box is 19.5px, so (48 - 19.5) / 2 lands at
+     14.25. At 12 it sat 2px high in every field on every screen. Tied to the
+     48px height — move one and the other has to follow. */
+  .fs > label{position:absolute;top:14px;left:13px;padding:0 3px;max-width:calc(100% - 26px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text-gray-dark);font:500 16px var(--font-primary);cursor:text;transition:top .1s ease-in,font-size .1s ease-in,color .12s}
   /* raised: focused, or holding a value */
   .fs input:focus ~ label,
   .fs input:not(:placeholder-shown) ~ label,
