@@ -33,6 +33,35 @@
 
   .shell{display:grid;grid-template-columns:380px 1fr;min-height:100vh}
 
+  /* ── Centred entry ────────────────────────────────────────────────
+     Sign-in screens drop the rail and sit alone in the middle. The rail
+     stays for register, where it carries the setup progress. */
+  body.centred{background:#FBFAF8}
+  body.centred .rail{display:none}
+  body.centred .shell{grid-template-columns:1fr}
+  body.centred .cwrap{max-width:none;padding:0 24px;justify-content:center;align-items:center;min-height:100vh}
+  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:420px;width:100%;margin:0}
+  body.centred .brandmark{display:block;height:26px;margin:0 auto 34px}
+  body.centred h1{font:700 40px/48px var(--font-primary);letter-spacing:-.03em;margin:0 0 10px}
+  body.centred .lead{font:400 16px/24px var(--font-primary);color:var(--text-gray-dark);margin:0 0 30px;max-width:none}
+  body.centred .stepno{display:none}
+  body.centred .acard{background:#fff;border-color:#EDEAE4;border-radius:16px;padding:22px 22px 20px;box-shadow:0 1px 2px rgba(22,22,67,.04)}
+  body.centred .or{margin:14px 0}
+  body.centred .aftercard{display:block}
+  body.centred .trustline{display:block}
+
+  .brandmark{display:none}
+  .aftercard{display:none;margin-top:22px;font:500 13px var(--font-primary);color:var(--text-gray-dark)}
+  .aftercard a{color:var(--text-brand);font-weight:600;text-decoration:none;cursor:pointer}
+  .aftercard a:hover{text-decoration:underline}
+  .trustline{display:none;margin-top:40px;font:500 12.5px/20px var(--font-primary);color:var(--text-gray-medium)}
+  .trustline b{color:var(--text-gray-dark);font-weight:600}
+  @media (max-width:640px){
+    body.centred h1{font:700 30px/36px var(--font-primary)}
+    body.centred .cwrap{padding:0 20px}
+    body.centred .trustline{margin-top:28px}
+  }
+
   /* ───────── Left rail ───────── */
   .rail{background:linear-gradient(160deg,#14143F 0%,#1B1B5A 55%,#23246E 100%);color:#fff;display:flex;flex-direction:column;padding:36px 34px;position:sticky;top:0;height:100vh}
   .rail .logo{height:24px;filter:brightness(0) invert(1);align-self:flex-start;margin-bottom:44px}
@@ -344,9 +373,10 @@
 
       <!-- ── Login ── -->
       <section class="screen boxed" data-screen="login" data-mode="auth" data-progress="6">
+        <img class="brandmark" src="ds/assets/logos/chekin-wordmark.png" alt="Chekin">
         <p class="stepno" id="li-step">Get started</p>
-        <h1 id="li-title">Log in or sign up</h1>
-        <p class="lead" id="li-lead">Enter your work email and we'll take you to the right place.</p>
+        <h1 id="li-title">Every check-in, handled</h1>
+        <p class="lead" id="li-lead">Log in or create your account with your work email.</p>
         <div class="acard">
           <button class="sso" id="li-google" type="button">
             <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.09 3.57-5.16 3.57-8.81Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.93-2.91l-3.87-3c-1.07.72-2.44 1.14-4.06 1.14-3.13 0-5.78-2.11-6.72-4.95H1.28v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.28 14.28a7.2 7.2 0 0 1 0-4.56v-3.1H1.28a12 12 0 0 0 0 10.76l4-3.1Z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.35.61 4.6 1.8l3.43-3.43A11.97 11.97 0 0 0 12 0 12 12 0 0 0 1.28 6.62l4 3.1C6.22 6.88 8.87 4.77 12 4.77Z"/></svg>
@@ -395,8 +425,11 @@
               <span class="ct">Verifying…</span>
               <span class="cf">CLOUDFLARE</span>
             </div>
+            <p class="terms">By continuing you accept our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
           </form>
         </div>
+        <p class="aftercard">Questions? <a>Talk to us — we reply in ~3 min</a></p>
+        <p class="trustline">Police reporting in <b>20+ countries</b> · <b>35+</b> PMS integrations</p>
       </section>
 
       <!-- ── Two-factor ── -->
@@ -667,6 +700,8 @@
     document.querySelectorAll('.rail-mode').forEach(function (r) {
       r.classList.toggle('on', r.getAttribute('data-railmode') === mode);
     });
+    /* Register keeps the rail — it carries the setup progress. */
+    document.body.classList.toggle('centred', mode === 'auth');
     /* Nobody arrives here to read — put the caret where the typing starts.
        The markup's autofocus never fires because the screen is hidden at parse. */
     var firstField = target.querySelector('input:not([type=checkbox]):not([type=hidden])');
