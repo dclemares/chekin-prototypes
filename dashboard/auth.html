@@ -628,7 +628,7 @@
       <section class="screen boxed" data-screen="reset" data-mode="auth" data-progress="6">
         <p class="stepno">Sign in · Recovery</p>
         <h1>Reset your password</h1>
-        <p class="lead">Set a new password to log in to your account.</p>
+        <p class="lead">Setting a new password for <b id="reset-addr">your account</b>.</p>
         <div class="acard">
           <div class="field">
             <div class="fs has-eye">
@@ -645,16 +645,18 @@
             </div>
           </div>
           <div class="field" id="rp-confirm-field">
-            <div class="fs">
+            <div class="fs has-eye">
               <input id="rp-confirm" type="password" placeholder="Repeat password" autocomplete="new-password">
               <fieldset><legend><span>Confirm password</span></legend></fieldset>
               <label for="rp-confirm">Confirm password</label>
+              <button class="eye" data-eye="rp-confirm" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
-            <p class="err">Passwords don't match.</p>
+            <p class="err" id="rp-confirm-err">Passwords don't match.</p>
           </div>
           <div class="cta">
             <button class="btn primary block" id="rp-submit">Reset password</button>
           </div>
+          <p class="muted-note" style="margin-top:12px;text-align:center;">This signs you out everywhere else.</p>
         </div>
         <p class="muted-note acard-alt"><button class="linklike" data-go="login">Back to login</button></p>
       </section>
@@ -859,6 +861,10 @@
     if (id === 'sso-only') {
       document.getElementById('sso-initial').textContent = addr.charAt(0);
       document.getElementById('sso-who').textContent = addr;
+    }
+    if (id === 'reset') {
+      var ra = document.getElementById('reset-addr');
+      if (ra) ra.textContent = addr;
     }
     if (id === 'check-email') {
       var ce = document.getElementById('check-email-addr');
@@ -1306,6 +1312,10 @@
   rpSubmit.addEventListener('click', function () {
     if (!passOk(rpPass.value)) { rpPass.focus(); updateReset(); return; }
     if (rpPass.value !== rpConfirm.value) {
+      /* Empty is not a mismatch: telling someone their passwords don't match
+         when they have not typed a second one sends them to check the first. */
+      document.getElementById('rp-confirm-err').textContent =
+        rpConfirm.value.length === 0 ? 'Repeat the password to confirm it.' : "Passwords don't match.";
       document.getElementById('rp-confirm-field').classList.add('invalid');
       rpConfirm.focus();
       return;
