@@ -592,20 +592,23 @@
       <!-- ── Password recovery ── -->
       <section class="screen boxed" data-screen="recovery" data-mode="auth" data-progress="6">
         <p class="stepno">Sign in · Recovery</p>
-        <h1>Password recovery</h1>
-        <p class="lead">Enter your email to recover your password.</p>
+        <h1>Forgot your password?</h1>
+        <p class="lead">We'll email you a link to set a new one.</p>
         <div class="acard">
-          <div class="field" id="rec-email-field">
-            <div class="fs">
-              <input id="rec-email" type="email" placeholder="name@company.com">
-              <fieldset><legend><span>Email</span></legend></fieldset>
-              <label for="rec-email">Email</label>
+          <!-- A real form: one field, so Enter is the natural way to send it. -->
+          <form id="rec-form" novalidate>
+            <div class="field" id="rec-email-field">
+              <div class="fs">
+                <input id="rec-email" type="email" placeholder="name@company.com" autocomplete="username">
+                <fieldset><legend><span>Email</span></legend></fieldset>
+                <label for="rec-email">Email</label>
+              </div>
+              <p class="err">Enter a valid email address.</p>
             </div>
-            <p class="err">Enter a valid email address.</p>
-          </div>
-          <div class="cta">
-            <button class="btn primary block" id="rec-send">Send recovery link</button>
-          </div>
+            <div class="cta">
+              <button class="btn primary block" id="rec-send" type="submit">Send recovery link</button>
+            </div>
+          </form>
         </div>
         <p class="muted-note acard-alt"><button class="linklike" data-go="login">Back to login</button></p>
       </section>
@@ -867,6 +870,13 @@
     if (id === 'sso-only') {
       document.getElementById('sso-initial').textContent = addr.charAt(0);
       document.getElementById('sso-who').textContent = addr;
+    }
+    /* Arriving from "Forgot password?" the address is already typed one screen
+       back; asking for it again is asking twice. */
+    if (id === 'recovery') {
+      var re = document.getElementById('rec-email');
+      var typed = (document.getElementById('li-email') || {}).value || state.email || '';
+      if (re && !re.value && typed) { re.value = typed; }
     }
     if (id === 'reset') {
       var ra = document.getElementById('reset-addr');
@@ -1306,7 +1316,8 @@
   var recSend = document.getElementById('rec-send');
   var recField = document.getElementById('rec-email-field');
   recEmail.addEventListener('input', function () { if (recField) recField.classList.remove('invalid'); });
-  recSend.addEventListener('click', function () {
+  document.getElementById('rec-form').addEventListener('submit', function (e) {
+    e.preventDefault();
     if (!validEmail(recEmail.value)) { recField.classList.add('invalid'); recEmail.focus(); return; }
     state.email = recEmail.value.trim();
     /* Always the same next screen: whether an address has an account is not
