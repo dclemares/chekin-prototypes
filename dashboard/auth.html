@@ -276,6 +276,10 @@
   /* Belt-and-braces: the button already fills .cta via .btn.block, but this
      guarantees centring even if a future button in here isn't full width. */
   .cta{display:flex;flex-direction:column;align-items:center}
+  /* Card holds only the button: 26px top padding + the button's 8px margin
+     left it 34px from the top against 24px from the bottom. */
+  body.centred [data-screen="reset-success"] .acard{padding:22px}
+  [data-screen="reset-success"] .acard .btn.primary{margin-top:0}
   .acard .btn.primary{width:100%;justify-content:center;margin-top:8px}
   .acard .terms{margin:14px 0 0;max-width:none;text-align:center}
   .acard-alt{max-width:460px;text-align:center;margin-top:18px}
