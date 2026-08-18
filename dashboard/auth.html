@@ -278,12 +278,14 @@
   .sso img,.sso svg{width:18px;height:18px}
   .or{display:flex;align-items:center;gap:14px;margin:18px 0;font:600 11px var(--font-primary);letter-spacing:.07em;text-transform:uppercase;color:var(--text-gray-medium)}
   .or::before,.or::after{content:'';flex:1;height:1px;background:var(--stroke-gray-lighter)}
-  .reqs{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
-  .req{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--bg-neutral-light);font:500 11.5px var(--font-primary);color:var(--text-gray-dark);transition:background .15s,color .15s}
+  /* One row, never wider than the field above: four rules wrapping onto a
+     second line read as a list of problems rather than a checklist. */
+  .reqs{display:flex;gap:5px;margin-top:9px;flex-wrap:nowrap;max-width:100%}
+  .req{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:4px 7px;border-radius:999px;background:var(--bg-neutral-light);font:500 10.5px var(--font-primary);color:var(--text-gray-dark);white-space:nowrap;flex:0 1 auto;min-width:0;transition:background .15s,color .15s}
   /* A tick shown before the rule is met reads as already done. Unmet is an
      empty circle; the tick arrives when it is earned. */
-  .req svg{display:none;width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:3}
-  .req::before{content:"";width:11px;height:11px;border-radius:50%;border:1.5px solid currentColor;opacity:.4;flex-shrink:0}
+  .req svg{display:none;width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:3}
+  .req::before{content:"";width:9px;height:9px;border-radius:50%;border:1.5px solid currentColor;opacity:.4;flex-shrink:0}
   .req.ok{background:var(--bg-success-light);color:var(--success);font-weight:600}
   .req.ok svg{display:block}
   .req.ok::before{display:none}
@@ -818,11 +820,22 @@
     document.body.classList.toggle('centred', mode === 'auth');
     document.body.classList.toggle('on-login', id === 'login');
 
-    /* The code screen names the address it went to — it catches a typo made
-       one screen earlier, which is where that mistake actually happens. */
+    /* These three name the address they are talking about. Reached straight
+       from the switcher there is no state to name, and they were showing an
+       empty chip or the words "your email" — so they fall back to a sample
+       address rather than a blank. */
+    var addr = state.email || 'marta@sonder.com';
     if (id === 'twofactor') {
-      var addr = document.getElementById('otp-addr');
-      if (addr && state.email) addr.textContent = state.email;
+      var otpAddr = document.getElementById('otp-addr');
+      if (otpAddr) otpAddr.textContent = addr;
+    }
+    if (id === 'sso-only') {
+      document.getElementById('sso-initial').textContent = addr.charAt(0);
+      document.getElementById('sso-who').textContent = addr;
+    }
+    if (id === 'check-email') {
+      var ce = document.getElementById('check-email-addr');
+      if (ce && !ce.dataset.set) ce.textContent = addr;
     }
     /* Coming back from a reset, the address is known — no reason to ask. */
     if (id === 'login' && state.email) {
@@ -1190,7 +1203,9 @@
     state.email = recEmail.value.trim();
     /* Always the same next screen: whether an address has an account is not
        something a recovery form should confirm to whoever typed it. */
-    document.getElementById('check-email-addr').textContent = recEmail.value.trim();
+    var ce = document.getElementById('check-email-addr');
+    ce.textContent = recEmail.value.trim();
+    ce.dataset.set = '1';
     show('check-email');
   });
   var rpPass = document.getElementById('rp-pass');
