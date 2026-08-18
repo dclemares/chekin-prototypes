@@ -34,32 +34,19 @@
   .shell{display:grid;grid-template-columns:380px 1fr;min-height:100vh}
 
   /* ── Centred entry ────────────────────────────────────────────────
-     Sign-in screens drop the rail and sit alone in the middle. The rail
-     stays for register, where it carries the setup progress. */
-  body.centred{background:#FBFAF8}
-  body.centred .rail{display:none}
-  body.centred .shell{grid-template-columns:1fr}
-  body.centred .cwrap{max-width:none;padding:0 24px;justify-content:center;align-items:center;min-height:100vh}
-  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:420px;width:100%;margin:0}
-  body.centred .brandmark{display:block;height:26px;margin:0 auto 34px}
-  body.centred h1{font:700 40px/48px var(--font-primary);letter-spacing:-.03em;margin:0 0 10px}
-  body.centred .lead{font:400 16px/24px var(--font-primary);color:var(--text-gray-dark);margin:0 0 30px;max-width:none}
-  body.centred .stepno{display:none}
-  body.centred .acard{background:#fff;border-color:#EDEAE4;border-radius:16px;padding:22px 22px 20px;box-shadow:0 1px 2px rgba(22,22,67,.04)}
+     The rail and the screen background stay exactly as they were; what
+     the sign-in screens borrow is the calm centred card: vertically
+     centred, a headline with room to breathe, and the legal note held
+     inside the card instead of floating under it. */
+  body.centred .cwrap{justify-content:center;align-items:center}
+  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:440px;width:100%;margin:0}
+  body.centred h1{font:700 36px/43px var(--font-primary);letter-spacing:-.03em;margin:0 0 10px}
+  body.centred .lead{font:400 15.5px/23px var(--font-primary);color:var(--text-gray-dark);margin:0 0 28px;max-width:none}
+  body.centred .acard{border-radius:16px;padding:22px 22px 20px}
   body.centred .or{margin:14px 0}
-  body.centred .aftercard{display:block}
-  body.centred .trustline{display:block}
-
-  .brandmark{display:none}
-  .aftercard{display:none;margin-top:22px;font:500 13px var(--font-primary);color:var(--text-gray-dark)}
-  .aftercard a{color:var(--text-brand);font-weight:600;text-decoration:none;cursor:pointer}
-  .aftercard a:hover{text-decoration:underline}
-  .trustline{display:none;margin-top:40px;font:500 12.5px/20px var(--font-primary);color:var(--text-gray-medium)}
-  .trustline b{color:var(--text-gray-dark);font-weight:600}
   @media (max-width:640px){
-    body.centred h1{font:700 30px/36px var(--font-primary)}
-    body.centred .cwrap{padding:0 20px}
-    body.centred .trustline{margin-top:28px}
+    body.centred h1{font:700 28px/34px var(--font-primary)}
+    body.centred .screen{max-width:none}
   }
 
   /* ───────── Left rail ───────── */
@@ -373,7 +360,6 @@
 
       <!-- ── Login ── -->
       <section class="screen boxed" data-screen="login" data-mode="auth" data-progress="6">
-        <img class="brandmark" src="ds/assets/logos/chekin-wordmark.png" alt="Chekin">
         <p class="stepno" id="li-step">Get started</p>
         <h1 id="li-title">Every check-in, handled</h1>
         <p class="lead" id="li-lead">Log in or create your account with your work email.</p>
@@ -428,8 +414,6 @@
             <p class="terms">By continuing you accept our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
           </form>
         </div>
-        <p class="aftercard">Questions? <a>Talk to us — we reply in ~3 min</a></p>
-        <p class="trustline">Police reporting in <b>20+ countries</b> · <b>35+</b> PMS integrations</p>
       </section>
 
       <!-- ── Two-factor ── -->
