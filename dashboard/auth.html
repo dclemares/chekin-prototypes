@@ -609,13 +609,17 @@
         <div class="bigmark mail"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m2 7 10 7L22 7"/></svg></div>
         <p class="stepno">Sign in · Recovery</p>
         <h1>Check your email</h1>
-        <p class="lead">We sent an email with a link to reset your password to <b id="check-email-addr">you@company.com</b>.</p>
+        <p class="lead">We sent a reset link to <b id="check-email-addr">you@company.com</b>. It expires in 30 minutes.</p>
         <div class="acard">
-          <p class="muted-note spam-note" style="margin-top:0;">Not there? Give it a minute, then check your spam folder.</p>
+          <!-- The one thing this screen is actually asking for: go to the inbox.
+               Without it the card held a hint and a text link — a box round
+               nothing, and no primary action anywhere on the screen. -->
+          <a class="btn primary block" id="open-inbox" href="#" target="_blank" rel="noopener">Open your inbox</a>
           <div class="resend-row">
-            <span>Still nothing?</span>
+            <span>Didn't get it?</span>
             <button class="linklike" id="rec-resend">Resend email</button>
           </div>
+          <p class="muted-note spam-note">Check your spam folder before resending — it usually turns up there.</p>
         </div>
         <p class="muted-note acard-alt"><button class="linklike" data-go="login">Back to login</button></p>
       </section>
@@ -859,6 +863,7 @@
     if (id === 'check-email') {
       var ce = document.getElementById('check-email-addr');
       if (ce && !ce.dataset.set) ce.textContent = addr;
+      setInbox(ce ? ce.textContent : addr);
     }
     /* Coming back from a reset, the address is known — no reason to ask. */
     if (id === 'login' && state.email) {
@@ -1140,6 +1145,33 @@
     liGoogle.innerHTML = 'Connecting to Google…';
     setTimeout(function () { window.location.href = 'index.html'; }, 1100);
   });
+
+  /* Name the provider and link straight to it. A generic "check your email"
+     leaves the user to go find the tab themselves. */
+  var INBOXES = [
+    { m: /@gmail\.|@googlemail\./,            n: 'Gmail',   u: 'https://mail.google.com' },
+    { m: /@(outlook|hotmail|live|msn)\./,     n: 'Outlook', u: 'https://outlook.live.com/mail' },
+    { m: /@(yahoo|ymail)\./,                  n: 'Yahoo Mail', u: 'https://mail.yahoo.com' },
+    { m: /@(icloud|me|mac)\./,                n: 'iCloud Mail', u: 'https://www.icloud.com/mail' },
+    { m: /@(proton|protonmail)\./,            n: 'Proton Mail', u: 'https://mail.proton.me' }
+  ];
+  function setInbox(email) {
+    var link = document.getElementById('open-inbox');
+    if (!link) return;
+    var hit = null;
+    for (var i = 0; i < INBOXES.length; i++) { if (INBOXES[i].m.test(email || '')) { hit = INBOXES[i]; break; } }
+    if (hit) {
+      link.textContent = 'Open ' + hit.n;
+      link.href = hit.u;
+      link.target = '_blank';
+    } else {
+      /* Work domains are the common case here and we cannot know their
+         webmail, so the button stops pretending and hands off to the OS. */
+      link.textContent = 'Open your email app';
+      link.href = 'mailto:';
+      link.target = '_self';
+    }
+  }
 
   /* ── SSO-only account ── */
   var ssoGoogle = document.getElementById('sso-google');
