@@ -59,6 +59,9 @@
   .brandmark{display:none}
   .trustline{display:none;margin-top:36px;font:500 12.5px/20px var(--font-primary);color:var(--text-gray-medium)}
   .trustline b{color:var(--text-gray-dark);font-weight:600}
+  .mlegal{display:none;margin:10px 0 0;font:400 12px var(--font-primary);color:var(--text-gray-medium)}
+  .mlegal a{color:var(--text-gray-medium);text-decoration:underline;text-underline-offset:2px}
+  .mlegal span{margin:0 10px;opacity:.5}
   @media (max-width:1100px){
     body.centred .brandmark{display:block;height:26px;margin:0 auto 30px}
     body.centred .trustline{display:block}
@@ -91,13 +94,19 @@
     body.centred .field{margin-bottom:18px}
     body.centred .or{margin:18px 0}
 
-    /* Anything that is not a way in drops to the foot, quiet and small */
-    body.centred .captcha.compact{padding-top:14px;font-size:11.5px;opacity:.75}
-    body.centred .acard .terms{text-align:center;margin-top:16px;font-size:11.5px}
-    body.centred .aftercard{margin-top:26px;font-size:12px}
-    body.centred .trustline{margin-top:10px;font-size:11.5px}
-    body.centred .scr-fab{bottom:18px!important}
-    body.centred .scr-menu{bottom:68px!important}
+    /* Off the phone entirely: the captcha needs nothing from the user, and
+       support belongs with the legal links at the foot, not mid-form. */
+    body.centred .captcha{display:none}
+    body.centred .aftercard{display:none}
+    body.centred .acard .terms{display:none}
+
+    /* Proof and legal sit at the bottom edge, the way the reference does */
+    body.centred .screen{flex:1 0 auto;min-height:calc(100vh - 48px)}
+    body.centred .trustline{display:block;margin-top:auto;padding-top:32px;font-size:11.5px}
+    body.centred .mlegal{display:block}
+    /* Prototype chrome out of the way of the footer it was covering */
+    body.centred .scr-fab{bottom:auto!important;top:12px!important;right:12px!important;transform:scale(.85);transform-origin:top right}
+    body.centred .scr-menu{bottom:auto!important;top:58px!important}
   }
 
   /* ───────── Left rail ───────── */
@@ -468,6 +477,7 @@
         </div>
         <p class="aftercard">Questions? <a>Talk to us — we reply in ~3 min</a></p>
         <p class="trustline">Police reporting in <b>20+ countries</b> · <b>35+</b> PMS integrations</p>
+        <p class="mlegal"><a href="#">Terms of use</a><span>|</span><a href="#">Privacy policy</a></p>
       </section>
 
       <!-- ── Two-factor ── -->
