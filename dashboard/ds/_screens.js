@@ -7,6 +7,7 @@
   var GROUPS = [
     { label: 'Sign in', page: 'auth.html', items: [
       ['#login', 'Login'],
+      ['#sso-only', 'Google-only account'],
       ['#twofactor', 'Two-factor code'],
       ['#recovery', 'Password recovery'],
       ['#check-email', 'Check your email'],
