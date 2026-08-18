@@ -328,6 +328,22 @@
   .bigmark.mail svg{stroke:var(--text-brand)}
   /* Prototype control, sits above the Screens button. Decides what the email
      step resolves to so a demo doesn't depend on remembering test addresses. */
+  /* Prototype-only notes and shortcuts. They used to sit inside the cards,
+     where a stakeholder reads them as part of the product. */
+  .demo-bar{position:fixed;right:22px;bottom:130px;z-index:199;display:none;align-items:center;gap:10px;
+    max-width:340px;padding:9px 14px;border-radius:14px;background:var(--bg-dark);box-shadow:0 8px 22px rgba(22,22,67,.28)}
+  .demo-bar.on{display:flex}
+  .demo-bar .lbl{font:700 9.5px var(--font-primary);letter-spacing:.09em;text-transform:uppercase;color:#8B93C9;flex-shrink:0}
+  .demo-bar .txt{font:500 12px/17px var(--font-primary);color:#DDE1FF}
+  .demo-bar .txt b{color:#fff;font-weight:700}
+  .demo-bar .act{border:none;cursor:pointer;border-radius:999px;padding:6px 12px;background:var(--text-brand);
+    color:#fff;font:600 11.5px var(--font-primary);white-space:nowrap}
+  .demo-bar .act:hover{filter:brightness(1.08)}
+  @media (max-width:640px){
+    /* Bottom on phones: at the top it covered the screen's own icon. */
+    body.centred .demo-bar{bottom:150px;top:auto;right:12px;left:12px;max-width:none}
+  }
+
   .acct-flag{position:fixed;right:22px;bottom:76px;z-index:199;display:flex;align-items:center;gap:6px;
     padding:6px;border-radius:999px;background:var(--bg-dark);box-shadow:0 8px 22px rgba(22,22,67,.28)}
   .acct-flag .lbl{font:700 9.5px var(--font-primary);letter-spacing:.09em;text-transform:uppercase;color:#8B93C9;padding:0 6px 0 8px}
@@ -556,7 +572,6 @@
             <input inputmode="numeric" maxlength="1" aria-label="Digit 6">
           </div>
           <p class="otp-err" id="otp-err">Invalid code. Please try again.</p>
-          <p class="muted-note" style="margin-top:10px;">Demo: any code verifies · <b>111111</b> shows the error state</p>
           <div class="cta">
             <button class="btn primary block" id="otp-submit" style="margin-top:18px;">Verify</button>
           </div>
@@ -596,10 +611,7 @@
         <h1>Check your email</h1>
         <p class="lead">We sent an email with a link to reset your password to <b id="check-email-addr">you@company.com</b>.</p>
         <div class="acard">
-          <div class="cta">
-            <button class="btn primary block" data-go="reset">Open the link from the email (demo)</button>
-          </div>
-          <p class="muted-note spam-note">Not there? Give it a minute, then check your spam folder.</p>
+          <p class="muted-note spam-note" style="margin-top:0;">Not there? Give it a minute, then check your spam folder.</p>
           <div class="resend-row">
             <span>Still nothing?</span>
             <button class="linklike" id="rec-resend">Resend email</button>
@@ -829,6 +841,7 @@
     /* Register keeps the rail — it carries the setup progress. */
     document.body.classList.toggle('centred', mode === 'auth');
     document.body.classList.toggle('on-login', id === 'login');
+    if (window.setDemo) setDemo(id);
 
     /* These three name the address they are talking about. Reached straight
        from the switcher there is no state to name, and they were showing an
@@ -986,6 +999,33 @@
     if (GOOGLE_ACCOUNTS.indexOf(email) !== -1) return 'sso';
     return KNOWN_ACCOUNTS.indexOf(email) !== -1 ? 'password' : 'signup';
   }
+
+  /* One place for everything that only exists because this is a prototype. */
+  var DEMO = {
+    twofactor:     { txt: 'Any code verifies · <b>111111</b> shows the error state' },
+    'check-email': { txt: 'The real user opens the link in their inbox.', act: 'Open the email link', go: 'reset' },
+    'r-creating':  { txt: 'Simulated — moves on by itself.' }
+  };
+  var demoBar = document.createElement('div');
+  demoBar.className = 'demo-bar';
+  demoBar.innerHTML = '<span class="lbl">Demo</span><span class="txt"></span>';
+  var demoAct = document.createElement('button');
+  demoAct.type = 'button';
+  demoAct.className = 'act';
+  demoBar.appendChild(demoAct);
+  document.body.appendChild(demoBar);
+
+  window.setDemo = function (id) {
+    var d = DEMO[id];
+    demoBar.classList.toggle('on', !!d);
+    if (!d) return;
+    demoBar.querySelector('.txt').innerHTML = d.txt;
+    demoAct.style.display = d.act ? '' : 'none';
+    if (d.act) {
+      demoAct.textContent = d.act;
+      demoAct.onclick = function () { show(d.go); };
+    }
+  };
 
   (function buildAcctFlag() {
     var box = document.createElement('div');
