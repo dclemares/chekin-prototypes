@@ -50,16 +50,16 @@
      stands down here rather than saying it twice. */
   body.centred .aftercard{display:block}
   body.centred .rail-mode[data-railmode="auth"] .help{display:none}
-  .aftercard{display:none;margin-top:22px;font:500 13px var(--font-primary);color:var(--text-gray-dark)}
+  .aftercard{display:none;margin-top:22px;font:500 13px var(--font-primary);color:var(--text-gray-dark);text-align:center;width:100%}
   .aftercard a{color:var(--text-brand);font-weight:600;text-decoration:none;cursor:pointer}
   .aftercard a:hover{text-decoration:underline}
 
   /* Only once the rail is gone does the screen have to carry the wordmark
      and the proof itself — above that width the rail already does. */
   .brandmark{display:none}
-  .trustline{display:none;margin-top:36px;font:500 12.5px/20px var(--font-primary);color:var(--text-gray-medium)}
+  .trustline{display:none;margin-top:36px;font:500 12.5px/20px var(--font-primary);color:var(--text-gray-medium);text-align:center;width:100%}
   .trustline b{color:var(--text-gray-dark);font-weight:600}
-  .mlegal{display:none;margin:10px 0 0;font:400 12px var(--font-primary);color:var(--text-gray-medium)}
+  .mlegal{display:none;margin:10px 0 0;font:400 12px var(--font-primary);color:var(--text-gray-medium);text-align:center;width:100%}
   .mlegal a{color:var(--text-gray-medium);text-decoration:underline;text-underline-offset:2px}
   .mlegal span{margin:0 10px;opacity:.5}
   @media (max-width:1100px){
@@ -96,12 +96,19 @@
 
     /* Off the phone entirely: the captcha needs nothing from the user, and
        support belongs with the legal links at the foot, not mid-form. */
+    /* The link rows under the form were left-aligned against a centred
+       header — the only thing on these screens that disagreed. */
+    body.centred .resend-row{justify-content:center}
+    body.centred .reqs{justify-content:center}
+    body.centred .otp-err,body.centred .muted-note{text-align:center}
     body.centred .captcha{display:none}
     body.centred .aftercard{display:none}
     body.centred .acard .terms{display:none}
 
-    /* Proof and legal sit at the bottom edge, the way the reference does */
-    body.centred .screen{flex:1 0 auto;min-height:calc(100vh - 48px)}
+    /* Proof and legal sit at the bottom edge, the way the reference does.
+       They are children of .cwrap now, so the auto margin pushes against the
+       wrapper rather than against a single screen. */
+    body.centred .cwrap{min-height:100vh}
     body.centred .trustline{display:block;margin-top:auto;padding-top:32px;font-size:11.5px}
     body.centred .mlegal{display:block}
     /* Prototype chrome out of the way of the footer it was covering */
@@ -418,9 +425,11 @@
     <div class="cbar"><i id="cbar" style="width:5%"></i></div>
     <div class="cwrap">
 
+      <!-- Shared by every auth screen, not just the first one -->
+      <img class="brandmark" src="ds/assets/logos/chekin-wordmark.png" alt="Chekin">
+
       <!-- ── Login ── -->
       <section class="screen boxed" data-screen="login" data-mode="auth" data-progress="6">
-        <img class="brandmark" src="ds/assets/logos/chekin-wordmark.png" alt="Chekin">
         <p class="stepno" id="li-step">Get started</p>
         <h1 id="li-title">Every check-in, handled</h1>
         <p class="lead" id="li-lead">Log in or create your account with your work email.</p>
@@ -475,19 +484,16 @@
             <p class="terms">By continuing you accept our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
           </form>
         </div>
-        <p class="aftercard">Questions? <a>Talk to us — we reply in ~3 min</a></p>
-        <p class="trustline">Police reporting in <b>20+ countries</b> · <b>35+</b> PMS integrations</p>
-        <p class="mlegal"><a href="#">Terms of use</a><span>|</span><a href="#">Privacy policy</a></p>
       </section>
 
       <!-- ── Two-factor ── -->
       <section class="screen boxed" data-screen="twofactor" data-mode="auth" data-progress="10">
         <p class="stepno">Sign in · Security</p>
-        <h1>Two-Factor Authentication</h1>
-        <p class="lead">To continue, please enter the 6-digit verification code sent to your account email.</p>
+        <h1>Enter your code</h1>
+        <p class="lead">We sent a 6-digit code to <b id="otp-addr">your email</b>.</p>
         <div class="acard">
           <div class="otp" id="otp">
-            <input inputmode="numeric" maxlength="1" aria-label="Digit 1">
+            <input inputmode="numeric" maxlength="1" aria-label="Digit 1" autocomplete="one-time-code">
             <input inputmode="numeric" maxlength="1" aria-label="Digit 2">
             <input inputmode="numeric" maxlength="1" aria-label="Digit 3">
             <input inputmode="numeric" maxlength="1" aria-label="Digit 4">
@@ -497,7 +503,7 @@
           <p class="otp-err" id="otp-err">Invalid code. Please try again.</p>
           <p class="muted-note" style="margin-top:10px;">Demo: any code verifies · <b>111111</b> shows the error state</p>
           <div class="cta">
-            <button class="btn primary block" id="otp-submit" disabled style="margin-top:18px;">Verify</button>
+            <button class="btn primary block" id="otp-submit" style="margin-top:18px;">Verify</button>
           </div>
           <div class="resend-row">
             <span>Didn't receive a code?</span>
@@ -515,15 +521,16 @@
         <h1>Password recovery</h1>
         <p class="lead">Enter your email to recover your password.</p>
         <div class="acard">
-          <div class="field">
+          <div class="field" id="rec-email-field">
             <div class="fs">
               <input id="rec-email" type="email" placeholder="name@company.com">
-              <fieldset><legend><span>Your recovery email</span></legend></fieldset>
-              <label for="rec-email">Your recovery email</label>
+              <fieldset><legend><span>Email</span></legend></fieldset>
+              <label for="rec-email">Email</label>
             </div>
+            <p class="err">Enter a valid email address.</p>
           </div>
           <div class="cta">
-            <button class="btn primary block" id="rec-send" disabled>Send Recovery Link</button>
+            <button class="btn primary block" id="rec-send">Send recovery link</button>
           </div>
           <div class="resend-row">
             <button class="linklike" data-go="login" style="color:var(--text-gray-medium);">Back</button>
@@ -562,7 +569,10 @@
               <button class="eye" data-eye="rp-pass" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
             <div class="strength" id="rp-strength"><i></i><i></i><i></i><i></i></div>
-            <p class="hint">Use 8+ characters with a mix of letters and numbers.</p>
+            <div class="reqs">
+              <span class="req" id="rp-req-len"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>8+ characters</span>
+              <span class="req" id="rp-req-mix"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Letters &amp; numbers</span>
+            </div>
           </div>
           <div class="field" id="rp-confirm-field">
             <div class="fs">
@@ -573,7 +583,7 @@
             <p class="err">Passwords don't match.</p>
           </div>
           <div class="cta">
-            <button class="btn primary block" id="rp-submit" disabled>Reset password</button>
+            <button class="btn primary block" id="rp-submit">Reset password</button>
           </div>
         </div>
       </section>
@@ -727,6 +737,11 @@
         </div>
       </section>
 
+      <!-- Footer for the auth screens, shared the same way -->
+      <p class="aftercard">Questions? <a>Talk to us — we reply in ~3 min</a></p>
+      <p class="trustline">Police reporting in <b>20+ countries</b> · <b>35+</b> PMS integrations</p>
+      <p class="mlegal"><a href="#">Terms of use</a><span>|</span><a href="#">Privacy policy</a></p>
+
     </div>
   </div>
 </div>
@@ -750,6 +765,18 @@
     });
     /* Register keeps the rail — it carries the setup progress. */
     document.body.classList.toggle('centred', mode === 'auth');
+
+    /* The code screen names the address it went to — it catches a typo made
+       one screen earlier, which is where that mistake actually happens. */
+    if (id === 'twofactor') {
+      var addr = document.getElementById('otp-addr');
+      if (addr && state.email) addr.textContent = state.email;
+    }
+    /* Coming back from a reset, the address is known — no reason to ask. */
+    if (id === 'login' && state.email) {
+      var li = document.getElementById('li-email');
+      if (li && !li.value) { li.value = state.email; }
+    }
     /* Nobody arrives here to read — put the caret where the typing starts.
        The markup's autofocus never fires because the screen is hidden at parse. */
     var firstField = target.querySelector('input:not([type=checkbox]):not([type=hidden])');
@@ -954,7 +981,21 @@
   var otpErr = document.getElementById('otp-err');
   var otpSubmit = document.getElementById('otp-submit');
   function otpValue() { return otpInputs.map(function (i) { return i.value; }).join(''); }
-  function updateOtp() { otpSubmit.disabled = otpValue().length !== 6; }
+  /* Six digits is the whole input — waiting for a button press after the
+     last one is a step nobody needs. Submits itself, as every code field
+     the user already knows does. */
+  function updateOtp() {
+    if (otpValue().length === 6) submitOtp();
+  }
+  function otpFail(msg) {
+    otpBox.classList.add('error');
+    otpErr.textContent = msg;
+    otpErr.classList.add('on');
+    otpSubmit.classList.remove('loading');
+    otpSubmit.textContent = 'Verify';
+    otpInputs.forEach(function (o) { o.value = ''; });
+    otpInputs[0].focus();
+  }
   otpInputs.forEach(function (inp, idx) {
     inp.addEventListener('input', function () {
       inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
@@ -975,16 +1016,16 @@
       updateOtp();
     });
   });
-  otpSubmit.addEventListener('click', function () {
-    if (otpValue() === '111111') {
-      otpBox.classList.add('error');
-      otpErr.classList.add('on');
-      return;
-    }
-    otpSubmit.disabled = true;
+  function submitOtp() {
+    if (otpValue().length !== 6) { otpFail('Enter all six digits.'); return; }
+    otpSubmit.classList.add('loading');
     otpSubmit.textContent = 'Signing you in…';
-    setTimeout(function () { window.location.href = 'index.html'; }, 900);
-  });
+    setTimeout(function () {
+      if (otpValue() === '111111') { otpFail('That code is not valid. Check it and try again.'); return; }
+      window.location.href = 'index.html';
+    }, 700);
+  }
+  otpSubmit.addEventListener('click', submitOtp);
   var resend = document.getElementById('resend');
   resend.addEventListener('click', function () {
     var left = 30;
@@ -1006,8 +1047,13 @@
   /* ── Recovery chain ── */
   var recEmail = document.getElementById('rec-email');
   var recSend = document.getElementById('rec-send');
-  recEmail.addEventListener('input', function () { recSend.disabled = !validEmail(recEmail.value); });
+  var recField = document.getElementById('rec-email-field');
+  recEmail.addEventListener('input', function () { if (recField) recField.classList.remove('invalid'); });
   recSend.addEventListener('click', function () {
+    if (!validEmail(recEmail.value)) { recField.classList.add('invalid'); recEmail.focus(); return; }
+    state.email = recEmail.value.trim();
+    /* Always the same next screen: whether an address has an account is not
+       something a recovery form should confirm to whoever typed it. */
     document.getElementById('check-email-addr').textContent = recEmail.value.trim();
     show('check-email');
   });
@@ -1015,14 +1061,33 @@
   var rpPass = document.getElementById('rp-pass');
   var rpConfirm = document.getElementById('rp-confirm');
   var rpSubmit = document.getElementById('rp-submit');
+  /* The hint promised letters and numbers but only the length was checked,
+     so a reset could set a weaker password than registration allows. Same
+     rule as registration now, shown live rather than as static advice. */
+  function resetRules() {
+    var v = rpPass.value;
+    return { len: v.length >= 8, mix: /[A-Za-z]/.test(v) && /\d/.test(v) };
+  }
   function updateReset() {
-    var match = rpPass.value.length >= 8 && rpPass.value === rpConfirm.value;
+    var r = resetRules();
+    var lenChip = document.getElementById('rp-req-len');
+    var mixChip = document.getElementById('rp-req-mix');
+    if (lenChip) lenChip.classList.toggle('ok', r.len);
+    if (mixChip) mixChip.classList.toggle('ok', r.mix);
     document.getElementById('rp-confirm-field').classList.toggle('invalid', rpConfirm.value.length > 0 && rpPass.value !== rpConfirm.value);
-    rpSubmit.disabled = !match;
   }
   rpPass.addEventListener('input', updateReset);
   rpConfirm.addEventListener('input', updateReset);
-  rpSubmit.addEventListener('click', function () { show('reset-success'); });
+  rpSubmit.addEventListener('click', function () {
+    var r = resetRules();
+    if (!r.len || !r.mix) { rpPass.focus(); updateReset(); return; }
+    if (rpPass.value !== rpConfirm.value) {
+      document.getElementById('rp-confirm-field').classList.add('invalid');
+      rpConfirm.focus();
+      return;
+    }
+    show('reset-success');
+  });
 
   /* ── Register: one form, account creation only ── */
   var reEmail = document.getElementById('re-email');
