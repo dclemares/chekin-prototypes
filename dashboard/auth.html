@@ -350,8 +350,9 @@
     body.centred .demo-bar{bottom:150px;top:auto;right:12px;left:12px;max-width:none}
   }
 
-  .acct-flag{position:fixed;right:22px;bottom:76px;z-index:199;display:flex;align-items:center;gap:6px;
+  .acct-flag{position:fixed;right:22px;bottom:76px;z-index:199;display:none;align-items:center;gap:6px;
     padding:6px;border-radius:999px;background:var(--bg-dark);box-shadow:0 8px 22px rgba(22,22,67,.28)}
+  body.on-login .acct-flag{display:flex}
   .acct-flag .lbl{font:700 9.5px var(--font-primary);letter-spacing:.09em;text-transform:uppercase;color:#8B93C9;padding:0 6px 0 8px}
   .acct-flag button{border:none;cursor:pointer;border-radius:999px;padding:6px 11px;background:transparent;
     font:600 11.5px var(--font-primary);color:#AEB7F5;transition:background .14s,color .14s}
@@ -1019,20 +1020,14 @@
      so nobody has to know in advance whether they already have an account.
      Password is revealed in place rather than on a second page: password
      managers behave far better without a navigation between the fields. */
-  var KNOWN_ACCOUNTS = ['dani@chekin.com', 'marta@sonder.com', 'host@example.com'];
-  var GOOGLE_ACCOUNTS = ['marta@sonder.com'];
-
-  /* Prototype flag: forces what the email step resolves to, so demos don't
-     hinge on remembering which test address is which. 'real' keeps the
-     address lists above. */
-  var acctMode = 'real';
-  try { acctMode = sessionStorage.getItem('chekin_acct_mode') || 'real'; } catch (e) {}
-  function resolveAccount(email) {
-    if (acctMode === 'existing') return 'password';
+  /* Prototype flag: the three states this address can be in. Everything the
+     login screen does — email or Google — branches off this one value. */
+  var acctMode = 'existing';
+  try { acctMode = sessionStorage.getItem('chekin_acct_mode') || 'existing'; } catch (e) {}
+  function resolveAccount() {
     if (acctMode === 'new') return 'signup';
     if (acctMode === 'google') return 'sso';
-    if (GOOGLE_ACCOUNTS.indexOf(email) !== -1) return 'sso';
-    return KNOWN_ACCOUNTS.indexOf(email) !== -1 ? 'password' : 'signup';
+    return 'password';
   }
 
   /* One place for everything that only exists because this is a prototype. */
@@ -1066,7 +1061,7 @@
     var box = document.createElement('div');
     box.className = 'acct-flag';
     box.innerHTML = '<span class="lbl">Account</span>';
-    [['real','Real'],['existing','Existing'],['new','New'],['google','Google']].forEach(function (o) {
+    [['existing','Has account'],['new','No account'],['google','Google only']].forEach(function (o) {
       var b = document.createElement('button');
       b.type = 'button';
       b.textContent = o[1];
@@ -1132,7 +1127,7 @@
       liSubmit.textContent = 'Checking…';
       setTimeout(function () {
         liSubmit.classList.remove('loading');
-        var route = resolveAccount(email);
+        var route = resolveAccount();
         if (route === 'password') {
           toPasswordStage(email);
         } else if (route === 'sso') {
@@ -1172,14 +1167,45 @@
   });
 
   var liGoogle = document.getElementById('li-google');
+  /* Google went straight to the dashboard whatever the address turned out to
+     be, so the provider path skipped the question the email path asks. It
+     branches on the same three states now. */
+  var liGoogleLabel = liGoogle.innerHTML;
   liGoogle.addEventListener('click', function () {
     liGoogle.disabled = true;
     liGoogle.innerHTML = 'Connecting to Google…';
-    setTimeout(function () { window.location.href = 'index.html'; }, 1100);
+    setTimeout(function () {
+      var email = GOOGLE_IDENTITY.email;
+      var route = resolveAccount();
+      liGoogle.disabled = false;
+      liGoogle.innerHTML = liGoogleLabel;
+
+      if (route === 'signup') {
+        /* No account: Google hands over the identity, registration keeps only
+           what it cannot answer. */
+        state.email = email;
+        show('r-account');
+        startGoogleSignup(email, GOOGLE_IDENTITY.name);
+        return;
+      }
+      if (route === 'password') {
+        /* The account exists but was made with a password, so the provider
+           cannot open it. Say so rather than failing silently. */
+        state.email = email;
+        liEmail.value = email;
+        toPasswordStage(email);
+        failLogin('This account uses a password. Enter it to continue.');
+        return;
+      }
+      /* Google account: this is exactly the way in. */
+      window.location.href = 'index.html';
+    }, 1100);
   });
 
   /* Name the provider and link straight to it. A generic "check your email"
      leaves the user to go find the tab themselves. */
+  var GOOGLE_IDENTITY = { email: 'marta@sonder.com', name: 'Marta Ferreira' };
+
   var INBOXES = [
     { m: /@gmail\.|@googlemail\./,            n: 'Gmail',   u: 'https://mail.google.com' },
     { m: /@(outlook|hotmail|live|msn)\./,     n: 'Outlook', u: 'https://outlook.live.com/mail' },
@@ -1424,21 +1450,27 @@
   }
   document.getElementById('racct-change').addEventListener('click', exitGoogle);
 
+  /* Google gives us the identity but not the property type, and that is what
+     decides the subscription — so the form stays, minus everything the
+     provider already answered. Shared by the register screen's own button and
+     by arriving here from the login screen. */
+  window.startGoogleSignup = function (email, name) {
+    reEmail.value = email; rnName.value = name;
+    reEmail.dispatchEvent(new Event('input'));
+    document.getElementById('racct-initial').textContent = name.charAt(0);
+    document.getElementById('racct-who').textContent = email;
+    racctCard.classList.add('from-google');
+    var q = document.getElementById('rp-ptypes');
+    if (q) q.scrollIntoView({ block: 'center' });
+  };
+
   gBtn.addEventListener('click', function () {
     gBtn.disabled = true;
     gBtn.innerHTML = 'Connecting to Google…';
     setTimeout(function () {
-      /* Google gives us the identity but not the property type, and that is
-         what decides the subscription — so the form stays, minus everything
-         the provider already answered. */
-      var email = 'marta@sonder.com', name = 'Marta Ferreira';
-      reEmail.value = email; rnName.value = name;
-      reEmail.dispatchEvent(new Event('input'));
-      document.getElementById('racct-initial').textContent = name.charAt(0);
-      document.getElementById('racct-who').textContent = email;
-      racctCard.classList.add('from-google');
-      var q = document.getElementById('rp-ptypes');
-      if (q) q.scrollIntoView({ block: 'center' });
+      startGoogleSignup(GOOGLE_IDENTITY.email, GOOGLE_IDENTITY.name);
+      gBtn.disabled = false;
+      gBtn.innerHTML = googleLabel;
     }, 1100);
   });
 
