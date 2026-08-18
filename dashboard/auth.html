@@ -52,14 +52,14 @@
   .rstep .bub svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:3}
   .rstep.done .bub{background:rgba(53,229,188,.16);color:var(--icon-success-light);border-color:transparent}
   .rstep.active .bub{background:#fff;color:#1B1B5A;border-color:transparent;box-shadow:0 0 0 4px rgba(255,255,255,.16)}
-  .rstep .txt .t{font:600 14px/18px var(--font-primary);color:#8B93C9;transition:color .2s}
-  .rstep .txt .d{font:400 12px/16px var(--font-primary);color:#5D64A0;margin-top:2px;max-height:0;overflow:hidden;opacity:0;transition:max-height .25s,opacity .25s}
+  .rstep .txt .t{font:600 16px/24px var(--font-primary);color:#8B93C9;transition:color .2s}
+  .rstep .txt .d{font:400 14px/20px var(--font-primary);color:#5D64A0;margin-top:2px;max-height:0;overflow:hidden;opacity:0;transition:max-height .25s,opacity .25s}
   .rstep.active .txt .t{color:#fff}
-  .rstep.active .txt .d{max-height:40px;opacity:1}
+  .rstep.active .txt .d{max-height:56px;opacity:1}
   .rstep.done .txt .t{color:#AEB7F5}
-  .rail .nextup{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.12);font:500 12.5px/18px var(--font-primary);color:#8B93C9}
+  .rail .nextup{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.12);font:500 14px/20px var(--font-primary);color:#8B93C9}
   .rail .nextup b{color:#DDE1FF;font-weight:600}
-  .rail .help{margin-top:20px;font:500 12.5px var(--font-primary);color:#8B93C9}
+  .rail .help{margin-top:20px;font:500 14px/20px var(--font-primary);color:#8B93C9}
   .rail .help a{color:#AEB7F5;font-weight:600;text-decoration:none;cursor:pointer}
   .rail-mode[data-railmode="auth"] .help{margin-top:auto}
 
@@ -75,7 +75,7 @@
   h1{font:700 30px/38px var(--font-primary);letter-spacing:-.015em;margin:0 0 10px}
   /* show() focuses the heading to announce the new screen — don't paint a ring */
   h1:focus,h1:focus-visible{outline:none}
-  .lead{font:400 15px/23px var(--font-primary);color:var(--text-gray-dark);margin:0 0 32px;max-width:560px}
+  .lead{font:400 14px/20px var(--font-primary);color:var(--text-gray-dark);margin:0 0 32px}
   .screen{display:none;animation:stepIn .35s cubic-bezier(.2,.8,.2,1);flex-direction:column;flex:1}
   .screen.on{display:flex}
   @keyframes stepIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -172,6 +172,28 @@
   .reqs .slabel.w2{color:var(--text-warn)}
   .reqs .slabel.w3,.reqs .slabel.w4{color:var(--success)}
 
+  /* Property type — the one business question we ask before creating the account,
+     because it decides the subscription type the backend needs at registration. */
+  .ptq{font:600 13px var(--font-primary);color:var(--text-dark);margin-bottom:10px}
+  .ptypes{display:flex;gap:8px;flex-wrap:wrap}
+  .ptype{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid var(--stroke-gray-lighter);border-radius:12px;background:var(--bg-white);font:600 13.5px var(--font-primary);color:var(--text-dark);cursor:pointer;transition:all .13s}
+  .ptype .em{font-size:16px;line-height:1}
+  .ptype:hover{border-color:var(--stroke-gray-medium)}
+  .ptype.sel{border-color:var(--text-brand);background:var(--bg-blue-light);color:var(--text-brand);box-shadow:0 0 0 3px rgba(56,92,248,.12)}
+
+  /* Account creation pending — mirrors CreatingAccountPending in the app */
+  .pending{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:64px 0}
+  .pending .mark{width:80px;height:80px;border-radius:24px;background:var(--bg-dark);display:grid;place-items:center}
+  .pending .mark svg{width:36px;height:36px;fill:#fff}
+  .pending .dots{display:inline-flex;align-items:center;gap:5px}
+  .pending .dots i{width:7px;height:7px;border-radius:50%;background:#E3E3E3;animation:pdot 1.4s infinite ease-in-out both}
+  .pending .dots i:nth-child(1){animation-delay:-.32s}
+  .pending .dots i:nth-child(2){animation-delay:-.16s}
+  @keyframes pdot{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+  .pending .line{height:24px;overflow:hidden}
+  .pending .line .in{display:flex;flex-direction:column;transition:transform .5s ease-out}
+  .pending .line p{margin:0;height:24px;font:500 14px/24px var(--font-primary);color:var(--text-gray-dark);text-align:center}
+
   .bigmark{width:56px;height:56px;border-radius:16px;background:var(--bg-success-light);display:grid;place-items:center;margin-bottom:20px}
   .bigmark svg{width:26px;height:26px;stroke:var(--success);fill:none;stroke-width:2.4}
   .bigmark.mail{background:var(--bg-blue-light)}
@@ -209,33 +231,6 @@
 
   /* Layout variants: boxed (card, centered) vs plain (no card, left) */
   /* Left-aligned content, but the column itself stays centred on the page */
-  body.v-plain .screen.boxed{align-items:flex-start;text-align:left;justify-content:flex-start;padding-bottom:0;width:100%;max-width:440px;margin-left:auto;margin-right:auto}
-  body.v-plain .screen.boxed .lead{margin-left:0;margin-right:0}
-  body.v-plain .screen.boxed .bigmark{margin-left:0;margin-right:0}
-  body.v-plain .acard{max-width:440px;background:none;border:none;padding:0;border-radius:0}
-  body.v-plain .acard .terms{text-align:left}
-  body.v-plain .acard-alt{text-align:left}
-  /* Label variant: bold label above a plainly bordered input (guestapp style).
-     Independent of the card variant — either label style works in either box. */
-  body.l-top .field{margin-bottom:20px}
-  body.l-top .fs{display:flex;flex-direction:column;min-height:0}
-  body.l-top .fs > fieldset{display:none}
-  body.l-top .fs > label{order:-1;position:static;max-width:none;margin:0 0 8px;padding:0;color:var(--text-dark);font:700 14px var(--font-primary);cursor:pointer;transition:color .12s}
-  body.l-top .fs input,body.l-top .fs select{height:52px;border:1px solid var(--field-line);border-radius:12px;background:var(--bg-white);font:500 15px var(--font-primary)}
-  body.l-top .fs input::placeholder{opacity:1}
-  body.l-top .fs input:focus,body.l-top .fs select:focus{border-color:var(--text-brand)}
-  body.l-top .fs .eye{top:auto;bottom:0;height:52px;transform:none}
-  body.l-top .fs.dial select{height:52px;margin-top:0}
-  body.l-top .phone-row{align-items:flex-end}
-  /* Label the whole row, not just the number box */
-  body.l-top .phone-row .fs:not(.dial) > label{margin-left:-110px}
-  body.l-top .field.invalid .fs input{border-color:var(--text-danger)}
-  body.l-top .field.invalid .fs > label{color:var(--text-danger)}
-  .vswitch{position:fixed;right:152px;bottom:22px;z-index:200;display:flex;align-items:center;gap:2px;background:#fff;border:1px solid var(--stroke-gray-light);border-radius:999px;padding:3px}
-  .vswitch .vlab{font:700 10px var(--font-primary);letter-spacing:.07em;text-transform:uppercase;color:var(--text-gray-medium);padding:0 7px 0 11px}
-  .vswitch .vsep{width:1px;align-self:stretch;margin:4px 3px;background:var(--stroke-gray-lighter)}
-  .vswitch button{border:none;background:none;color:var(--text-gray-dark);padding:7px 12px;border-radius:999px;cursor:pointer;font:600 12px var(--font-primary)}
-  .vswitch button.on{background:var(--bg-dark);color:#fff}
 
   @media (max-width:1100px){
     .shell{grid-template-columns:1fr}
@@ -248,14 +243,14 @@
     .cwrap{padding:22px 20px 24px;max-width:none}
     .topalt{padding:14px 20px 0;font-size:12.5px}
     h1{font:700 24px/31px var(--font-primary)}
-    .lead{font:400 14.5px/22px var(--font-primary);margin-bottom:24px}
+    .lead{font:400 14px/20px var(--font-primary);margin-bottom:24px}
     .screen{justify-content:flex-start}
     /* The card's chrome costs ~56px of a 375px screen — drop it and let the
        form run full-bleed. Boxed and Plain converge here by design. */
     .screen.boxed{align-items:stretch;text-align:left;justify-content:flex-start;padding-bottom:0;max-width:none;margin:0}
     .screen.boxed .lead,.screen.boxed .bigmark{margin-left:0;margin-right:0}
-    .acard,body.v-plain .acard{max-width:none;background:none;border:none;padding:0;border-radius:0}
-    .acard .terms,.acard-alt,body.v-plain .acard .terms,body.v-plain .acard-alt{text-align:left}
+    .acard{max-width:none;background:none;border:none;padding:0;border-radius:0}
+    .acard .terms,.acard-alt{text-align:left}
     .sso,.or{max-width:none}
     .field{margin-bottom:18px}
     .otp{gap:7px}
@@ -275,9 +270,6 @@
     .cwrap{padding-bottom:calc(var(--dock-h,72px) + 24px)}
 
     /* Prototype chrome stacks above the dock instead of under it */
-    .vswitch{right:auto;left:12px;bottom:calc(var(--dock-h,72px) + 62px);padding:2px}
-    .vswitch .vlab{padding:0 4px 0 8px;font-size:9px}
-    .vswitch button{padding:6px 9px;font-size:11px}
     .scr-fab{bottom:calc(var(--dock-h,72px) + 12px)!important}
     .scr-menu{bottom:calc(var(--dock-h,72px) + 62px)!important;max-height:52vh}
   }
@@ -307,7 +299,7 @@
     <!-- register: account creation, then the guided-setup journey ahead -->
     <div class="rail-mode" data-railmode="register">
       <div class="steps">
-        <div class="rstep active" data-rail="account"><span class="bub">1</span><div class="txt"><div class="t">Create your account</div><div class="d">One short form — email, name, password &amp; phone.</div></div></div>
+        <div class="rstep active" data-rail="account"><span class="bub">1</span><div class="txt"><div class="t">Create your account</div><div class="d">One short form — and you are in.</div></div></div>
         <div class="rstep" data-rail="s1"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">We tailor legal modules to your market.</div></div></div>
         <div class="rstep" data-rail="s2"><span class="bub">3</span><div class="txt"><div class="t">Your portfolio</div><div class="d">So the dashboard fits your scale.</div></div></div>
         <div class="rstep" data-rail="s3"><span class="bub">4</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
@@ -492,8 +484,8 @@
           <div class="field">
             <div class="fs">
               <input id="re-email" type="email" placeholder="name@company.com" autocomplete="email" data-autofocus>
-              <fieldset><legend><span>Work email</span></legend></fieldset>
-              <label for="re-email">Work email</label>
+              <fieldset><legend><span>Email</span></legend></fieldset>
+              <label for="re-email">Email</label>
             </div>
             <p class="err">Enter a valid email address.</p>
           </div>
@@ -514,11 +506,20 @@
               </div>
               <div class="fs">
                 <input id="rp-phone" type="tel" placeholder="600 000 000" autocomplete="tel">
-                <fieldset><legend><span>Phone number</span></legend></fieldset>
-                <label for="rp-phone">Phone number</label>
+                <fieldset><legend><span>Phone number (optional)</span></legend></fieldset>
+                <label for="rp-phone">Phone number (optional)</label>
               </div>
             </div>
             <p class="hint">Only for account security and urgent check-in alerts — never marketing.</p>
+          </div>
+          <div class="field">
+            <div class="ptq">What type of property do you manage?</div>
+            <div class="ptypes" id="rp-ptypes">
+              <button class="ptype" type="button" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
+              <button class="ptype" type="button" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
+              <button class="ptype" type="button" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
+              <button class="ptype" type="button" data-ptype="other"><span class="em">✳️</span>Other</button>
+            </div>
           </div>
           <div class="field">
             <div class="fs has-eye">
@@ -543,6 +544,19 @@
       </section>
 
       <!-- ── Register · welcome → guided setup ── -->
+      <section class="screen" data-screen="r-creating" data-mode="register" data-progress="14">
+        <div class="pending" role="status" aria-live="polite">
+          <div class="mark"><svg viewBox="0 0 27 21" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8.77132 19.8332L0.670544 11.7095C0.241121 11.271 0 10.6772 0 10.0581C0 9.43909 0.241121 8.84516 0.670544 8.40668L2.5192 6.56852C2.96895 6.1403 3.56171 5.90204 4.17763 5.90204C4.79355 5.90204 5.38643 6.1403 5.83606 6.56852L10.4186 11.1605L21.0182 0.665703C21.4681 0.237936 22.0609 0 22.6766 0C23.2923 0 23.8851 0.237936 24.335 0.665703L26.1848 2.50496C26.6148 2.94321 26.8562 3.53714 26.8562 4.15635C26.8562 4.77568 26.6148 5.36961 26.1848 5.80774L14.1987 17.6784C14.1212 17.7908 14.0334 17.8957 13.9368 17.9916L12.0848 19.8332C11.6352 20.2615 11.0423 20.4998 10.4264 20.4998C9.81047 20.4998 9.21771 20.2615 8.76796 19.8332H8.77132Z"/></svg></div>
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="line"><div class="in" id="pendLines">
+            <p>Checking your configuration…</p>
+            <p>Setting up your account…</p>
+            <p>Preparing your dashboard…</p>
+            <p>Adding the final touches…</p>
+          </div></div>
+        </div>
+      </section>
+
       <section class="screen boxed" data-screen="r-welcome" data-mode="register" data-progress="18">
         <div class="bigmark"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
         <p class="stepno">Account created</p>
@@ -596,21 +610,11 @@
   </div>
 </div>
 
-<div class="vswitch" role="group" aria-label="Form design variants">
-  <span class="vlab">Card</span>
-  <button id="v-boxed" type="button" class="on">Boxed</button>
-  <button id="v-plain" type="button">Plain</button>
-  <span class="vsep"></span>
-  <span class="vlab">Label</span>
-  <button id="l-float" type="button" class="on">Floating</button>
-  <button id="l-top" type="button">Top</button>
-</div>
-
 <script>
 (function () {
   'use strict';
 
-  var state = { name: '', email: '' };
+  var state = { name: '', email: '', ptype: null };
 
   /* ── Screen router ── */
   function show(id) {
@@ -710,28 +714,6 @@
     setTimeout(function () { window.location.href = 'index.html'; }, 1100);
   });
 
-  /* ── Design variant switches: card style and label style, independent ── */
-  function variant(opts) {
-    var on = document.getElementById(opts.onId);
-    var off = document.getElementById(opts.offId);
-    function set(v) {
-      var alt = v === opts.altValue;
-      document.body.classList.toggle(opts.altClass, alt);
-      on.classList.toggle('on', !alt);
-      off.classList.toggle('on', alt);
-      try { localStorage.setItem(opts.key, v); } catch (e) {}
-    }
-    on.addEventListener('click', function () { set(opts.defValue); });
-    off.addEventListener('click', function () { set(opts.altValue); });
-    var saved;
-    try { saved = localStorage.getItem(opts.key); } catch (e) {}
-    set(saved === opts.altValue ? opts.altValue : opts.defValue);
-  }
-  variant({ onId: 'v-boxed', offId: 'v-plain', defValue: 'boxed', altValue: 'plain',
-            altClass: 'v-plain', key: 'chekin_auth_card' });
-  variant({ onId: 'l-float', offId: 'l-top', defValue: 'floating', altValue: 'top',
-            altClass: 'l-top', key: 'chekin_auth_label' });
-
   /* ── Two-factor ── */
   var otpBox = document.getElementById('otp');
   var otpInputs = Array.prototype.slice.call(otpBox.querySelectorAll('input'));
@@ -815,13 +797,23 @@
   var rpPhone = document.getElementById('rp-phone');
   var acctNext = document.getElementById('racct-next');
 
+  /* Phone is deliberately NOT part of the gate — it is optional at signup. */
   function updateAccount() {
     acctNext.disabled = !(validEmail(reEmail.value) &&
       rnName.value.trim().length >= 2 &&
       rnPass.value.length >= 8 &&
-      rpPhone.value.replace(/\D/g, '').length >= 6);
+      state.ptype);
   }
   [reEmail, rnName, rnPass, rpPhone].forEach(function (i) { i.addEventListener('input', updateAccount); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('#rp-ptypes .ptype'), function (b) {
+    b.addEventListener('click', function () {
+      Array.prototype.forEach.call(document.querySelectorAll('#rp-ptypes .ptype'), function (x) { x.classList.remove('sel'); });
+      b.classList.add('sel');
+      state.ptype = b.dataset.ptype;
+      updateAccount();
+    });
+  });
   reEmail.addEventListener('blur', function () {
     reEmail.closest('.field').classList.toggle('invalid', reEmail.value.length > 0 && !validEmail(reEmail.value));
   });
@@ -858,20 +850,34 @@
     }, 1100);
   });
 
+  /* Rotating pending screen while the account is created */
+  function runPending(done){
+    var lines = document.getElementById('pendLines');
+    var total = lines.children.length, i = 0;
+    lines.style.transform = 'translateY(0px)';
+    show('r-creating');
+    var tick = setInterval(function () {
+      i = (i + 1) % total;
+      lines.style.transform = 'translateY(-' + (i * 24) + 'px)';
+    }, 2200);
+    setTimeout(function () { clearInterval(tick); done(); }, 3400);
+  }
+
   acctNext.addEventListener('click', function () {
     state.email = reEmail.value.trim();
     state.name = rnName.value.trim().split(' ')[0];
     acctNext.disabled = true;
-    acctNext.textContent = 'Creating your account…';
-    setTimeout(function () {
+    runPending(function () {
       if (state.name) {
         document.getElementById('welcome-title').textContent = 'Hey ' + state.name + ', welcome to Chekin! 👋';
       }
-      try { localStorage.setItem('chekin_account_name', state.name || ''); } catch (err) {}
+      try {
+        localStorage.setItem('chekin_account_name', state.name || '');
+        localStorage.setItem('chekin_account_ptype', state.ptype || '');
+      } catch (err) {}
       acctNext.disabled = false;
-      acctNext.innerHTML = 'Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
       show('r-welcome');
-    }, 900);
+    });
   });
 
   /* ── Boot + hash deep-link ── */

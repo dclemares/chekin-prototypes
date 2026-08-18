@@ -44,10 +44,10 @@
   .rstep .bub svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:3}
   .rstep.done .bub{background:rgba(53,229,188,.16);color:var(--icon-success-light);border-color:transparent}
   .rstep.active .bub{background:#fff;color:#1B1B5A;border-color:transparent;box-shadow:0 0 0 4px rgba(255,255,255,.16)}
-  .rstep .txt .t{font:600 14px/18px var(--font-primary);color:#8B93C9;transition:color .2s}
-  .rstep .txt .d{font:400 12px/16px var(--font-primary);color:#5D64A0;margin-top:2px;max-height:0;overflow:hidden;opacity:0;transition:max-height .25s,opacity .25s}
+  .rstep .txt .t{font:600 16px/24px var(--font-primary);color:#8B93C9;transition:color .2s}
+  .rstep .txt .d{font:400 14px/20px var(--font-primary);color:#5D64A0;margin-top:2px;max-height:0;overflow:hidden;opacity:0;transition:max-height .25s,opacity .25s}
   .rstep.active .txt .t{color:#fff}
-  .rstep.active .txt .d{max-height:40px;opacity:1}
+  .rstep.active .txt .d{max-height:56px;opacity:1}
   .rstep.done .txt .t{color:#AEB7F5}
 
   .rail .plan-so-far{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.12)}
@@ -55,7 +55,7 @@
   .rail .pchips{display:flex;flex-wrap:wrap;gap:6px;min-height:26px}
   .rail .pchip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);font:600 11.5px var(--font-primary);color:#DDE1FF;animation:chipIn .25s ease}
   @keyframes chipIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-  .rail .help{margin-top:20px;font:500 12.5px var(--font-primary);color:#8B93C9}
+  .rail .help{margin-top:20px;font:500 14px/20px var(--font-primary);color:#8B93C9}
   .rail .help a{color:#AEB7F5;font-weight:600;text-decoration:none;cursor:pointer}
 
   /* ───────── Content ───────── */
@@ -65,7 +65,7 @@
   .cwrap{flex:1;display:flex;flex-direction:column;max-width:820px;width:100%;margin:0 auto;padding:56px 48px 40px}
   .stepno{font:700 11px var(--font-primary);color:var(--text-brand);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px}
   h1{font:700 30px/38px var(--font-primary);letter-spacing:-.015em;margin:0 0 10px}
-  .lead{font:400 15px/23px var(--font-primary);color:var(--text-gray-dark);margin:0 0 32px;max-width:560px}
+  .lead{font:400 14px/20px var(--font-primary);color:var(--text-gray-dark);margin:0 0 32px}
 
   .panel{display:none;animation:stepIn .35s cubic-bezier(.2,.8,.2,1)}
   .panel.on{display:block}
@@ -100,6 +100,15 @@
   .regions.on{display:block;animation:stepIn .3s ease}
   .regions .rh{font:600 13px var(--font-primary);color:var(--text-gray-dark);margin-bottom:10px}
   .regions .rchips{display:flex;flex-wrap:wrap;gap:8px}
+  /* Escape hatch for markets outside the twelve cards — mirrors OtherCountriesPicker */
+  .others{margin-top:26px}
+  .others .rh{font:600 13px var(--font-primary);color:var(--text-gray-dark);margin-bottom:10px}
+  .other-search{width:100%;max-width:420px;height:44px;padding:0 14px;border-radius:10px;border:1.5px solid var(--stroke-gray-light);background:#fff;font:500 14px var(--font-primary);color:var(--text-dark);outline:none}
+  .other-search:focus{border-color:var(--text-brand);box-shadow:0 0 0 3px rgba(56,92,248,.12)}
+  .ochips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .ochip{display:inline-flex;align-items:center;gap:7px;padding:8px 12px 8px 14px;border-radius:999px;border:1.5px solid var(--stroke-gray-light);background:#fff;font:600 13px var(--font-primary);color:var(--text-gray-dark);cursor:pointer;transition:all .13s}
+  .ochip:hover{border-color:var(--stroke-gray-medium);color:var(--text-dark)}
+  .ochip svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5}
   .rchip{padding:8px 14px;border-radius:999px;border:1.5px solid var(--stroke-gray-light);background:#fff;font:600 13px var(--font-primary);color:var(--text-gray-dark);cursor:pointer;transition:all .13s}
   .rchip:hover{border-color:var(--stroke-gray-medium);color:var(--text-dark)}
   .rchip.sel{background:var(--bg-blue-light);border-color:var(--text-brand);color:var(--text-brand)}
@@ -290,24 +299,21 @@
             <button class="rchip" data-region="Navarre">Navarre · Policía Foral</button>
           </div>
         </div>
+        <div class="others">
+          <div class="rh">Operating somewhere else?</div>
+          <input class="other-search" id="otherSearch" list="otherCountryList" placeholder="Search for a country" autocomplete="off">
+          <datalist id="otherCountryList"></datalist>
+          <div class="ochips" id="otherChips"></div>
+        </div>
       </section>
 
       <!-- STEP 2 · Portfolio -->
       <section class="panel" data-panel="2">
         <div class="stepno">Step 2 of 5</div>
-        <h1>Tell us about your portfolio</h1>
+        <h1>How big is your portfolio?</h1>
         <p class="lead">We'll calibrate the dashboard — a single apartment and a 200-unit operation need very different tools.</p>
 
-        <div class="subq">What type of property do you manage?</div>
-        <div class="ptypes" id="ptypeCards">
-          <button class="ptype" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
-          <button class="ptype" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
-          <button class="ptype" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
-          <button class="ptype" data-ptype="other"><span class="em">✳️</span>Other</button>
-        </div>
-        <input class="ptype-other" id="ptypeOther" placeholder="Tell us what you manage — e.g. hostel, coliving, marina…" style="display:none">
-
-        <div class="subq" style="margin-top:28px" id="sizeQ">How many properties?</div>
+        <div class="subq" id="sizeQ">How many properties?</div>
         <div class="cards c2" id="sizeCards"><!-- rendered by JS per property type --></div>
       </section>
 
@@ -598,18 +604,73 @@
     refresh();
   }));
 
-  /* ───── Step 2: property type (single select) ───── */
-  $$('#ptypeCards .ptype').forEach(b => b.addEventListener('click', () => {
-    $$('#ptypeCards .ptype').forEach(x => x.classList.remove('sel'));
-    b.classList.add('sel');
-    state.ptype = b.dataset.ptype;
-    $('#ptypeOther').style.display = state.ptype === 'other' ? '' : 'none';
-    if (state.ptype !== 'other') state.ptypeOther = '';
+  /* ───── Step 1: any other market (mirrors OtherCountriesPicker) ───── */
+  const OTHER_COUNTRIES = [
+    { code:'AD', flag:'🇦🇩', name:'Andorra' },   { code:'AR', flag:'🇦🇷', name:'Argentina' },
+    { code:'AU', flag:'🇦🇺', name:'Australia' }, { code:'BE', flag:'🇧🇪', name:'Belgium' },
+    { code:'BR', flag:'🇧🇷', name:'Brazil' },    { code:'BG', flag:'🇧🇬', name:'Bulgaria' },
+    { code:'CA', flag:'🇨🇦', name:'Canada' },    { code:'CL', flag:'🇨🇱', name:'Chile' },
+    { code:'CO', flag:'🇨🇴', name:'Colombia' },  { code:'CR', flag:'🇨🇷', name:'Costa Rica' },
+    { code:'CY', flag:'🇨🇾', name:'Cyprus' },    { code:'CZ', flag:'🇨🇿', name:'Czechia' },
+    { code:'DK', flag:'🇩🇰', name:'Denmark' },   { code:'EE', flag:'🇪🇪', name:'Estonia' },
+    { code:'FI', flag:'🇫🇮', name:'Finland' },   { code:'HU', flag:'🇭🇺', name:'Hungary' },
+    { code:'IS', flag:'🇮🇸', name:'Iceland' },   { code:'IE', flag:'🇮🇪', name:'Ireland' },
+    { code:'IL', flag:'🇮🇱', name:'Israel' },    { code:'JP', flag:'🇯🇵', name:'Japan' },
+    { code:'LV', flag:'🇱🇻', name:'Latvia' },    { code:'LT', flag:'🇱🇹', name:'Lithuania' },
+    { code:'LU', flag:'🇱🇺', name:'Luxembourg' },{ code:'MT', flag:'🇲🇹', name:'Malta' },
+    { code:'MA', flag:'🇲🇦', name:'Morocco' },   { code:'NL', flag:'🇳🇱', name:'Netherlands' },
+    { code:'NZ', flag:'🇳🇿', name:'New Zealand' },{ code:'NO', flag:'🇳🇴', name:'Norway' },
+    { code:'PA', flag:'🇵🇦', name:'Panama' },    { code:'PE', flag:'🇵🇪', name:'Peru' },
+    { code:'PL', flag:'🇵🇱', name:'Poland' },    { code:'RO', flag:'🇷🇴', name:'Romania' },
+    { code:'SA', flag:'🇸🇦', name:'Saudi Arabia' },{ code:'RS', flag:'🇷🇸', name:'Serbia' },
+    { code:'SG', flag:'🇸🇬', name:'Singapore' }, { code:'SK', flag:'🇸🇰', name:'Slovakia' },
+    { code:'SI', flag:'🇸🇮', name:'Slovenia' },  { code:'ZA', flag:'🇿🇦', name:'South Africa' },
+    { code:'SE', flag:'🇸🇪', name:'Sweden' },    { code:'CH', flag:'🇨🇭', name:'Switzerland' },
+    { code:'TH', flag:'🇹🇭', name:'Thailand' },  { code:'TR', flag:'🇹🇷', name:'Turkey' },
+  ].filter(c => !COUNTRIES.some(m => m.code === c.code));
+
+  const otherSearch = $('#otherSearch');
+  const otherChips = $('#otherChips');
+  $('#otherCountryList').innerHTML = OTHER_COUNTRIES
+    .map(c => `<option value="${c.flag} ${c.name}"></option>`).join('');
+
+  function renderOtherChips(){
+    const extras = state.countries.filter(c => OTHER_COUNTRIES.some(o => o.code === c.code));
+    otherChips.innerHTML = '';
+    extras.forEach(c => {
+      const el = document.createElement('button');
+      el.className = 'ochip';
+      el.type = 'button';
+      el.innerHTML = `${c.flag} ${c.name}<svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
+      el.setAttribute('aria-label', `Remove ${c.name}`);
+      el.addEventListener('click', () => {
+        state.countries = state.countries.filter(x => x.code !== c.code);
+        renderOtherChips();
+        refresh();
+      });
+      otherChips.appendChild(el);
+    });
+  }
+
+  otherSearch.addEventListener('input', () => {
+    const picked = OTHER_COUNTRIES.find(c => `${c.flag} ${c.name}` === otherSearch.value);
+    if (!picked) return;
+    otherSearch.value = '';
+    if (state.countries.some(c => c.code === picked.code)) return;
+    state.countries.push({ ...picked, reg:false, scheme:null, tax:false });
+    renderOtherChips();
+    refresh();
+  });
+
+  /* Property type is answered during registration — it decides the subscription
+     type the backend needs at that point — so this step only asks for the size. */
+  function applyRegisteredPropertyType(){
+    let stored = null;
+    try { stored = localStorage.getItem('chekin_account_ptype'); } catch(e){}
+    state.ptype = SIZE_SETS[stored] ? stored : 'vr';
     $('#sizeQ').textContent = SIZE_Q[state.ptype] || SIZE_Q.other;
     renderSizeCards();
-    refresh();
-  }));
-  $('#ptypeOther').addEventListener('input', e => { state.ptypeOther = e.target.value.trim(); refresh(); });
+  }
 
   /* ───── Step 2: size (single select, tiers re-rendered per property type) ───── */
   function renderSizeCards(){
@@ -635,7 +696,7 @@
       box.appendChild(el);
     });
   }
-  renderSizeCards();
+  applyRegisteredPropertyType();
 
   /* ───── Step 3: manage (single select) + PMS grid ───── */
   const pmsGrid = $('#pmsGrid');
@@ -915,7 +976,7 @@
   /* ───── Validation + navigation ───── */
   function valid(){
     if (step === 1) return state.countries.length > 0;
-    if (step === 2) return !!state.size && !!state.ptype;
+    if (step === 2) return !!state.size;
     if (step === 3) return state.manage && (state.manage !== 'pms' || !!state.pms);
     if (step === 6) return true; // connecting is optional — you can finish it later
     if (step === 4) return state.prios.length > 0; // regulated markets always have compliance locked in
