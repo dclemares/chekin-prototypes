@@ -169,6 +169,7 @@
   .field .hint{font:400 12px/17px var(--font-primary);color:var(--text-gray-medium);margin-top:7px}
   .field .err{display:none;font:500 12.5px var(--font-primary);color:var(--text-danger);margin-top:7px}
   .field.invalid .err{display:block}
+  .err.on{display:block}
 
   /* Floating-label field — notched outline, mirrors @chekinapp/ui Input */
   .fs{position:relative;display:block;min-height:48px;text-align:left}
@@ -268,7 +269,7 @@
   .strength.s4 i{background:var(--success)}
 
   /* Boxed auth/register card */
-  .acard{width:100%;max-width:460px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
+  .acard{width:100%;max-width:384px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
   .acard .btn.primary{width:100%;justify-content:center;margin-top:8px}
   .acard .terms{margin:14px 0 0;max-width:none;text-align:center}
   .acard-alt{max-width:460px;text-align:center;margin-top:18px}
@@ -621,7 +622,7 @@
             Sign up with Google
           </button>
           <div class="or">or register with email</div>
-          <div class="field">
+          <div class="field" id="re-email-field">
             <div class="fs">
               <input id="re-email" type="email" placeholder="name@company.com" autocomplete="email" data-autofocus>
               <fieldset><legend><span>Email</span></legend></fieldset>
@@ -629,7 +630,7 @@
             </div>
             <p class="err">Enter a valid email address.</p>
           </div>
-          <div class="field">
+          <div class="field" id="rn-name-field">
             <div class="fs">
               <input id="rn-name" type="text" placeholder="e.g. Marta Ferreira" autocomplete="name">
               <fieldset><legend><span>Full name</span></legend></fieldset>
@@ -660,8 +661,9 @@
               <button class="ptype" type="button" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
               <button class="ptype" type="button" data-ptype="other"><span class="em">✳️</span>Other</button>
             </div>
+            <p class="err" id="ptype-err">Pick the one closest to your business.</p>
           </div>
-          <div class="field">
+          <div class="field" id="rn-pass-field">
             <div class="fs has-eye">
               <input id="rn-pass" type="password" placeholder="Set your password" autocomplete="new-password">
               <fieldset><legend><span>Password</span></legend></fieldset>
@@ -676,7 +678,7 @@
             </div>
           </div>
           <div class="cta">
-            <button class="btn primary block" id="racct-next" disabled>Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+            <button class="btn primary block" id="racct-next">Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
           </div>
           <p class="terms">By creating an account you accept our <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a>.</p>
         </div>
@@ -1130,10 +1132,18 @@
 
   /* Phone is deliberately NOT part of the gate — it is optional at signup. */
   function updateAccount() {
-    acctNext.disabled = !(validEmail(reEmail.value) &&
-      rnName.value.trim().length >= 2 &&
-      rnPass.value.length >= 8 &&
-      state.ptype);
+    document.getElementById('req-len').classList.toggle('ok', rnPass.value.length >= 8);
+    document.getElementById('req-mix').classList.toggle('ok', /[A-Za-z]/.test(rnPass.value) && /\d/.test(rnPass.value));
+  }
+  /* The chips promised letters and numbers while only the length was checked,
+     so registration accepted 12345678 — the same gap the reset screen had. */
+  function accountRules() {
+    return {
+      email: validEmail(reEmail.value),
+      name:  rnName.value.trim().length >= 2,
+      pass:  rnPass.value.length >= 8 && /[A-Za-z]/.test(rnPass.value) && /\d/.test(rnPass.value),
+      ptype: !!state.ptype
+    };
   }
   [reEmail, rnName, rnPass, rpPhone].forEach(function (i) { i.addEventListener('input', updateAccount); });
 
@@ -1195,6 +1205,16 @@
   }
 
   acctNext.addEventListener('click', function () {
+    var r = accountRules();
+    ['re-email','rn-name','rn-pass'].forEach(function (id) {
+      document.getElementById(id + '-field').classList.remove('invalid');
+    });
+    document.getElementById('ptype-err').classList.remove('on');
+    if (!r.email) { document.getElementById('re-email-field').classList.add('invalid'); reEmail.focus(); return; }
+    if (!r.name)  { document.getElementById('rn-name-field').classList.add('invalid');  rnName.focus();  return; }
+    if (!r.ptype) { document.getElementById('ptype-err').classList.add('on'); document.getElementById('rp-ptypes').scrollIntoView({block:'center'}); return; }
+    if (!r.pass)  { document.getElementById('rn-pass-field').classList.add('invalid');  rnPass.focus();  updateAccount(); return; }
+
     state.email = reEmail.value.trim();
     state.name = rnName.value.trim().split(' ')[0];
     acctNext.disabled = true;
