@@ -48,7 +48,7 @@
 
   /* Support sits under the card. The rail carries the same line, so it
      stands down here rather than saying it twice. */
-  body.centred .aftercard{display:block}
+  body.centred.on-login .aftercard{display:block}
   body.centred .rail-mode[data-railmode="auth"] .help{display:none}
   .aftercard{display:none;margin-top:22px;font:500 13px var(--font-primary);color:var(--text-gray-dark);text-align:center;width:100%}
   .aftercard a{color:var(--text-brand);font-weight:600;text-decoration:none;cursor:pointer}
@@ -275,8 +275,13 @@
   .or::before,.or::after{content:'';flex:1;height:1px;background:var(--stroke-gray-lighter)}
   .reqs{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
   .req{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--bg-neutral-light);font:500 11.5px var(--font-primary);color:var(--text-gray-dark);transition:background .15s,color .15s}
-  .req svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:3}
+  /* A tick shown before the rule is met reads as already done. Unmet is an
+     empty circle; the tick arrives when it is earned. */
+  .req svg{display:none;width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:3}
+  .req::before{content:"";width:11px;height:11px;border-radius:50%;border:1.5px solid currentColor;opacity:.4;flex-shrink:0}
   .req.ok{background:var(--bg-success-light);color:var(--success);font-weight:600}
+  .req.ok svg{display:block}
+  .req.ok::before{display:none}
   .reqs .slabel{margin-left:auto;align-self:center;font:600 11.5px var(--font-primary);color:var(--text-gray-medium)}
   .reqs .slabel.w1{color:var(--text-danger)}
   .reqs .slabel.w2{color:var(--text-warn)}
@@ -534,7 +539,7 @@
             <button class="btn primary block" id="rec-send">Send recovery link</button>
           </div>
           <div class="resend-row">
-            <button class="linklike" data-go="login" style="color:var(--text-gray-medium);">Back</button>
+            <button class="linklike" data-go="login" style="color:var(--text-gray-medium);">Back to login</button>
           </div>
         </div>
       </section>
@@ -591,6 +596,9 @@
           <div class="cta">
             <button class="btn primary block" id="rp-submit">Reset password</button>
           </div>
+          <div class="resend-row">
+            <button class="linklike" data-go="login" style="color:var(--text-gray-medium);">Back to login</button>
+          </div>
         </div>
       </section>
 
@@ -602,7 +610,7 @@
         <p class="lead">You can now log in with your new password.</p>
         <div class="acard">
           <div class="cta">
-            <button class="btn primary block" data-go="login">Back to login</button>
+            <button class="btn primary block" data-go="login">Log in</button>
           </div>
         </div>
       </section>
@@ -771,6 +779,7 @@
     });
     /* Register keeps the rail — it carries the setup progress. */
     document.body.classList.toggle('centred', mode === 'auth');
+    document.body.classList.toggle('on-login', id === 'login');
 
     /* The code screen names the address it went to — it catches a typo made
        one screen earlier, which is where that mistake actually happens. */
