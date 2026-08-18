@@ -674,8 +674,8 @@
       <section class="screen boxed" data-screen="reset-success" data-mode="auth" data-progress="6">
         <div class="bigmark"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
         <p class="stepno">Sign in · Recovery</p>
-        <h1>Password successfully reset</h1>
-        <p class="lead">You can now log in with your new password.</p>
+        <h1>Your password is set</h1>
+        <p class="lead">Log in to <b id="done-addr">your account</b> with the new one. Everywhere else has been signed out — if that wasn't you, <button class="linklike" data-go="recovery">reset it again</button>.</p>
         <div class="acard">
           <div class="cta">
             <button class="btn primary block" data-go="login">Log in</button>
@@ -881,6 +881,11 @@
     if (id === 'reset') {
       var ra = document.getElementById('reset-addr');
       if (ra) ra.textContent = addr;
+    }
+    /* A confirmation that doesn't say what it confirmed isn't one. */
+    if (id === 'reset-success') {
+      var da = document.getElementById('done-addr');
+      if (da) da.textContent = addr;
     }
     if (id === 'check-email') {
       var ce = document.getElementById('check-email-addr');
