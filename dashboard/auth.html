@@ -267,12 +267,6 @@
   .resend-row{display:flex;gap:6px;margin-top:16px;font:500 13px var(--font-primary);color:var(--text-gray-dark)}
 
   [hidden]{display:none!important}
-  .strength{display:flex;gap:5px;margin-top:8px}
-  .strength i{height:4px;flex:1;border-radius:2px;background:var(--stroke-gray-lighter);transition:background .2s}
-  .strength.s1 i:nth-child(1){background:var(--text-danger)}
-  .strength.s2 i:nth-child(-n+2){background:var(--text-warn)}
-  .strength.s3 i:nth-child(-n+3){background:var(--success)}
-  .strength.s4 i{background:var(--success)}
 
   /* Boxed auth/register card */
   .acard{width:100%;max-width:384px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
@@ -293,10 +287,6 @@
   .req.ok{background:var(--bg-success-light);color:var(--success);font-weight:600}
   .req.ok svg{display:block}
   .req.ok::before{display:none}
-  .reqs .slabel{margin-left:auto;align-self:center;font:600 11.5px var(--font-primary);color:var(--text-gray-medium)}
-  .reqs .slabel.w1{color:var(--text-danger)}
-  .reqs .slabel.w2{color:var(--text-warn)}
-  .reqs .slabel.w3,.reqs .slabel.w4{color:var(--success)}
 
   /* Property type — the one business question we ask before creating the account,
      because it decides the subscription type the backend needs at registration. */
@@ -619,10 +609,11 @@
               <label for="rp-pass">New password</label>
               <button class="eye" data-eye="rp-pass" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
-            <div class="strength" id="rp-strength"><i></i><i></i><i></i><i></i></div>
             <div class="reqs">
               <span class="req" id="rp-req-len"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>8+ characters</span>
-              <span class="req" id="rp-req-mix"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Letters &amp; numbers</span>
+              <span class="req" id="rp-req-upper"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Uppercase</span>
+              <span class="req" id="rp-req-num"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Number</span>
+              <span class="req" id="rp-req-sym"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Symbol</span>
             </div>
           </div>
           <div class="field" id="rp-confirm-field">
@@ -709,11 +700,11 @@
               <label for="rn-pass">Password</label>
               <button class="eye" data-eye="rn-pass" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
-            <div class="strength" id="rn-strength" hidden><i></i><i></i><i></i><i></i></div>
             <div class="reqs">
               <span class="req" id="req-len"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>8+ characters</span>
-              <span class="req" id="req-mix"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Letters &amp; numbers</span>
-              <span class="slabel" id="rn-slabel" aria-live="polite"></span>
+              <span class="req" id="req-upper"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Uppercase</span>
+              <span class="req" id="req-num"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Number</span>
+              <span class="req" id="req-sym"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Symbol</span>
             </div>
           </div>
           <div class="field">
@@ -894,18 +885,29 @@
       b.setAttribute('aria-label', inp.type === 'password' ? 'Show password' : 'Hide password');
     });
   });
-  function strengthOf(v) {
-    var s = 0;
-    if (v.length >= 8) s++;
-    if (/[A-Z]/.test(v)) s++;
-    if (/\d/.test(v)) s++;
-    if (/[^A-Za-z0-9]/.test(v) || v.length >= 14) s++;
-    return s;
+  /* One definition of the policy, shared by registration and reset so the two
+     can't drift. Confirm the real rule with whoever owns security before this
+     ships — it is written here as 8 chars + uppercase + number + symbol. */
+  function passRules(v) {
+    return {
+      len:   v.length >= 8,
+      upper: /[A-Z]/.test(v),
+      num:   /\d/.test(v),
+      sym:   /[^A-Za-z0-9]/.test(v)
+    };
   }
-  function bindStrength(inputId, meterId) {
-    var i = document.getElementById(inputId), m = document.getElementById(meterId);
-    i.addEventListener('input', function () { m.className = 'strength s' + strengthOf(i.value); });
+  function passOk(v) {
+    var r = passRules(v);
+    return r.len && r.upper && r.num && r.sym;
   }
+  function paintRules(v, ids) {
+    var r = passRules(v);
+    ['len','upper','num','sym'].forEach(function (k) {
+      var el = document.getElementById(ids[k]);
+      if (el) el.classList.toggle('ok', r[k]);
+    });
+  }
+
 
   /* ── Login ── */
   var captcha = document.getElementById('captcha');
@@ -1191,30 +1193,21 @@
     document.getElementById('check-email-addr').textContent = recEmail.value.trim();
     show('check-email');
   });
-  bindStrength('rp-pass', 'rp-strength');
   var rpPass = document.getElementById('rp-pass');
   var rpConfirm = document.getElementById('rp-confirm');
   var rpSubmit = document.getElementById('rp-submit');
   /* The hint promised letters and numbers but only the length was checked,
      so a reset could set a weaker password than registration allows. Same
      rule as registration now, shown live rather than as static advice. */
-  function resetRules() {
-    var v = rpPass.value;
-    return { len: v.length >= 8, mix: /[A-Za-z]/.test(v) && /\d/.test(v) };
-  }
+  var RESET_IDS = { len:'rp-req-len', upper:'rp-req-upper', num:'rp-req-num', sym:'rp-req-sym' };
   function updateReset() {
-    var r = resetRules();
-    var lenChip = document.getElementById('rp-req-len');
-    var mixChip = document.getElementById('rp-req-mix');
-    if (lenChip) lenChip.classList.toggle('ok', r.len);
-    if (mixChip) mixChip.classList.toggle('ok', r.mix);
+    paintRules(rpPass.value, RESET_IDS);
     document.getElementById('rp-confirm-field').classList.toggle('invalid', rpConfirm.value.length > 0 && rpPass.value !== rpConfirm.value);
   }
   rpPass.addEventListener('input', updateReset);
   rpConfirm.addEventListener('input', updateReset);
   rpSubmit.addEventListener('click', function () {
-    var r = resetRules();
-    if (!r.len || !r.mix) { rpPass.focus(); updateReset(); return; }
+    if (!passOk(rpPass.value)) { rpPass.focus(); updateReset(); return; }
     if (rpPass.value !== rpConfirm.value) {
       document.getElementById('rp-confirm-field').classList.add('invalid');
       rpConfirm.focus();
@@ -1232,8 +1225,7 @@
 
   /* Phone is deliberately NOT part of the gate — it is optional at signup. */
   function updateAccount() {
-    document.getElementById('req-len').classList.toggle('ok', rnPass.value.length >= 8);
-    document.getElementById('req-mix').classList.toggle('ok', /[A-Za-z]/.test(rnPass.value) && /\d/.test(rnPass.value));
+    paintRules(rnPass.value, ACCT_IDS);
   }
   /* The chips promised letters and numbers while only the length was checked,
      so registration accepted 12345678 — the same gap the reset screen had. */
@@ -1241,8 +1233,7 @@
     return {
       email: validEmail(reEmail.value),
       name:  rnName.value.trim().length >= 2,
-      pass:  racctCard.classList.contains('from-google') ||
-             (rnPass.value.length >= 8 && /[A-Za-z]/.test(rnPass.value) && /\d/.test(rnPass.value)),
+      pass:  racctCard.classList.contains('from-google') || passOk(rnPass.value),
       ptype: !!state.ptype
     };
   }
@@ -1260,19 +1251,10 @@
     reEmail.closest('.field').classList.toggle('invalid', reEmail.value.length > 0 && !validEmail(reEmail.value));
   });
 
-  /* Password feedback: meter appears on first keystroke; pills tick live */
-  var rnMeter = document.getElementById('rn-strength');
-  var rnLabel = document.getElementById('rn-slabel');
-  var SLABELS = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-  rnPass.addEventListener('input', function () {
-    var v = rnPass.value, s = v.length ? Math.max(1, strengthOf(v)) : 0;
-    rnMeter.hidden = v.length === 0;
-    rnMeter.className = 'strength s' + s;
-    rnLabel.textContent = v.length ? SLABELS[s] : '';
-    rnLabel.className = 'slabel w' + s;
-    document.getElementById('req-len').classList.toggle('ok', v.length >= 8);
-    document.getElementById('req-mix').classList.toggle('ok', /[A-Za-z]/.test(v) && /\d/.test(v));
-  });
+  /* The four rules are the feedback now — a strength bar on top of them was a
+     second, vaguer answer to the same question. */
+  var ACCT_IDS = { len:'req-len', upper:'req-upper', num:'req-num', sym:'req-sym' };
+  rnPass.addEventListener('input', function () { paintRules(rnPass.value, ACCT_IDS); });
 
   /* Enter submits once everything is valid */
   document.querySelector('[data-screen="r-account"]').addEventListener('keydown', function (e) {
