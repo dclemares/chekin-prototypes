@@ -44,9 +44,29 @@
   body.centred .lead{font:400 15.5px/23px var(--font-primary);color:var(--text-gray-dark);margin:0 0 28px;max-width:none}
   body.centred .acard{border-radius:16px;padding:22px 22px 20px}
   body.centred .or{margin:14px 0}
+  body.centred .stepno{display:none}
+
+  /* Support sits under the card. The rail carries the same line, so it
+     stands down here rather than saying it twice. */
+  body.centred .aftercard{display:block}
+  body.centred .rail-mode[data-railmode="auth"] .help{display:none}
+  .aftercard{display:none;margin-top:22px;font:500 13px var(--font-primary);color:var(--text-gray-dark)}
+  .aftercard a{color:var(--text-brand);font-weight:600;text-decoration:none;cursor:pointer}
+  .aftercard a:hover{text-decoration:underline}
+
+  /* Only once the rail is gone does the screen have to carry the wordmark
+     and the proof itself — above that width the rail already does. */
+  .brandmark{display:none}
+  .trustline{display:none;margin-top:36px;font:500 12.5px/20px var(--font-primary);color:var(--text-gray-medium)}
+  .trustline b{color:var(--text-gray-dark);font-weight:600}
+  @media (max-width:1100px){
+    body.centred .brandmark{display:block;height:26px;margin:0 auto 30px}
+    body.centred .trustline{display:block}
+  }
   @media (max-width:640px){
     body.centred h1{font:700 28px/34px var(--font-primary)}
     body.centred .screen{max-width:none}
+    body.centred .trustline{margin-top:26px}
   }
 
   /* ───────── Left rail ───────── */
@@ -360,6 +380,7 @@
 
       <!-- ── Login ── -->
       <section class="screen boxed" data-screen="login" data-mode="auth" data-progress="6">
+        <img class="brandmark" src="ds/assets/logos/chekin-wordmark.png" alt="Chekin">
         <p class="stepno" id="li-step">Get started</p>
         <h1 id="li-title">Every check-in, handled</h1>
         <p class="lead" id="li-lead">Log in or create your account with your work email.</p>
@@ -414,6 +435,8 @@
             <p class="terms">By continuing you accept our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
           </form>
         </div>
+        <p class="aftercard">Questions? <a>Talk to us — we reply in ~3 min</a></p>
+        <p class="trustline">Police reporting in <b>20+ countries</b> · <b>35+</b> PMS integrations</p>
       </section>
 
       <!-- ── Two-factor ── -->
