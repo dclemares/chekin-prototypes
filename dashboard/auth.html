@@ -202,6 +202,7 @@
   .linklike{font:600 13px var(--font-primary);color:var(--text-brand);background:none;border:none;cursor:pointer;padding:0}
   .linklike:hover{text-decoration:underline}
   .muted-note{font:400 12.5px/18px var(--font-primary);color:var(--text-gray-medium)}
+  .spam-note{margin:16px 0 0;text-align:center}
   .row-between{display:flex;align-items:center;justify-content:space-between;margin:2px 0 18px}
   .terms{font:400 12px/18px var(--font-primary);color:var(--text-gray-medium);margin-top:14px;max-width:440px}
   .terms a{color:var(--text-gray-dark);font-weight:600;text-decoration:none}
@@ -547,6 +548,11 @@
         <div class="acard">
           <div class="cta">
             <button class="btn primary block" data-go="reset">Open the link from the email (demo)</button>
+          </div>
+          <p class="muted-note spam-note">Not there? Give it a minute, then check your spam folder.</p>
+          <div class="resend-row">
+            <span>Still nothing?</span>
+            <button class="linklike" id="rec-resend">Resend email</button>
           </div>
           <div class="resend-row">
             <span>Wrong address?</span>
@@ -1043,6 +1049,28 @@
     }, 1000);
     resend.textContent = 'Code sent · 30s';
   });
+
+  /* Same cooldown as the code resend: without one the button invites
+     hammering, and every press is another mail nobody asked for. */
+  var recResend = document.getElementById('rec-resend');
+  if (recResend) {
+    recResend.addEventListener('click', function () {
+      var left = 30;
+      recResend.disabled = true;
+      recResend.style.color = 'var(--text-gray-medium)';
+      recResend.textContent = 'Email sent · 30s';
+      var t = setInterval(function () {
+        left--;
+        recResend.textContent = 'Email sent · ' + left + 's';
+        if (left <= 0) {
+          clearInterval(t);
+          recResend.disabled = false;
+          recResend.style.color = '';
+          recResend.textContent = 'Resend email';
+        }
+      }, 1000);
+    });
+  }
 
   /* ── Recovery chain ── */
   var recEmail = document.getElementById('rec-email');
