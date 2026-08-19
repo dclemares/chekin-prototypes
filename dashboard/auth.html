@@ -288,6 +288,21 @@
   [hidden]{display:none!important}
 
   /* Boxed auth/register card */
+  /* Portfolio pickers. Two-up grid so four options cost two rows inside a
+     384px card instead of four. */
+  .subq{font:600 13px var(--font-primary);color:var(--text-dark);margin:0 0 9px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .opts .opt{display:flex;align-items:center;gap:7px;min-height:44px;padding:8px 10px;border:1.5px solid var(--stroke-gray-light);border-radius:10px;background:var(--bg-white);cursor:pointer;font:600 12.5px/15px var(--font-primary);color:var(--text-dark);text-align:left;transition:border-color .12s,background .12s}
+  .opts .opt:hover{border-color:var(--stroke-gray-medium)}
+  .opts .opt:focus-visible{outline:2px solid var(--text-brand);outline-offset:2px}
+  .opts .opt.sel{border-color:var(--text-brand);background:rgba(56,92,248,.05);box-shadow:inset 0 0 0 1px var(--text-brand)}
+  .opts .opt .em{font-size:15px;line-height:1;flex-shrink:0}
+  .opts.sizes .opt{flex-direction:column;align-items:flex-start;justify-content:center;gap:1px}
+  .opts.sizes .opt .n{font:700 14px var(--font-primary)}
+  .opts.sizes .opt .t{font:500 11px/14px var(--font-primary);color:var(--text-gray-dark)}
+  .opts.sizes .opt.sel .t{color:var(--text-brand)}
+  .field.invalid .opts .opt{border-color:var(--text-danger)}
+
   .acard{width:100%;max-width:384px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
   /* Belt-and-braces: the button already fills .cta via .btn.block, but this
      guarantees centring even if a future button in here isn't full width. */
@@ -476,14 +491,13 @@
     <!-- register: account creation, then the guided-setup journey ahead -->
     <div class="rail-mode" data-railmode="register">
       <div class="steps">
-        <div class="rstep active" data-rail="account"><span class="bub">1</span><div class="txt"><div class="t">Create your account</div><div class="d">One short form — and you are in.</div></div></div>
+        <div class="rstep active" data-rail="account"><span class="bub">1</span><div class="txt"><div class="t">Create your account</div><div class="d">Your details and your portfolio, in one form.</div></div></div>
         <div class="rstep" data-rail="s1"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">We tailor legal modules to your market.</div></div></div>
-        <div class="rstep" data-rail="s2"><span class="bub">3</span><div class="txt"><div class="t">Your portfolio</div><div class="d">So the dashboard fits your scale.</div></div></div>
-        <div class="rstep" data-rail="s3"><span class="bub">4</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
-        <div class="rstep" data-rail="s4"><span class="bub">5</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
-        <div class="rstep" data-rail="s5"><span class="bub">6</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
+        <div class="rstep" data-rail="s3"><span class="bub">3</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
+        <div class="rstep" data-rail="s4"><span class="bub">4</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
+        <div class="rstep" data-rail="s5"><span class="bub">5</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
       </div>
-      <div class="nextup">First we create your account — then <b>four quick questions</b> tailor the dashboard to your business.</div>
+      <div class="nextup">First we create your account — then <b>three quick questions</b> tailor the dashboard to your business.</div>
       <div class="help">Already have an account? <a data-go="login">Log in</a></div>
     </div>
   </aside>
@@ -692,7 +706,7 @@
       <!-- ── Register · one account form ── -->
       <section class="screen boxed" data-screen="r-account" data-mode="register" data-progress="8">
         <h1>Let's get you set up</h1>
-        <p class="lead">Start your 14-day free trial — no credit card needed. About a minute; the questions about your business come next.</p>
+        <p class="lead">Start your 14-day free trial — no credit card needed. Takes about a minute.</p>
         <div class="acard">
           <button class="sso" id="racct-google" type="button">
             <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.09 3.57-5.16 3.57-8.81Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.93-2.91l-3.87-3c-1.07.72-2.44 1.14-4.06 1.14-3.13 0-5.78-2.11-6.72-4.95H1.28v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.28 14.28a7.2 7.2 0 0 1 0-4.56v-3.1H1.28a12 12 0 0 0 0 10.76l4-3.1Z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.35.61 4.6 1.8l3.43-3.43A11.97 11.97 0 0 0 12 0 12 12 0 0 0 1.28 6.62l4 3.1C6.22 6.88 8.87 4.77 12 4.77Z"/></svg>
@@ -753,6 +767,26 @@
             </div>
             <p class="err" id="rp-phone-err">Enter your phone number and its country code.</p>
           </div>
+
+            <!-- Portfolio. Sits after the identity fields because it's about the
+                 business, not the person — and because the size ranges only make
+                 sense once the type above them is picked. -->
+            <div class="field" id="ra-ptype-field">
+            <div class="subq">What type of property do you manage?</div>
+            <div class="opts" id="ra-ptypes" role="radiogroup" aria-label="Property type">
+              <button class="opt" type="button" role="radio" aria-checked="false" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
+              <button class="opt" type="button" role="radio" aria-checked="false" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
+              <button class="opt" type="button" role="radio" aria-checked="false" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
+              <button class="opt" type="button" role="radio" aria-checked="false" data-ptype="other"><span class="em">✳️</span>Other</button>
+            </div>
+            <p class="err">Pick the type that fits your properties best.</p>
+            </div>
+
+            <div class="field" id="ra-size-field">
+            <div class="subq" id="ra-sizeq">How many properties?</div>
+            <div class="opts sizes" id="ra-sizes" role="radiogroup" aria-label="Portfolio size"><!-- rendered per property type --></div>
+            <p class="err">Pick the range closest to your portfolio.</p>
+            </div>
           <div class="cta">
             <button class="btn primary block" id="racct-next">Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
           </div>
@@ -779,7 +813,7 @@
       <section class="screen boxed" data-screen="r-welcome" data-mode="register" data-progress="18">
         <div class="bigmark"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h1 id="welcome-title">Hey there, welcome to Chekin! 👋</h1>
-        <p class="lead">Your account is ready. Four quick questions and we'll switch on exactly what your business needs — nothing more.</p>
+        <p class="lead">Your account is ready. Three quick questions and we'll switch on exactly what your business needs — nothing more.</p>
         <div class="acard">
           <div class="nexthead">
             <span class="nh-t">What's next</span>
@@ -838,7 +872,7 @@
 (function () {
   'use strict';
 
-  var state = { name: '', email: '', ptype: null };
+  var state = { name: '', email: '', ptype: null, size: null, sizeTier: null };
 
   /* ── Screen router ── */
   function show(id) {
@@ -1393,7 +1427,66 @@
   var rpPhone = document.getElementById('rp-phone');
   var acctNext = document.getElementById('racct-next');
 
-  /* Phone is deliberately NOT part of the gate — it is optional at signup. */
+  /* ── Portfolio pickers ──
+     Ranges and their labels both change with the vertical: "21-100 properties"
+     and "31-100 rooms" are different businesses. So the type has to be answered
+     before the sizes below it mean anything, and changing it clears the range
+     rather than carrying a number that no longer exists in the new set.
+     Tier index (0-3) travels with the answer — the guided setup keys rules off
+     it, not off the label. */
+  var SIZE_Q = {
+    vr:'How many properties?', hotel:'How many rooms across your hotels?',
+    camping:'How many units or pitches?', other:'How many properties?'
+  };
+  var SIZE_SETS = {
+    vr:      [['1-5','Independent host'],['6-20','Growing portfolio'],['21-100','Property manager'],['100+','Enterprise']],
+    hotel:   [['1-10','Guest house'],['11-30','Boutique hotel'],['31-100','Independent hotel'],['100+','Hotel group']],
+    camping: [['1-25','Small site'],['26-75','Family campsite'],['76-200','Large site'],['200+','Resort / group']]
+  };
+  SIZE_SETS.other = SIZE_SETS.vr;
+
+  var raSizes = document.getElementById('ra-sizes');
+  var raSizeField = document.getElementById('ra-size-field');
+
+  function renderSizes() {
+    var set = SIZE_SETS[state.ptype] || SIZE_SETS.vr;
+    /* The old pick cannot survive a type change — the ranges are different */
+    state.size = null; state.sizeTier = null;
+    raSizeField.classList.remove('invalid');
+    document.getElementById('ra-sizeq').textContent = SIZE_Q[state.ptype] || SIZE_Q.other;
+    raSizes.innerHTML = '';
+    set.forEach(function (row, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', 'false');
+      b.innerHTML = '<span class="n">' + row[0].replace('-', '\u2013') + '</span><span class="t">' + row[1] + '</span>';
+      b.addEventListener('click', function () {
+        raSizes.querySelectorAll('.opt').forEach(function (x) {
+          x.classList.remove('sel'); x.setAttribute('aria-checked', 'false');
+        });
+        b.classList.add('sel'); b.setAttribute('aria-checked', 'true');
+        state.size = row[0]; state.sizeTier = i;
+        raSizeField.classList.remove('invalid');
+      });
+      raSizes.appendChild(b);
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#ra-ptypes .opt'), function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('#ra-ptypes .opt').forEach(function (x) {
+        x.classList.remove('sel'); x.setAttribute('aria-checked', 'false');
+      });
+      b.classList.add('sel'); b.setAttribute('aria-checked', 'true');
+      state.ptype = b.dataset.ptype;
+      document.getElementById('ra-ptype-field').classList.remove('invalid');
+      renderSizes();
+    });
+  });
+  renderSizes();
+
   function updateAccount() {
     paintRules(rnPass.value, ACCT_IDS);
   }
@@ -1407,7 +1500,8 @@
       /* Required: it is how we reach someone about their own account, and a
          number with no country code cannot be dialled. */
       phone: !!rpPhone.value.trim() && !!document.getElementById('rp-code').value,
-      ptype: true /* asked in the guided setup now, not here */
+      ptype: !!state.ptype,
+      size:  !!state.size
     };
   }
   [reEmail, rnName, rnPass, rpPhone].forEach(function (i) { i.addEventListener('input', updateAccount); });
@@ -1494,10 +1588,24 @@
     if (el) el.textContent = text;
   }
 
+  /* A radiogroup has no input to focus, so scroll it into view and put the
+     caret on its first option — otherwise the form just refuses to submit
+     with the reason sitting off-screen. */
+  function failGroup(fieldId, sel) {
+    var f = document.getElementById(fieldId);
+    f.classList.add('invalid');
+    f.scrollIntoView({ block: 'center' });
+    var first = document.querySelector(sel);
+    if (first) first.focus();
+  }
+
   acctNext.addEventListener('click', function () {
     var r = accountRules();
     ['re-email','rn-name','rn-pass','rp-phone'].forEach(function (id) {
       document.getElementById(id + '-field').classList.remove('invalid');
+    });
+    ['ra-ptype-field','ra-size-field'].forEach(function (id) {
+      document.getElementById(id).classList.remove('invalid');
     });
     /* Same order the fields appear in, so the caret always lands on the first
        problem going down the form rather than jumping back up it. */
@@ -1505,6 +1613,8 @@
     if (!r.pass)  { document.getElementById('rn-pass-field').classList.add('invalid');  rnPass.focus();  updateAccount(); return; }
     if (!r.name)  { document.getElementById('rn-name-field').classList.add('invalid');  rnName.focus();  return; }
     if (!r.phone) { document.getElementById('rp-phone-field').classList.add('invalid'); document.getElementById('rp-code').focus(); return; }
+    if (!r.ptype) { failGroup('ra-ptype-field', '#ra-ptypes .opt'); return; }
+    if (!r.size)  { failGroup('ra-size-field',  '#ra-sizes .opt');  return; }
 
     state.email = reEmail.value.trim();
     state.name = rnName.value.trim().split(' ')[0];
@@ -1516,6 +1626,8 @@
       try {
         localStorage.setItem('chekin_account_name', state.name || '');
         localStorage.setItem('chekin_account_ptype', state.ptype || '');
+        localStorage.setItem('chekin_account_size', state.size || '');
+        localStorage.setItem('chekin_account_size_tier', String(state.sizeTier == null ? '' : state.sizeTier));
       } catch (err) {}
       acctNext.disabled = false;
       show('r-welcome');
