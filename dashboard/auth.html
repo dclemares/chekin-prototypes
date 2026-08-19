@@ -204,14 +204,18 @@
   /* Was 53px pulled up by -5px, so it stood proud of the field beside it.
      The native arrow belonged to the browser, not to this design system, and
      "Code" rendered in value ink so an empty select looked answered. */
-  .fs.dial select{
+  .fs.dial select,.fs.sel select{
     padding:0 32px 0 14px;cursor:pointer;
     appearance:none;-webkit-appearance:none;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239696B9' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
     background-repeat:no-repeat;background-position:right 11px center;background-size:13px;
   }
-  .fs.dial select.empty{color:var(--text-gray-dark)}
-  .fs.dial:focus-within > fieldset{border-color:var(--text-brand);border-width:2px}
+  .fs.dial select.empty,.fs.sel select.empty{color:var(--text-gray-dark)}
+  .fs.dial:focus-within > fieldset,.fs.sel:focus-within > fieldset{border-color:var(--text-brand);border-width:2px}
+  /* A select always shows something, so its label has nowhere to rest inside
+     the box — it sits raised from the start and the notch stays open. */
+  .fs.sel select{padding-right:38px}
+
   .phone-row{display:flex;gap:10px;align-items:flex-start}
   .phone-row .fs:not(.dial){flex:1;min-width:0}
   .linklike{font:600 13px var(--font-primary);color:var(--text-brand);background:none;border:none;cursor:pointer;padding:0}
@@ -288,47 +292,6 @@
   [hidden]{display:none!important}
 
   /* Boxed auth/register card */
-  /* ── Registration: two columns ──
-     This screen stopped being a narrow auth form when the portfolio questions
-     joined it — stacked in one 384px column it ran 842px tall, which put the
-     primary action below the fold on a 900px-high desktop while leaving most
-     of the width empty. Split in two it is about 510px, and the split itself
-     does the grouping: who you are on the left, what you run on the right.
-
-     The condition is the CARD's width, not the window's. A viewport query got
-     this wrong in both directions: at 1120px the 272px rail leaves the card
-     around 650px — too narrow to divide — while below 1100px the rail is gone
-     and the same viewport has room to spare. */
-  body.form-wide .cwrap{max-width:900px}
-  [data-screen="r-account"] .acard{max-width:804px;container-type:inline-size}
-  .form2col{display:grid;grid-template-columns:1fr}
-  @container (min-width:700px){
-    /* The right track is fixed at what its widest option needs on one line
-       ("Camping / glamping" measures 113px, plus emoji and padding, two up).
-       An even 1fr/1fr split starved it and every label broke in two. */
-    .form2col{grid-template-columns:minmax(0,1fr) 371px;align-items:start}
-    .form2col > .col:first-child{padding-right:30px}
-    .form2col > .col:last-child{border-left:1px solid var(--stroke-gray-lighter);padding-left:30px}
-    /* Both columns end on a field, whose 22px margin would otherwise stack on
-       top of the gap above the button. */
-    .form2col > .col > .field:last-child{margin-bottom:6px}
-  }
-
-  /* Portfolio pickers. Two-up grid so four options cost two rows inside a
-     384px card instead of four. */
-  .subq{font:600 13px var(--font-primary);color:var(--text-dark);margin:0 0 9px}
-  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .opts .opt{display:flex;align-items:center;gap:7px;min-height:44px;padding:8px 10px;border:1.5px solid var(--stroke-gray-light);border-radius:10px;background:var(--bg-white);cursor:pointer;font:600 12.5px/15px var(--font-primary);color:var(--text-dark);text-align:left;transition:border-color .12s,background .12s}
-  .opts .opt:hover{border-color:var(--stroke-gray-medium)}
-  .opts .opt:focus-visible{outline:2px solid var(--text-brand);outline-offset:2px}
-  .opts .opt.sel{border-color:var(--text-brand);background:rgba(56,92,248,.05);box-shadow:inset 0 0 0 1px var(--text-brand)}
-  .opts .opt .em{font-size:15px;line-height:1;flex-shrink:0}
-  .opts.sizes .opt{flex-direction:column;align-items:flex-start;justify-content:center;gap:1px}
-  .opts.sizes .opt .n{font:700 14px var(--font-primary)}
-  .opts.sizes .opt .t{font:500 11px/14px var(--font-primary);color:var(--text-gray-dark)}
-  .opts.sizes .opt.sel .t{color:var(--text-brand)}
-  .field.invalid .opts .opt{border-color:var(--text-danger)}
-
   .acard{width:100%;max-width:384px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
   /* Belt-and-braces: the button already fills .cta via .btn.block, but this
      guarantees centring even if a future button in here isn't full width. */
@@ -750,8 +713,6 @@
           </button>
           <div class="or" id="racct-or">or register with email</div>
 
-          <div class="form2col">
-          <div class="col">
           <div class="identity" id="racct-identity">
             <span class="who"><span class="av" id="racct-initial"></span><span id="racct-who"></span></span>
             <button type="button" class="linklike" id="racct-change">Change</button>
@@ -806,30 +767,44 @@
             </div>
             <p class="err" id="rp-phone-err">Enter your phone number and its country code.</p>
           </div>
-          </div>
 
-          <div class="col">
-            <!-- Portfolio. Sits after the identity fields because it's about the
-                 business, not the person — and because the size ranges only make
-                 sense once the type above them is picked. -->
+            <!-- Portfolio. Two selects rather than eight cards. A card grid
+                 earns its space when you are comparing options, which is why it
+                 belongs in the guided setup where the question owns the screen.
+                 Here, beside email and password, it was 256px of an 842px form
+                 for two answers you already know, and it pushed the button that
+                 submits the form off the bottom. The descriptive labels ride
+                 along inside the options, so nothing is lost. -->
             <div class="field" id="ra-ptype-field">
-            <div class="subq">What type of property do you manage?</div>
-            <div class="opts" id="ra-ptypes" role="radiogroup" aria-label="Property type">
-              <button class="opt" type="button" role="radio" aria-checked="false" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
-              <button class="opt" type="button" role="radio" aria-checked="false" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
-              <button class="opt" type="button" role="radio" aria-checked="false" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
-              <button class="opt" type="button" role="radio" aria-checked="false" data-ptype="other"><span class="em">✳️</span>Other</button>
-            </div>
-            <p class="err">Pick the type that fits your properties best.</p>
+              <div class="fs sel raised">
+                <select id="ra-ptype" class="empty">
+                  <option value="" selected>Select…</option>
+                  <option value="vr">🏠 Vacation rentals</option>
+                  <option value="hotel">🏨 Hotel / aparthotel</option>
+                  <option value="camping">⛺ Camping / glamping</option>
+                  <option value="other">✳️ Other</option>
+                </select>
+                <fieldset><legend><span>Property type</span></legend></fieldset>
+                <label for="ra-ptype">Property type</label>
+              </div>
+              <p class="err">Pick the type that fits your properties best.</p>
             </div>
 
-            <div class="field" id="ra-size-field">
-            <div class="subq" id="ra-sizeq">How many properties?</div>
-            <div class="opts sizes" id="ra-sizes" role="radiogroup" aria-label="Portfolio size"><!-- rendered per property type --></div>
-            <p class="err">Pick the range closest to your portfolio.</p>
+            <!-- Appears once the type above is answered: the ranges and their
+                 wording both change with it, so there is nothing truthful to
+                 offer here before then. Revealed rather than greyed out — a
+                 disabled control is a dead box you cannot tab to or ask about,
+                 and this reuses the reveal the login screen already does. -->
+            <div class="field reveal" id="ra-size-field">
+              <div class="fs sel raised">
+                <select id="ra-size" class="empty">
+                  <option value="" selected>Select…</option>
+                </select>
+                <fieldset><legend><span id="ra-sizeq">Portfolio size</span></legend></fieldset>
+                <label for="ra-size" id="ra-sizelab">Portfolio size</label>
+              </div>
+              <p class="err">Pick the range closest to your portfolio.</p>
             </div>
-          </div>
-          </div>
 
           <div class="cta">
             <button class="btn primary block" id="racct-next">Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
@@ -925,7 +900,6 @@
     /* Register keeps the rail — it carries the setup progress. */
     document.body.classList.toggle('centred', mode === 'auth');
     document.body.classList.toggle('on-login', id === 'login');
-    document.body.classList.toggle('form-wide', id === 'r-account');
     if (window.setDemo) setDemo(id);
 
     /* These three name the address they are talking about. Reached straight
@@ -1485,10 +1459,6 @@
      rather than carrying a number that no longer exists in the new set.
      Tier index (0-3) travels with the answer — the guided setup keys rules off
      it, not off the label. */
-  var SIZE_Q = {
-    vr:'How many properties?', hotel:'How many rooms across your hotels?',
-    camping:'How many units or pitches?', other:'How many properties?'
-  };
   var SIZE_SETS = {
     vr:      [['1-5','Independent host'],['6-20','Growing portfolio'],['21-100','Property manager'],['100+','Enterprise']],
     hotel:   [['1-10','Guest house'],['11-30','Boutique hotel'],['31-100','Independent hotel'],['100+','Hotel group']],
@@ -1496,46 +1466,53 @@
   };
   SIZE_SETS.other = SIZE_SETS.vr;
 
-  var raSizes = document.getElementById('ra-sizes');
+  var raPtype = document.getElementById('ra-ptype');
+  var raSize = document.getElementById('ra-size');
   var raSizeField = document.getElementById('ra-size-field');
+  var raPtypeField = document.getElementById('ra-ptype-field');
+
+  /* The label carries the unit, the options carry the tier name — between them
+     the answer reads the same as it did across eight cards, in two rows. */
+  var SIZE_LAB = {
+    vr:'How many properties?', hotel:'How many rooms?',
+    camping:'How many units?', other:'How many properties?'
+  };
 
   function renderSizes() {
-    var set = SIZE_SETS[state.ptype] || SIZE_SETS.vr;
-    /* The old pick cannot survive a type change — the ranges are different */
+    var set = SIZE_SETS[state.ptype];
+    /* A range picked under the previous type does not exist under the new one */
     state.size = null; state.sizeTier = null;
     raSizeField.classList.remove('invalid');
-    document.getElementById('ra-sizeq').textContent = SIZE_Q[state.ptype] || SIZE_Q.other;
-    raSizes.innerHTML = '';
+    raSize.innerHTML = '';
+    raSize.appendChild(new Option('Select…', ''));
+    raSize.classList.add('empty');
+    raSizeField.classList.toggle('on', !!set);
+    var lab = SIZE_LAB[state.ptype] || 'Portfolio size';
+    document.getElementById('ra-sizeq').textContent = lab;
+    document.getElementById('ra-sizelab').textContent = lab;
+    if (!set) return;
     set.forEach(function (row, i) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'opt';
-      b.setAttribute('role', 'radio');
-      b.setAttribute('aria-checked', 'false');
-      b.innerHTML = '<span class="n">' + row[0].replace('-', '\u2013') + '</span><span class="t">' + row[1] + '</span>';
-      b.addEventListener('click', function () {
-        raSizes.querySelectorAll('.opt').forEach(function (x) {
-          x.classList.remove('sel'); x.setAttribute('aria-checked', 'false');
-        });
-        b.classList.add('sel'); b.setAttribute('aria-checked', 'true');
-        state.size = row[0]; state.sizeTier = i;
-        raSizeField.classList.remove('invalid');
-      });
-      raSizes.appendChild(b);
+      var o = new Option(row[0].replace('-', '\u2013') + '  ·  ' + row[1], String(i));
+      raSize.appendChild(o);
     });
   }
 
-  Array.prototype.forEach.call(document.querySelectorAll('#ra-ptypes .opt'), function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('#ra-ptypes .opt').forEach(function (x) {
-        x.classList.remove('sel'); x.setAttribute('aria-checked', 'false');
-      });
-      b.classList.add('sel'); b.setAttribute('aria-checked', 'true');
-      state.ptype = b.dataset.ptype;
-      document.getElementById('ra-ptype-field').classList.remove('invalid');
-      renderSizes();
-    });
+  raPtype.addEventListener('change', function () {
+    state.ptype = raPtype.value || null;
+    raPtype.classList.toggle('empty', !raPtype.value);
+    raPtypeField.classList.remove('invalid');
+    renderSizes();
   });
+
+  raSize.addEventListener('change', function () {
+    var i = raSize.value === '' ? null : Number(raSize.value);
+    var set = SIZE_SETS[state.ptype];
+    state.sizeTier = i;
+    state.size = (set && i != null) ? set[i][0] : null;
+    raSize.classList.toggle('empty', raSize.value === '');
+    raSizeField.classList.remove('invalid');
+  });
+
   renderSizes();
 
   function updateAccount() {
@@ -1643,17 +1620,6 @@
     if (el) el.textContent = text;
   }
 
-  /* A radiogroup has no input to focus, so scroll it into view and put the
-     caret on its first option — otherwise the form just refuses to submit
-     with the reason sitting off-screen. */
-  function failGroup(fieldId, sel) {
-    var f = document.getElementById(fieldId);
-    f.classList.add('invalid');
-    f.scrollIntoView({ block: 'center' });
-    var first = document.querySelector(sel);
-    if (first) first.focus();
-  }
-
   acctNext.addEventListener('click', function () {
     var r = accountRules();
     ['re-email','rn-name','rn-pass','rp-phone'].forEach(function (id) {
@@ -1668,8 +1634,8 @@
     if (!r.pass)  { document.getElementById('rn-pass-field').classList.add('invalid');  rnPass.focus();  updateAccount(); return; }
     if (!r.name)  { document.getElementById('rn-name-field').classList.add('invalid');  rnName.focus();  return; }
     if (!r.phone) { document.getElementById('rp-phone-field').classList.add('invalid'); document.getElementById('rp-code').focus(); return; }
-    if (!r.ptype) { failGroup('ra-ptype-field', '#ra-ptypes .opt'); return; }
-    if (!r.size)  { failGroup('ra-size-field',  '#ra-sizes .opt');  return; }
+    if (!r.ptype) { raPtypeField.classList.add('invalid'); raPtype.focus(); return; }
+    if (!r.size)  { raSizeField.classList.add('invalid');  raSize.focus();  return; }
 
     state.email = reEmail.value.trim();
     state.name = rnName.value.trim().split(' ')[0];
