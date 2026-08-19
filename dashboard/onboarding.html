@@ -389,15 +389,15 @@
         <p class="lead">We'll calibrate the dashboard — a single apartment and a 200-unit operation need very different tools.</p>
 
         <div class="subq">What type of property do you manage?</div>
-        <div class="ptypes" id="ptypeCards">
-          <button class="ptype" type="button" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
-          <button class="ptype" type="button" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
-          <button class="ptype" type="button" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
-          <button class="ptype" type="button" data-ptype="other"><span class="em">✳️</span>Other</button>
+        <div class="ptypes" id="ptypeCards" role="radiogroup" aria-label="Property type">
+          <button class="ptype" type="button" role="radio" aria-checked="false" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
+          <button class="ptype" type="button" role="radio" aria-checked="false" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
+          <button class="ptype" type="button" role="radio" aria-checked="false" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
+          <button class="ptype" type="button" role="radio" aria-checked="false" data-ptype="other"><span class="em">✳️</span>Other</button>
         </div>
 
         <div class="subq" id="sizeQ">How many properties?</div>
-        <div class="cards c2" id="sizeCards"><!-- rendered by JS per property type --></div>
+        <div class="cards c2" id="sizeCards" role="radiogroup" aria-label="Portfolio size"><!-- rendered by JS per property type --></div>
       </section>
 
       <!-- STEP 3 · Bookings management -->
@@ -903,7 +903,7 @@
     $$('#ptypeCards .ptype').forEach(b => {
       const on = b.dataset.ptype === state.ptype;
       b.classList.toggle('sel', on);
-      b.setAttribute('aria-pressed', String(on));
+      b.setAttribute('aria-checked', String(on));
     });
     $('#sizeQ').textContent = SIZE_Q[state.ptype] || SIZE_Q.other;
     renderSizeCards();
@@ -934,11 +934,17 @@
       const el = document.createElement('div');
       el.className = 'card size';
       el.tabIndex = 0;
+      el.setAttribute('role', 'radio');
+      el.setAttribute('aria-checked', 'false');
       el.innerHTML = `<span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>
         <span class="n">${s.v.replace('-','–')}</span><span class="t">${s.t}</span><span class="d">${s.d}</span>`;
       const pick = () => {
-        box.querySelectorAll('.card').forEach(x => x.classList.remove('sel'));
+        box.querySelectorAll('.card').forEach(x => {
+          x.classList.remove('sel');
+          x.setAttribute('aria-checked', 'false');
+        });
         el.classList.add('sel');
+        el.setAttribute('aria-checked', 'true');
         state.size = s.v; state.sizeTier = i;
         refresh();
       };
