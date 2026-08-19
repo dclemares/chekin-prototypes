@@ -1153,12 +1153,9 @@
     liSubmit.classList.add('loading');
     liSubmit.textContent = 'Signing in…';
     setTimeout(function () {
-      /* Prototype stand-in for the credential check. */
-      if (liPass.value.length < 8) {
-        failLogin('Incorrect password. Check it and try again.');
-        liPass.select();
-        return;
-      }
+      /* No credential check: the flag already says this account exists, so any
+         address and any password get in. Guessing a length rule here only made
+         short passwords look wrong. */
       liSubmit.classList.remove('loading');
       liSubmit.textContent = 'Log in';
       state.email = liEmail.value.trim();
