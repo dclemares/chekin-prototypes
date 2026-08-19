@@ -179,6 +179,7 @@
   .pms:hover{border-color:var(--stroke-gray-medium)}
   .pms.sel{border-color:var(--text-brand);background:var(--bg-blue-light);color:var(--text-brand)}
   .pms .lgimg{height:19px;max-width:112px;width:auto;object-fit:contain;display:block}
+  .pms .lgico{width:24px;height:24px;object-fit:contain;flex-shrink:0;border-radius:5px}
   .pms.sel .lgimg{filter:none}
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
@@ -592,80 +593,80 @@
      offers. Name only: these carry no bespoke connect flow, so picking
      one routes to the same partner-assisted path as "Other". */
   const PMS_MORE = [
-    { id:'5stelle', name:"5stelle", kind:'catalogue' },
+    { id:'5stelle', icon:'ds/assets/pms/5stelle.png', name:"5stelle", kind:'catalogue' },
     { id:'abal-consulting', name:"ABAL Consulting", kind:'catalogue' },
     { id:'adobe-booking', name:"Adobe Booking", kind:'catalogue' },
-    { id:'apaleo', name:"Apaleo", kind:'catalogue' },
-    { id:'amenitiz', name:"Amenitiz", kind:'catalogue' },
+    { id:'apaleo', icon:'ds/assets/pms/apaleo.png', name:"Apaleo", kind:'catalogue' },
+    { id:'amenitiz', icon:'ds/assets/pms/amenitiz.png', name:"Amenitiz", kind:'catalogue' },
     { id:'avalon', name:"Avalon", kind:'catalogue' },
-    { id:'avaibook', name:"AvaiBook", kind:'catalogue' },
+    { id:'avaibook', icon:'ds/assets/pms/avaibook.png', name:"AvaiBook", kind:'catalogue' },
     { id:'beds24', logo:'https://chekin.com/wp-content/uploads/2024/01/Beds24-logo.svg', name:"Beds24", kind:'catalogue' },
-    { id:'booking-automation', name:"Booking Automation", kind:'catalogue' },
-    { id:'bookingsync', name:"BookingSync", kind:'catalogue' },
-    { id:'bookipro', name:"Bookipro", kind:'catalogue' },
+    { id:'booking-automation', icon:'ds/assets/pms/booking-automation.png', name:"Booking Automation", kind:'catalogue' },
+    { id:'bookingsync', icon:'ds/assets/pms/bookingsync.png', name:"BookingSync", kind:'catalogue' },
+    { id:'bookipro', icon:'ds/assets/pms/bookipro.png', name:"Bookipro", kind:'catalogue' },
     { id:'brillantez-ihms', name:"BrillantEZ iHMS", kind:'catalogue' },
-    { id:'channex', name:"Channex", kind:'catalogue' },
-    { id:'cms-guestcentrix', name:"CMS GuestCentrix", kind:'catalogue' },
-    { id:'deskline', name:"Deskline", kind:'catalogue' },
-    { id:'easy-rez', name:"Easy-Rez", kind:'catalogue' },
-    { id:'eviivo', name:"Eviivo", kind:'catalogue' },
-    { id:'ezee', name:"Ezee", kind:'catalogue' },
-    { id:'fantasticstay', name:"Fantasticstay", kind:'catalogue' },
+    { id:'channex', icon:'ds/assets/pms/channex.png', name:"Channex", kind:'catalogue' },
+    { id:'cms-guestcentrix', icon:'ds/assets/pms/cms-guestcentrix.png', name:"CMS GuestCentrix", kind:'catalogue' },
+    { id:'deskline', icon:'ds/assets/pms/deskline.png', name:"Deskline", kind:'catalogue' },
+    { id:'easy-rez', icon:'ds/assets/pms/easy-rez.png', name:"Easy-Rez", kind:'catalogue' },
+    { id:'eviivo', icon:'ds/assets/pms/eviivo.png', name:"Eviivo", kind:'catalogue' },
+    { id:'ezee', icon:'ds/assets/pms/ezee.png', name:"Ezee", kind:'catalogue' },
+    { id:'fantasticstay', icon:'ds/assets/pms/fantasticstay.png', name:"Fantasticstay", kind:'catalogue' },
     { id:'front2go', name:"Front2Go", kind:'catalogue' },
     { id:'goldenmup', name:"GoldenmUp", kind:'catalogue' },
-    { id:'guestline', name:"Guestline", kind:'catalogue' },
-    { id:'guestwisely', name:"GuestWisely", kind:'catalogue' },
-    { id:'hospitable', name:"Hospitable", kind:'catalogue' },
-    { id:'hostfully', name:"Hostfully", kind:'catalogue' },
+    { id:'guestline', icon:'ds/assets/pms/guestline.png', name:"Guestline", kind:'catalogue' },
+    { id:'guestwisely', icon:'ds/assets/pms/guestwisely.png', name:"GuestWisely", kind:'catalogue' },
+    { id:'hospitable', icon:'ds/assets/pms/hospitable.png', name:"Hospitable", kind:'catalogue' },
+    { id:'hostfully', icon:'ds/assets/pms/hostfully.png', name:"Hostfully", kind:'catalogue' },
     { id:'hostify', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-hostify-2023.svg', name:"Hostify", kind:'catalogue' },
-    { id:'hoteliga', name:"Hoteliga", kind:'catalogue' },
-    { id:'hotelizer', name:"Hotelizer", kind:'catalogue' },
-    { id:'hoteltime', name:"HotelTime", kind:'catalogue' },
+    { id:'hoteliga', icon:'ds/assets/pms/hoteliga.png', name:"Hoteliga", kind:'catalogue' },
+    { id:'hotelizer', icon:'ds/assets/pms/hotelizer.png', name:"Hotelizer", kind:'catalogue' },
+    { id:'hoteltime', icon:'ds/assets/pms/hoteltime.png', name:"HotelTime", kind:'catalogue' },
     { id:'housemonk', name:"Housemonk", kind:'catalogue' },
-    { id:'ibelsa-rooms', name:"ibelsa.rooms", kind:'catalogue' },
-    { id:'igms', name:"IGMS", kind:'catalogue' },
-    { id:'innkeypms', name:"InnkeyPMS", kind:'catalogue' },
+    { id:'ibelsa-rooms', icon:'ds/assets/pms/ibelsa-rooms.png', name:"ibelsa.rooms", kind:'catalogue' },
+    { id:'igms', icon:'ds/assets/pms/igms.png', name:"IGMS", kind:'catalogue' },
+    { id:'innkeypms', icon:'ds/assets/pms/innkeypms.png', name:"InnkeyPMS", kind:'catalogue' },
     { id:'lavanda', name:"Lavanda", kind:'catalogue' },
-    { id:'little-hotelier', name:"Little Hotelier", kind:'catalogue' },
+    { id:'little-hotelier', icon:'ds/assets/pms/little-hotelier.png', name:"Little Hotelier", kind:'catalogue' },
     { id:'livensa', name:"Livensa", kind:'catalogue' },
-    { id:'masteryield', name:"MasterYield", kind:'catalogue' },
-    { id:'mews', name:"Mews", kind:'catalogue' },
-    { id:'minihotel', name:"Minihotel", kind:'catalogue' },
-    { id:'mister-booking', name:"Mister Booking", kind:'catalogue' },
+    { id:'masteryield', icon:'ds/assets/pms/masteryield.png', name:"MasterYield", kind:'catalogue' },
+    { id:'mews', icon:'ds/assets/pms/mews.png', name:"Mews", kind:'catalogue' },
+    { id:'minihotel', icon:'ds/assets/pms/minihotel.png', name:"Minihotel", kind:'catalogue' },
+    { id:'mister-booking', icon:'ds/assets/pms/mister-booking.png', name:"Mister Booking", kind:'catalogue' },
     { id:'myvr', name:"Myvr", kind:'catalogue' },
-    { id:'newbook', name:"NewBook", kind:'catalogue' },
-    { id:'noray', name:"Noray", kind:'catalogue' },
-    { id:'occupancy-plus', name:"Occupancy Plus", kind:'catalogue' },
-    { id:'oracle', name:"Oracle", kind:'catalogue' },
-    { id:'ownerrez', name:"Ownerrez", kind:'catalogue' },
-    { id:'planyo', name:"Planyo", kind:'catalogue' },
-    { id:'preno', name:"Preno", kind:'catalogue' },
+    { id:'newbook', icon:'ds/assets/pms/newbook.png', name:"NewBook", kind:'catalogue' },
+    { id:'noray', icon:'ds/assets/pms/noray.png', name:"Noray", kind:'catalogue' },
+    { id:'occupancy-plus', icon:'ds/assets/pms/occupancy-plus.png', name:"Occupancy Plus", kind:'catalogue' },
+    { id:'oracle', icon:'ds/assets/pms/oracle.png', name:"Oracle", kind:'catalogue' },
+    { id:'ownerrez', icon:'ds/assets/pms/ownerrez.png', name:"Ownerrez", kind:'catalogue' },
+    { id:'planyo', icon:'ds/assets/pms/planyo.png', name:"Planyo", kind:'catalogue' },
+    { id:'preno', icon:'ds/assets/pms/preno.png', name:"Preno", kind:'catalogue' },
     { id:'quickmerlin', name:"QuickMerlin", kind:'catalogue' },
-    { id:'rdpwin-resort-data-processing', name:"RDPWin - Resort Data Processing", kind:'catalogue' },
-    { id:'rentals-united', name:"Rentals United", kind:'catalogue' },
-    { id:'rentalwise', name:"Rentalwise", kind:'catalogue' },
-    { id:'rentlio', name:"Rentlio", kind:'catalogue' },
-    { id:'resharmonics', name:"Resharmonics", kind:'catalogue' },
-    { id:'rmscloud', name:"RMSCloud", kind:'catalogue' },
+    { id:'rdpwin-resort-data-processing', icon:'ds/assets/pms/rdpwin-resort-data-processing.png', name:"RDPWin - Resort Data Processing", kind:'catalogue' },
+    { id:'rentals-united', icon:'ds/assets/pms/rentals-united.png', name:"Rentals United", kind:'catalogue' },
+    { id:'rentalwise', icon:'ds/assets/pms/rentalwise.png', name:"Rentalwise", kind:'catalogue' },
+    { id:'rentlio', icon:'ds/assets/pms/rentlio.png', name:"Rentlio", kind:'catalogue' },
+    { id:'resharmonics', icon:'ds/assets/pms/resharmonics.png', name:"Resharmonics", kind:'catalogue' },
+    { id:'rmscloud', icon:'ds/assets/pms/rmscloud.png', name:"RMSCloud", kind:'catalogue' },
     { id:'roomranger', name:"RoomRanger", kind:'catalogue' },
-    { id:'roomraccoon', name:"RoomRaccoon", kind:'catalogue' },
+    { id:'roomraccoon', icon:'ds/assets/pms/roomraccoon.png', name:"RoomRaccoon", kind:'catalogue' },
     { id:'shalom-pms', name:"Shalom PMS", kind:'catalogue' },
-    { id:'sihot', name:"Sihot", kind:'catalogue' },
-    { id:'sirvoy-reservation-system', name:"Sirvoy Reservation System", kind:'catalogue' },
-    { id:'siteminder-channel-manager', name:"SiteMinder Channel Manager", kind:'catalogue' },
-    { id:'smartness', name:"Smartness", kind:'catalogue' },
-    { id:'tha-s-h-tel', name:"Thaïs-Hôtel", kind:'catalogue' },
-    { id:'tk-system', name:"TK System", kind:'catalogue' },
-    { id:'tommybs', name:"TommyBS", kind:'catalogue' },
-    { id:'tokeet', name:"Tokeet", kind:'catalogue' },
-    { id:'track', name:"Track", kind:'catalogue' },
-    { id:'ulyses', name:"Ulyses", kind:'catalogue' },
+    { id:'sihot', icon:'ds/assets/pms/sihot.png', name:"Sihot", kind:'catalogue' },
+    { id:'sirvoy-reservation-system', icon:'ds/assets/pms/sirvoy-reservation-system.png', name:"Sirvoy Reservation System", kind:'catalogue' },
+    { id:'siteminder-channel-manager', icon:'ds/assets/pms/siteminder-channel-manager.png', name:"SiteMinder Channel Manager", kind:'catalogue' },
+    { id:'smartness', icon:'ds/assets/pms/smartness.png', name:"Smartness", kind:'catalogue' },
+    { id:'tha-s-h-tel', icon:'ds/assets/pms/tha-s-h-tel.png', name:"Thaïs-Hôtel", kind:'catalogue' },
+    { id:'tk-system', icon:'ds/assets/pms/tk-system.png', name:"TK System", kind:'catalogue' },
+    { id:'tommybs', icon:'ds/assets/pms/tommybs.png', name:"TommyBS", kind:'catalogue' },
+    { id:'tokeet', icon:'ds/assets/pms/tokeet.png', name:"Tokeet", kind:'catalogue' },
+    { id:'track', icon:'ds/assets/pms/track.png', name:"Track", kind:'catalogue' },
+    { id:'ulyses', icon:'ds/assets/pms/ulyses.png', name:"Ulyses", kind:'catalogue' },
     { id:'verial', name:"Verial", kind:'catalogue' },
     { id:'vhp-sindata', name:"VHP Sindata", kind:'catalogue' },
-    { id:'winhms', name:"WinHMS", kind:'catalogue' },
-    { id:'winhotel', name:"Winhotel", kind:'catalogue' },
+    { id:'winhms', icon:'ds/assets/pms/winhms.png', name:"WinHMS", kind:'catalogue' },
+    { id:'winhotel', icon:'ds/assets/pms/winhotel.png', name:"Winhotel", kind:'catalogue' },
     { id:'xenia-pms', name:"Xenia PMS", kind:'catalogue' },
-    { id:'zavia-erp', name:"Zavia ERP", kind:'catalogue' }
+    { id:'zavia-erp', icon:'ds/assets/pms/zavia-erp.png', name:"Zavia ERP", kind:'catalogue' }
   ];
 
   const PMS = [
@@ -691,7 +692,7 @@
     { id:'cloudbeds', logo:'https://chekin.com/wp-content/uploads/2026/02/Cloudbeds.svg',name:'Cloudbeds', bg:'#1789FC', kind:'oauth', video:'zUlBKUhQTZY', site:'cloudbeds.com',
       desc:'The Cloudbeds Hospitality Platform integrates operations, revenue management, distribution channels and growth marketing tools.',
       benefits:['Streamline operations and automate workflows','Modernize your guest experience','Data delivered, insights revealed'] },
-    { id:'octorate', name:'Octorate',  bg:'#7C3AED', kind:'form',  video:'G1cKQ3g5-3Y', site:'octorate.com',
+    { id:'octorate', icon:'ds/assets/pms/octorate.png', name:'Octorate',  bg:'#7C3AED', kind:'form',  video:'G1cKQ3g5-3Y', site:'octorate.com',
       fields:[['api_key','API key','Octorate \u2192 Integrations \u2192 Chekin']],
       desc:'Octorate is an all-in-one cloud solution for hotels, B&Bs and vacation rentals: channel manager, booking engine and PMS.',
       benefits:['All-in-one cloud suite','Fast channel synchronisation'] },
@@ -967,9 +968,15 @@
      name rather than sitting beside it — printing both would say it twice.
      Everything without one keeps the monogram the grid already used. */
   function pmsMark(p){
-    return p.logo
-      ? `<img class="lgimg" src="${p.logo}" alt="${p.name}" loading="lazy">`
-      : `<span class="lg" style="background:${p.bg || '#6C6CA8'}">${p.name[0].toUpperCase()}</span>${p.name}`;
+    if (p.logo) return `<img class="lgimg" src="${p.logo}" alt="${p.name}" loading="lazy">`;
+    /* A square brand icon sits where the monogram sat, so the name stays —
+       unlike a wordmark, an icon alone does not identify anything. Sixteen
+       vendors kept the monogram: their icon either could not be found or
+       turned out to belong to a different company. */
+    const mark = p.icon
+      ? `<img class="lgico" src="${p.icon}" alt="" loading="lazy">`
+      : `<span class="lg" style="background:${p.bg || '#6C6CA8'}">${p.name[0].toUpperCase()}</span>`;
+    return mark + p.name;
   }
 
   const pmsGrid = $('#pmsGrid');
