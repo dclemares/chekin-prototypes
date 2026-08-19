@@ -273,6 +273,8 @@
   .needs{display:none;margin:0;padding:8px 12px;border-radius:8px;background:var(--warn-bg);
          color:var(--text-warn);font:600 13px/1.35 var(--font-primary);max-width:38ch}
   .needs.on{display:block;animation:needsIn .16s ease}
+  .later{display:none;margin:0;font:500 12.5px/1.4 var(--font-primary);color:var(--text-gray-dark);max-width:40ch}
+  .later.on{display:block}
   @keyframes needsIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
   .btn{height:44px;padding:0 22px;border-radius:var(--radius-md);font:600 14px var(--font-primary);cursor:pointer;display:inline-flex;align-items:center;gap:8px;border:none;transition:transform .12s,box-shadow .12s,background .15s}
   .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.4}
@@ -496,6 +498,7 @@
         <button class="btn ghost" id="btnBack" style="visibility:hidden"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>Back</button>
         <button class="btn primary" id="btnNext">Continue<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
         <p class="needs" id="stepNeeds" role="alert"></p>
+        <p class="later" id="pmsLater">Your properties and bookings won't import until you authorise it. You can do it later from the dashboard.</p>
         <button class="skip" id="btnSkip">Skip for now</button>
       </div>
 
@@ -937,7 +940,7 @@
 
     pmsConnect.innerHTML = `<div class="pc-form">${f}</div><div class="pc-info">${info}</div>`;
 
-    const done = btn => { btn.classList.add('done'); btn.disabled = true; btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> ${p.name} connected`; state.pmsConnected = true; };
+    const done = btn => { btn.classList.add('done'); btn.disabled = true; btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> ${p.name} connected`; state.pmsConnected = true; refresh(); };
     const go = $('#pcGo');
     if (go){
       const fields = $$('[data-pcf]');
@@ -1196,6 +1199,18 @@
     if (valid()) clearNeeds();
     syncStepLabels();
     renderChips();
+    syncCta();
+  }
+  /* Lives here rather than in show(): authorising the PMS changes the label but
+     not the step, so computing it on navigation alone left the button reading
+     "without connecting" after the account had just been connected. */
+  function syncCta(){
+    const arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
+    const pending = step === 6 && !state.pmsConnected;
+    $('#btnNext').innerHTML = (step === LAST ? 'Go to my dashboard'
+                              : pending ? 'Continue without connecting'
+                              : 'Continue') + arrow;
+    $('#pmsLater').classList.toggle('on', pending);
   }
   function show(n){
     clearNeeds();
@@ -1216,12 +1231,7 @@
     $('#btnBack').style.visibility = i > 0 ? 'visible' : 'hidden';
     $('#btnSkip').style.display = step === LAST ? 'none' : '';
     if (step === 4) setupPrioStep();
-    if (step === LAST){
-      renderPlan();
-      $('#btnNext').innerHTML = 'Go to my dashboard<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
-    } else {
-      $('#btnNext').innerHTML = 'Continue<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
-    }
+    if (step === LAST) renderPlan();
     refresh();
     window.scrollTo({top:0});
   }
