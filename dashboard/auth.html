@@ -288,6 +288,32 @@
   [hidden]{display:none!important}
 
   /* Boxed auth/register card */
+  /* ── Registration: two columns ──
+     This screen stopped being a narrow auth form when the portfolio questions
+     joined it — stacked in one 384px column it ran 842px tall, which put the
+     primary action below the fold on a 900px-high desktop while leaving most
+     of the width empty. Split in two it is about 510px, and the split itself
+     does the grouping: who you are on the left, what you run on the right.
+
+     The condition is the CARD's width, not the window's. A viewport query got
+     this wrong in both directions: at 1120px the 272px rail leaves the card
+     around 650px — too narrow to divide — while below 1100px the rail is gone
+     and the same viewport has room to spare. */
+  body.form-wide .cwrap{max-width:900px}
+  [data-screen="r-account"] .acard{max-width:804px;container-type:inline-size}
+  .form2col{display:grid;grid-template-columns:1fr}
+  @container (min-width:700px){
+    /* The right track is fixed at what its widest option needs on one line
+       ("Camping / glamping" measures 113px, plus emoji and padding, two up).
+       An even 1fr/1fr split starved it and every label broke in two. */
+    .form2col{grid-template-columns:minmax(0,1fr) 371px;align-items:start}
+    .form2col > .col:first-child{padding-right:30px}
+    .form2col > .col:last-child{border-left:1px solid var(--stroke-gray-lighter);padding-left:30px}
+    /* Both columns end on a field, whose 22px margin would otherwise stack on
+       top of the gap above the button. */
+    .form2col > .col > .field:last-child{margin-bottom:6px}
+  }
+
   /* Portfolio pickers. Two-up grid so four options cost two rows inside a
      384px card instead of four. */
   .subq{font:600 13px var(--font-primary);color:var(--text-dark);margin:0 0 9px}
@@ -723,6 +749,9 @@
             Sign up with Google
           </button>
           <div class="or" id="racct-or">or register with email</div>
+
+          <div class="form2col">
+          <div class="col">
           <div class="identity" id="racct-identity">
             <span class="who"><span class="av" id="racct-initial"></span><span id="racct-who"></span></span>
             <button type="button" class="linklike" id="racct-change">Change</button>
@@ -777,7 +806,9 @@
             </div>
             <p class="err" id="rp-phone-err">Enter your phone number and its country code.</p>
           </div>
+          </div>
 
+          <div class="col">
             <!-- Portfolio. Sits after the identity fields because it's about the
                  business, not the person — and because the size ranges only make
                  sense once the type above them is picked. -->
@@ -797,6 +828,9 @@
             <div class="opts sizes" id="ra-sizes" role="radiogroup" aria-label="Portfolio size"><!-- rendered per property type --></div>
             <p class="err">Pick the range closest to your portfolio.</p>
             </div>
+          </div>
+          </div>
+
           <div class="cta">
             <button class="btn primary block" id="racct-next">Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
           </div>
@@ -891,6 +925,7 @@
     /* Register keeps the rail — it carries the setup progress. */
     document.body.classList.toggle('centred', mode === 'auth');
     document.body.classList.toggle('on-login', id === 'login');
+    document.body.classList.toggle('form-wide', id === 'r-account');
     if (window.setDemo) setDemo(id);
 
     /* These three name the address they are talking about. Reached straight
