@@ -64,7 +64,6 @@
   .cbar{height:4px;background:var(--stroke-gray-lighter)}
   .cbar i{display:block;height:100%;background:linear-gradient(90deg,#385CF8,#35E5BC);border-radius:0 2px 2px 0;transition:width .35s cubic-bezier(.3,.9,.3,1)}
   .cwrap{flex:1;display:flex;flex-direction:column;max-width:820px;width:100%;margin:0 auto;padding:56px 48px 40px}
-  .stepno{font:700 11px var(--font-primary);color:var(--text-brand);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px}
   h1{font:700 30px/38px var(--font-primary);letter-spacing:-.015em;margin:0 0 10px}
   .lead{font:400 14px/20px var(--font-primary);color:var(--text-gray-dark);margin:0 0 32px}
 
@@ -351,7 +350,6 @@
 
       <!-- STEP 1 · Location -->
       <section class="panel on" data-panel="1">
-        <div class="stepno">Step 1 of 5</div>
         <h1>Where are your properties?</h1>
         <p class="lead">Guest registration rules change by country. Tell us where you operate and we'll switch on exactly what the law requires — nothing more.</p>
         <div class="multihint">
@@ -384,7 +382,6 @@
 
       <!-- STEP 2 · Portfolio -->
       <section class="panel" data-panel="2">
-        <div class="stepno">Step 2 of 5</div>
         <h1>How big is your portfolio?</h1>
         <p class="lead">We'll calibrate the dashboard — a single apartment and a 200-unit operation need very different tools.</p>
 
@@ -402,7 +399,6 @@
 
       <!-- STEP 3 · Bookings management -->
       <section class="panel" data-panel="3">
-        <div class="stepno">Step 3 of 5</div>
         <h1>How do you manage your bookings today?</h1>
         <p class="lead">This decides how your properties and reservations get into Chekin — automatically, or with a little help.</p>
         <div class="cards" id="manageCards">
@@ -442,7 +438,6 @@
 
       <!-- STEP 3b · Connect the chosen PMS (only when a PMS is selected) -->
       <section class="panel" data-panel="6">
-        <div class="stepno">Connect your PMS</div>
         <h1 id="pcTitle">Connect your PMS</h1>
         <p class="lead" id="pcLead">Enter your credentials so we can import your properties and bookings.</p>
         <div class="pms-connect on" id="pmsConnect"></div>
@@ -450,7 +445,6 @@
 
       <!-- STEP 4 · Priority -->
       <section class="panel" data-panel="4">
-        <div class="stepno">Step 4 of 5</div>
         <h1 id="prioTitle">What matters most to you right now?</h1>
         <p class="lead" id="prioLead">Pick one or several — we'll build your dashboard around them. You can change this anytime.</p>
         <div class="cards" id="prioCards">
@@ -485,7 +479,6 @@
 
       <!-- STEP 5 · Plan -->
       <section class="panel" data-panel="5">
-        <div class="stepno">Step 5 of 5</div>
         <h1 id="planTitle">Here's your plan</h1>
         <p class="lead" id="planLead">Based on your answers, this is the fastest path to your first automated check-in.</p>
         <div class="plan-grid">
@@ -1286,16 +1279,6 @@
     if (step === 4) return state.prios.length > 0; // regulated markets always have compliance locked in
     return true;
   }
-  function syncStepLabels(){
-    const f = flow();
-    f.forEach((pid, idx) => {
-      const el = document.querySelector(`.panel[data-panel="${pid}"] .stepno`);
-      if (!el) return;
-      el.textContent = pid === 6
-        ? `Step ${idx + 1} of ${f.length} · Connect`
-        : `Step ${idx + 1} of ${f.length}`;
-    });
-  }
   const NEEDS = {
     1: 'Pick at least one country — that\'s what switches on the right legal modules.',
     2: 'Tell us the property type and the range closest to your portfolio.',
@@ -1315,7 +1298,6 @@
   }
   function refresh(){
     if (valid()) clearNeeds();
-    syncStepLabels();
     renderChips();
     syncCta();
   }
@@ -1359,7 +1341,6 @@
       if (s < rs) r.querySelector('.bub').innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
       else r.querySelector('.bub').textContent = s;
     });
-    syncStepLabels();
     $('#cbar').style.width = ((i + 1) / f.length * 100) + '%';
     $('#btnBack').style.visibility = i > 0 ? 'visible' : 'hidden';
     $('#btnSkip').style.display = step === LAST ? 'none' : '';
