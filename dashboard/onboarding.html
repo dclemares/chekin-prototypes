@@ -240,6 +240,7 @@
 
   /* Step 5 — plan */
   .plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+  .rail2 .r2.more{color:#AEB7F5;font-style:normal;opacity:.85;padding-left:2px}
   .plan-list{display:flex;flex-direction:column;gap:0}
   .pl-item{display:flex;gap:14px;padding:14px 4px;border-bottom:1px solid var(--stroke-gray-lighter)}
   .pl-item:last-child{border-bottom:none}
@@ -497,7 +498,7 @@
             <div class="pbody">
               <div class="mini-hero">
                 <div class="g" id="pvGreet">Your workspace</div>
-                <div class="h">Welcome back 👋</div>
+                <div class="h">Your dashboard is ready 👋</div>
                 <div class="rail2" id="pvRail"></div>
               </div>
               <div class="mods">
@@ -1186,12 +1187,21 @@
     // Mini hero rail (first 4 steps)
     const rail = $('#pvRail');
     rail.innerHTML = '';
-    steps.slice(0, 4).forEach((s, i) => {
+    const SHOWN = 4;
+    steps.slice(0, SHOWN).forEach((s, i) => {
       const r = document.createElement('div');
       r.className = 'r2' + (i === 0 ? ' first' : '');
       r.innerHTML = `<span class="b">${i+1}</span>${s.t}`;
       rail.appendChild(r);
     });
+    /* A miniature may abbreviate; it may not do so silently. Seven steps were
+       shown as four, so the preview undersold the plan it was previewing. */
+    if (steps.length > SHOWN){
+      const more = document.createElement('div');
+      more.className = 'r2 more';
+      more.textContent = `+${steps.length - SHOWN} more on your dashboard`;
+      rail.appendChild(more);
+    }
     const tp = state.ptype ? (state.ptype === 'other' && state.ptypeOther ? state.ptypeOther : PTYPE_LABELS[state.ptype]) : '';
     $('#pvGreet').textContent = state.countries.map(c => c.flag).join(' ') + ' · ' + (state.size || '') + ' ' + (state.size ? unit() : '') + (tp ? ' · ' + tp : '');
 
