@@ -65,6 +65,23 @@
   .hero{position:relative;border-radius:var(--radius-xl);overflow:hidden;background:linear-gradient(135deg,#1B1B5A 0%,#23235D 42%,#2E3FB0 100%);color:#fff;padding:30px 34px 26px;box-shadow:var(--shadow-raised)}
   .hero::before{content:"";position:absolute;top:-60px;right:-40px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(56,92,248,.55),transparent 62%)}
   .hero::after{content:"";position:absolute;bottom:-90px;right:120px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(53,229,188,.20),transparent 65%)}
+  /* Shown only when the guided setup was never completed. Skipping it used to
+     be a one-way door: nothing here linked back and nothing read the answers. */
+  .finish-setup{display:none;position:relative;z-index:1;align-items:center;gap:16px;flex-wrap:wrap;
+    margin-bottom:22px;padding:13px 16px;border-radius:12px;
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16)}
+  .finish-setup.on{display:flex}
+  .finish-setup .fs-t{font:600 13.5px/1.45 var(--font-primary);color:#fff}
+  .finish-setup .fs-d{font:400 13px/1.45 var(--font-primary);color:#B9C2FF}
+  .finish-setup .fs-b{margin-left:auto;flex-shrink:0;border:none;cursor:pointer;text-decoration:none;
+    padding:9px 15px;border-radius:9px;background:#fff;color:#1B1B5A;
+    font:600 13px var(--font-primary);display:inline-flex;align-items:center;gap:8px}
+  .finish-setup .fs-b:hover{background:#EEF1FF}
+  .finish-setup .fs-b svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4}
+  @media (max-width:760px){
+    .finish-setup .fs-b{margin-left:0;width:100%;justify-content:center}
+  }
+
   .hero-row{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap}
   .hero .greet{font:500 13px var(--font-primary);color:#B9C2FF;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
   .hero .greet .dot{width:6px;height:6px;border-radius:50%;background:var(--icon-success-light);box-shadow:0 0 0 4px rgba(53,229,188,.18)}
@@ -242,6 +259,13 @@
 
       <!-- ───── Hero band: greeting + progress + setup rail ───── -->
       <section class="hero reveal" style="animation-delay:.02s">
+        <div class="finish-setup" id="finishSetup">
+          <div>
+            <div class="fs-t">This dashboard isn't tailored yet</div>
+            <div class="fs-d">Four quick questions — about three minutes — and we switch on what your business actually needs.</div>
+          </div>
+          <a class="fs-b" href="onboarding.html">Finish setup <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
         <div class="hero-row">
           <div>
             <div class="greet"><span class="dot"></span>Saturday, 18 July 2026 · everything running smoothly</div>
@@ -468,6 +492,19 @@
       }
       requestAnimationFrame(tick);
     });
+  })();
+
+  /* The guided setup writes chekin_onboarding when it finishes. Until then the
+     dashboard is generic, and skipping used to leave no way back — nothing
+     linked to onboarding.html and nothing read what it saved. */
+  (function(){
+    var done = false;
+    try {
+      var raw = localStorage.getItem('chekin_onboarding');
+      done = !!(raw && JSON.parse(raw));
+    } catch (e) { done = false; }
+    var band = document.getElementById('finishSetup');
+    if (band) band.classList.toggle('on', !done);
   })();
 </script>
 </body>
