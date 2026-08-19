@@ -1225,15 +1225,74 @@
     } catch(e){}
   }
   $('#btnNext').addEventListener('click', () => {
-    if (step === LAST){ savePlan(); goTop('firstrun'); return; }
+    if (step === LAST){ savePlan(); clearProgress(); goTop('firstrun'); return; }
     const f = flow();
     show(f[f.indexOf(step) + 1]);
+    saveProgress();
   });
   $('#btnBack').addEventListener('click', () => {
     const f = flow();
     show(f[Math.max(0, f.indexOf(step) - 1)]);
+    saveProgress();
   });
-  $('#btnSkip').addEventListener('click', () => goTop('fable'));
+  /* Leaving mid-flow used to discard everything answered so far — nothing was
+     written until the final step, so a skip on step 3 threw away the countries
+     and the portfolio. Progress is kept, and re-entering resumes where it
+     stopped rather than starting the questions over. */
+  function saveProgress(){
+    try {
+      localStorage.setItem('chekin_onboarding_progress', JSON.stringify({
+        step,
+        countries: state.countries.map(c => c.code),
+        regions: state.regions,
+        primary: state.primary,
+        size: state.size, sizeTier: state.sizeTier,
+        manage: state.manage,
+        pms: state.pms ? state.pms.id : null,
+        prios: state.prios
+      }));
+    } catch(e){}
+  }
+  function clearProgress(){
+    try { localStorage.removeItem('chekin_onboarding_progress'); } catch(e){}
+  }
+
+  function restoreProgress(){
+    let p = null;
+    try { const raw = localStorage.getItem('chekin_onboarding_progress'); p = raw ? JSON.parse(raw) : null; } catch(e){ p = null; }
+    if (!p) return;
+
+    (p.countries || []).forEach(code => {
+      const card = groupsBox.querySelector(`.card.country[data-code="${code}"]`);
+      if (card && !card.classList.contains('sel')) card.click();
+    });
+    state.regions = Array.isArray(p.regions) ? p.regions : [];
+    if (p.primary) state.primary = p.primary;
+
+    if (p.sizeTier != null){
+      const sizeCards = $$('#sizeCards .card');
+      if (sizeCards[p.sizeTier]) sizeCards[p.sizeTier].click();
+    }
+    if (p.manage){
+      const mc = document.querySelector(`.card.manage[data-manage="${p.manage}"]`);
+      if (mc) mc.click();
+    }
+    (p.prios || []).forEach(k => {
+      const pc = document.querySelector(`.card.prio[data-prio="${k}"]`);
+      if (pc && !pc.classList.contains('sel')) pc.click();
+    });
+
+    syncStep1();
+    refresh();
+    /* Deliberately does not navigate: the bottom of this script ends with an
+       unconditional show(), so restoring the step here was overwritten a line
+       later. It hands the step back and lets that call decide. */
+    const f = flow();
+    return (p.step && f.includes(p.step)) ? p.step : null;
+  }
+
+  $('#btnSkip').addEventListener('click', () => { saveProgress(); goTop('fable'); });
+
 
   /* ───── Demo presets: ?demo=compliance|ops|cleaning ───── */
   const demo = new URLSearchParams(location.search).get('demo');
@@ -1272,10 +1331,12 @@
       show(5);
     }
   } else {
+    const resumed = restoreProgress();
     syncStep1();
     // Debug: ?step=N jumps straight to a step (no validation)
-    const stepParam = parseInt(new URLSearchParams(location.search).get('step') || '1', 10);
-    show(isNaN(stepParam) ? 1 : stepParam);
+    const raw = new URLSearchParams(location.search).get('step');
+    const stepParam = raw ? parseInt(raw, 10) : null;
+    show(stepParam && !isNaN(stepParam) ? stepParam : (resumed || 1));
   }
 })();
 </script>
