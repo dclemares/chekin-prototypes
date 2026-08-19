@@ -752,7 +752,7 @@
      landed past the fold along with Continue, so the answer to a click was
      invisible. Brings whichever just appeared into view, once, on the
      transition into being shown. */
-  const revealed = { locals:false, primaryMarket:false };
+  const revealed = { locals:false, primaryMarket:false, pmsPick:false };
   function bringIntoView(id){
     const el = document.getElementById(id);
     if (!el) return;
@@ -761,8 +761,10 @@
     revealed[id] = isOn;
     if (!isOn || wasOn) return;
     if (el.getBoundingClientRect().bottom <= window.innerHeight - 24) return;
-    const soft = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-    el.scrollIntoView({ behavior: soft, block: 'center' });
+    /* Instant, not smooth: a smooth scroll fired in the same tick as the
+       block's reveal animation gets dropped, and the page stayed put — the
+       one outcome this exists to prevent. */
+    el.scrollIntoView({ block: 'center' });
   }
 
   /* Everything that depends on which countries are ticked. */
@@ -1082,6 +1084,9 @@
       $('#pmsPick').classList.toggle('on', state.manage === 'pms');
       if (state.manage !== 'pms') { state.pms = null; state.pmsConnected = false; $$('#pmsGrid .pms').forEach(x => x.classList.remove('sel')); renderPmsConnect(null); }
       refresh();
+      /* Choosing PMS opens the list of them below the fold — same as step 1's
+         follow-ups, and with Continue pushed out of sight behind it. */
+      bringIntoView('pmsPick');
     };
     c.addEventListener('click', pick);
     c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
