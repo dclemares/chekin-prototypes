@@ -1088,21 +1088,30 @@
   });
 
   /* ───── Step 4: priority ───── */
+  /* Compliance is wider than police registration. France, Greece and the UAE
+     collect tourist tax without any guest registration, and the plan adds the
+     tax step for them — so dimming this card on registration alone told people
+     compliance did not apply while the next screen handed them a compliance
+     task. It follows whether anything is mandatory at all. */
   function setupPrioStep(){
     const comp = $('#prioCompliance');
-    const req = regulated();
-    $('#reqChip').style.display = req ? '' : 'none';
+    const police = regulated();
+    const tax = anyTax();
+    const mandatory = police || tax;
+    $('#reqChip').style.display = mandatory ? '' : 'none';
     comp.classList.remove('locked','dim');
-    if (req){
+    if (mandatory){
       comp.classList.add('locked');
       if (!state.prios.includes('compliance')) state.prios.push('compliance');
       $('#prioTitle').textContent = 'Legal compliance is covered. What else matters?';
-      $('#prioLead').textContent  = 'Police reporting and tourist taxes are mandatory where you operate — they’re already in your plan. Add as many extra focuses as you need.';
+      $('#prioLead').textContent  = police
+        ? 'Police reporting and tourist taxes are mandatory where you operate — they’re already in your plan. Add as many extra focuses as you need.'
+        : 'No guest registration in your markets, but tourist tax is mandatory — it’s already in your plan. Add as many extra focuses as you need.';
     } else {
       comp.classList.add('dim');
       state.prios = state.prios.filter(p => p !== 'compliance');
       $('#prioTitle').textContent = 'What matters most to you right now?';
-      $('#prioLead').textContent  = 'Good news — no guest registration is required in your markets. Pick one or several focuses; we’ll build your dashboard around them.';
+      $('#prioLead').textContent  = 'Good news — no guest registration or tourist tax applies in your markets. Pick one or several focuses; we’ll build your dashboard around them.';
     }
   }
   $$('#prioCards .card').forEach(c => {
