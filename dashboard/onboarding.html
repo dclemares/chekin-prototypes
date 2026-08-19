@@ -740,6 +740,24 @@
     });
   });
 
+  /* Picking a country opens follow-ups below the grid — the regional block,
+     and the main-market question once there are two. On a 900px screen both
+     landed past the fold along with Continue, so the answer to a click was
+     invisible. Brings whichever just appeared into view, once, on the
+     transition into being shown. */
+  const revealed = { locals:false, primaryMarket:false };
+  function bringIntoView(id){
+    const el = document.getElementById(id);
+    if (!el) return;
+    const wasOn = revealed[id];
+    const isOn = el.classList.contains('on');
+    revealed[id] = isOn;
+    if (!isOn || wasOn) return;
+    if (el.getBoundingClientRect().bottom <= window.innerHeight - 24) return;
+    const soft = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    el.scrollIntoView({ behavior: soft, block: 'center' });
+  }
+
   /* Everything that depends on which countries are ticked. */
   function syncStep1(){
     const picked = state.countries;
@@ -801,6 +819,10 @@
         pc.appendChild(btn);
       });
     }
+
+    /* Main market first: when both open at once it is the lower of the two. */
+    bringIntoView('primaryMarket');
+    bringIntoView('locals');
   }
 
   /* ───── Step 1: any other market (mirrors OtherCountriesPicker) ───── */
