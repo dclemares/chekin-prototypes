@@ -185,10 +185,32 @@
 
   /* Step 3b — PMS connect (credentials / OAuth / guide) */
   .pms-connect{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+  /* ── Connect: the guide is the layout ── */
+  .pc-steps{list-style:none;margin:0;padding:0;counter-reset:pc}
+  .pc-step{display:grid;grid-template-columns:26px 1fr;gap:13px;position:relative;padding-bottom:20px}
+  /* The rail joins the numbers so the eye reads it as one sequence. It stops
+     at the last step because there is nothing after it to join to. */
+  .pc-step:not(.last)::before{content:"";position:absolute;left:12.5px;top:28px;bottom:2px;width:1.5px;background:var(--stroke-gray-lighter)}
+  .pc-step:last-child{padding-bottom:0}
+  .pc-n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--bg-blue-light);color:var(--text-brand);font:700 12px var(--font-primary);flex-shrink:0}
+  .pc-step.last .pc-n{background:var(--text-brand);color:#fff}
+  .pc-step > div{min-width:0}
+  /* Only the step's own title is a block — the <b> inside a detail marks the
+     menu path and has to stay inline, or it breaks the sentence in two. */
+  .pc-step > div > b{display:block;font:600 13.5px/20px var(--font-primary);color:var(--text-dark)}
+  .pc-step p b{font-weight:600;color:var(--text-dark)}
+  .pc-step p{margin:3px 0 0;font:400 13px/19px var(--font-primary);color:var(--text-gray-dark)}
+  .pc-step b + p{margin-top:2px}
+  .pc-after{background:var(--bg-neutral-light);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:15px 17px;margin-bottom:16px}
+  .pc-after h4{font:700 13px var(--font-primary);margin:0 0 8px}
+  .pc-after ul{margin:0;padding-left:16px;font:400 12.5px/20px var(--font-primary);color:var(--text-gray-dark)}
+  .pc-site{display:inline-block;margin-top:10px;font:600 12.5px var(--font-primary);color:var(--text-brand);text-decoration:none}
+
   .pc-form{background:#fff;border:1.5px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-card)}
   .pc-form h4{font:700 14px var(--font-primary);margin:0 0 14px;display:flex;align-items:center;gap:9px}
   .pc-form .lg{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font:800 11px var(--font-primary);color:#fff}
   .pc-field{margin-bottom:13px}
+  .pc-step.last .pc-field:first-child{margin-top:2px}
   .pc-field label{display:block;font:600 12.5px var(--font-primary);margin-bottom:6px}
   .pc-field input{width:100%;height:40px;padding:0 12px;border-radius:9px;border:1.5px solid var(--stroke-gray-light);font:500 13px var(--font-primary);outline:none;color:var(--text-dark)}
   .pc-field input:focus{border-color:var(--text-brand);box-shadow:0 0 0 3px rgba(56,92,248,.12)}
@@ -670,30 +692,39 @@
   ];
 
   const PMS = [
-    { id:'guesty', logo:'https://chekin.com/wp-content/uploads/2026/02/Guesty.svg',   name:'Guesty',    bg:'#0B3954', kind:'none',  video:'Z3eAVpF5xkY', site:'guesty.com',
+    { id:'guesty', logo:'https://chekin.com/wp-content/uploads/2026/02/Guesty.svg',   name:'Guesty',    bg:'#0B3954', kind:'form',  video:'Z3eAVpF5xkY', site:'guesty.com',
+      fields:[['integration_token','Integration Token','']],
+      guide:[['Open Guesty','Go to <b>Marketplace \u2192 Chekin</b> and press Connect.'],['Copy the Integration Token','It appears in the popup that opens.']],
+      sync:'Guests can be registered from the moment it connects.',
       desc:'Guesty simplifies managing hospitality businesses with its all-in-one platform, automating operations to save time and increase revenue.',
       benefits:['Flexible solutions for every business','Unlock your listings\u2019 true potential','Boost operational productivity'] },
-    { id:'hostaway', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-hostaway-2023.svg', name:'Hostaway',  bg:'#F5A623', kind:'form',  video:'lsqJOm-TsIg', site:'hostaway.com',
-      fields:[['client_id','Client ID',''],['client_secret','Client secret','Create both under Hostaway \u2192 Marketplace \u2192 Chekin']],
+    { id:'hostaway',
+      guide:[['Open Hostaway','Go to <b>Settings \u2192 Hostaway API</b>.'],['Generate the API secret key','Or copy the existing one. Your Account ID is on the same screen.']], sync:'Both values come from that one screen.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-hostaway-2023.svg', name:'Hostaway',  bg:'#F5A623', kind:'form',  video:'lsqJOm-TsIg', site:'hostaway.com',
+      fields:[['account_id','Account ID',''],['api_secret','API secret key','']],
       desc:'Hostaway is the fast-growing vacation rental platform combining channel management, automation and analytics for professional managers.',
       benefits:['Deep channel integrations','Powerful automations & workflows','Reporting built for scale'] },
-    { id:'lodgify', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-lodgify-2023.svg',  name:'Lodgify',   bg:'#5A31F4', kind:'form',  video:'4_pz38vRROM', site:'lodgify.com',
-      fields:[['api_key','API key','Paste the key from Lodgify \u2192 Settings \u2192 Public API']],
+    { id:'lodgify',
+      guide:[['Open Lodgify','Go to <b>Settings \u2192 Public API</b>.'],['Copy the API key','That single key is all we need.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-lodgify-2023.svg',  name:'Lodgify',   bg:'#5A31F4', kind:'form',  video:'4_pz38vRROM', site:'lodgify.com',
+      fields:[['api_key','API key','']],
       desc:'Lodgify is vacation rental software that lets you create a website, sync availability across channels and manage all bookings in one place.',
       benefits:['Channel manager for Airbnb, Booking.com & Vrbo','Direct booking website included','Automated guest communication'] },
-    { id:'smoobu', logo:'https://chekin.com/wp-content/uploads/2026/02/Smoobu-logo.svg',   name:'Smoobu',    bg:'#00A699', kind:'oauth', video:'7IBjUKv70Ao', site:'smoobu.com',
+    { id:'smoobu',
+      guide:[['Open Smoobu','Go to <b>Settings \u2192 Marketplace</b>.'],['Add Chekin','Find Chekin in the list and add it.']], sync:'Reservations sync across every portal in real time.', logo:'https://chekin.com/wp-content/uploads/2026/02/Smoobu-logo.svg',   name:'Smoobu',    bg:'#00A699', kind:'oauth', video:'7IBjUKv70Ao', site:'smoobu.com',
       desc:'Smoobu is the all-in-one software for short-term and vacation rentals: channel manager, PMS, website builder and guest guide.',
       benefits:['Real-time sync across all portals','One calendar for every booking','Guest guide & online check-in links'] },
-    { id:'avantio', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-avantio-2023.svg',  name:'Avantio',   bg:'#E4572E', kind:'form',  video:null, site:'avantio.com',
-      fields:[['pms_username','Avantio username',''],['pms_password','Avantio password','']],
-      note:'You must request these credentials by opening a ticket from your Avantio account.',
+    { id:'avantio',
+      guide:[['Ask Avantio for your API key','Request it through <b>Live Chat</b> inside your Avantio account.'],['Wait for their reply','They send the key back on the same chat.']], sync:'Importing can take from seconds to a couple of minutes.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-avantio-2023.svg',  name:'Avantio',   bg:'#E4572E', kind:'form',  video:null, site:'avantio.com',
+      fields:[['api_key','API key','']],
+      
       desc:'Avantio\u2019s property management software is an all-in-one solution, available in 7 languages, supporting agencies across the globe.',
       benefits:['Fully customisable, ready to integrate','Streamlines processes to maximize revenue'] },
-    { id:'cloudbeds', logo:'https://chekin.com/wp-content/uploads/2026/02/Cloudbeds.svg',name:'Cloudbeds', bg:'#1789FC', kind:'oauth', video:'zUlBKUhQTZY', site:'cloudbeds.com',
+    { id:'cloudbeds',
+      guide:[['Authorise on Cloudbeds','We send you to Cloudbeds to approve access \u2014 nothing to copy.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2026/02/Cloudbeds.svg',name:'Cloudbeds', bg:'#1789FC', kind:'oauth', video:'zUlBKUhQTZY', site:'cloudbeds.com',
       desc:'The Cloudbeds Hospitality Platform integrates operations, revenue management, distribution channels and growth marketing tools.',
       benefits:['Streamline operations and automate workflows','Modernize your guest experience','Data delivered, insights revealed'] },
-    { id:'octorate', icon:'ds/assets/pms/octorate.png', name:'Octorate',  bg:'#7C3AED', kind:'form',  video:'G1cKQ3g5-3Y', site:'octorate.com',
-      fields:[['api_key','API key','Octorate \u2192 Integrations \u2192 Chekin']],
+    { id:'octorate',
+      guide:[['Sign in to Octorate','We send you to Octorate to sign in and confirm the connection.']], icon:'ds/assets/pms/octorate.png', name:'Octorate',  bg:'#7C3AED', kind:'oauth', video:'G1cKQ3g5-3Y', site:'octorate.com',
+      
       desc:'Octorate is an all-in-one cloud solution for hotels, B&Bs and vacation rentals: channel manager, booking engine and PMS.',
       benefits:['All-in-one cloud suite','Fast channel synchronisation'] },
     { id:'other',    name:'Other\u2026',    bg:'#6B6B95', kind:'contact', video:null, site:null,
@@ -1038,7 +1069,7 @@
     $('#pcTitle').textContent = p.id === 'other' ? 'Tell us your PMS' : `Connect ${p.name}`;
     $('#pcLead').textContent = (PC_LEAD[p.kind] || PC_LEAD.form)(p);
     const logo = pmsMark(p);
-    let f = `<h4>${logo} Connect ${p.name}</h4>`;
+    let f = '';
     if (p.kind === 'form'){
       if (p.note) f += `<div class="pc-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg><span>${p.note}</span></div>`;
       p.fields.forEach((fl, i) => {
@@ -1066,17 +1097,33 @@
 
     /* The catalogue entries carry a name and nothing else, and an "About"
        heading over an empty paragraph is worse than no panel at all. */
-    let info = p.desc
-      ? `<h4>About ${p.name}</h4><p>${p.desc}${p.site ? ` <a href="https://${p.site}" target="_blank" rel="noopener">${p.site}</a>` : ''}</p>`
-      : '';
-    if (p.benefits && p.benefits.length){
-      info += `<h4 style="font-size:12.5px">Benefits of integrating Chekin and ${p.name}</h4><ul>${p.benefits.map(b => `<li>${b}</li>`).join('')}</ul>`;
+    /* What used to sit here was the vendor's own marketing copy, which is no
+       help while you are trying to connect. This says what happens after. */
+    let info = '';
+    if (p.id !== 'other'){
+      info += `<div class="pc-after"><h4>Once it is connected</h4><ul>` +
+        `<li>Your properties and bookings import automatically.</li>` +
+        `<li>Guests get the check-in link without you sending it.</li>` +
+        (p.sync ? `<li>${p.sync}</li>` : '') +
+        `</ul>${p.site ? `<a class="pc-site" href="https://${p.site}" target="_blank" rel="noopener">${p.site} \u2197</a>` : ''}</div>`;
     }
     if (p.video){
       info += `<p class="pc-vlabel">How to connect ${p.name} with Chekin</p><div class="pc-video"><iframe src="https://www.youtube.com/embed/${p.video}" title="How to connect ${p.name} with Chekin" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
     }
 
-    pmsConnect.innerHTML = `<div class="pc-form">${f}</div><div class="pc-info">${info}</div>`;
+    /* The steps are the screen. Everything the guide says to do in the other
+       tool comes first, numbered, and the thing you do here is the last step
+       rather than a separate card floating beside them. */
+    const guide = p.guide || [];
+    /* A lone "step 1" is numbering for its own sake. Without preparation to
+       do in the other tool there is no sequence, so the action stands alone. */
+    const body = guide.length
+      ? `<ol class="pc-steps">` +
+        guide.map((g, i) => `<li class="pc-step"><span class="pc-n">${i + 1}</span><div><b>${g[0]}</b><p>${g[1]}</p></div></li>`).join('') +
+        `<li class="pc-step last"><span class="pc-n">${guide.length + 1}</span><div>${f}</div></li></ol>`
+      : f;
+
+    pmsConnect.innerHTML = `<div class="pc-form">${body}</div><div class="pc-info">${info}</div>`;
 
     const done = btn => { btn.classList.add('done'); btn.disabled = true; btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> ${p.name} connected`; state.pmsConnected = true; refresh(); };
     const go = $('#pcGo');
