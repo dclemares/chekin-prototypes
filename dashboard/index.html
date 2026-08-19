@@ -269,10 +269,10 @@
         <div class="hero-row">
           <div>
             <div class="greet"><span class="dot"></span>Saturday, 18 July 2026 · everything running smoothly</div>
-            <h1>Welcome back <span class="wave">👋</span></h1>
-            <div class="sub">You're two steps from going live. Connect a channel and set up police reporting to unlock fully automated check-in.</div>
+            <h1 id="heroTitle">Welcome back <span class="wave">👋</span></h1>
+            <div class="sub" id="heroSub">You're two steps from going live. Connect a channel and set up police reporting to unlock fully automated check-in.</div>
             <div class="actions">
-              <button class="btn-hero solid">Connect a channel <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+              <button class="btn-hero solid" id="heroCta">Connect a channel <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
               <button class="btn-hero ghost">Preview guest flow</button>
             </div>
           </div>
@@ -289,13 +289,13 @@
                 <circle class="track" cx="64" cy="64" r="54"/>
                 <circle class="fill" cx="64" cy="64" r="54"/>
               </svg>
-              <div class="ctr"><span class="pct" data-count="40" data-suffix="%">0%</span><span class="lbl">Setup</span></div>
+              <div class="ctr"><span class="pct" id="heroPct" data-count="40" data-suffix="%">0%</span><span class="lbl">Setup</span></div>
             </div>
-            <div class="eta"><b>2 of 5</b> done · ~8 min left</div>
+            <div class="eta" id="heroEta"><b>2 of 5</b> done · ~8 min left</div>
           </div>
         </div>
 
-        <div class="rail" aria-label="Setup progress">
+        <div class="rail" id="setupRail" aria-label="Setup progress">
           <div class="rl done" title="Sonder Madrid">
             <span class="bub"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>
             <span class="lbl">Create workspace</span>
@@ -473,6 +473,79 @@
 <script src="ds/_sidebar.js"></script>
 <script src="ds/_agent.js"></script>
 <script>
+  /* Runs before the count-up: that animation reads data-count once at start,
+     so rewriting the ring afterwards was overwritten a frame later. */
+  /* The guided setup writes chekin_onboarding when it finishes: the countries,
+     the portfolio, how bookings arrive, the priorities, and the plan it built
+     from all of it. Nothing here ever read that key — the flow ended with
+     goTop('firstrun'), index.html ignored ?view=, and the plan the user had
+     just agreed to was replaced by a hardcoded rail about someone else's
+     Madrid apartment. This is the arrival. */
+  (function(){
+    var plan = null;
+    try {
+      var raw = localStorage.getItem('chekin_onboarding');
+      plan = raw ? JSON.parse(raw) : null;
+    } catch (e) { plan = null; }
+
+    var band = document.getElementById('finishSetup');
+    if (band) band.classList.toggle('on', !plan);
+    if (!plan || !Array.isArray(plan.steps) || !plan.steps.length) return;
+
+    var steps = plan.steps;
+    var mins = steps.reduce(function (a, s) { return a + (s.eta || 0); }, 0);
+
+    /* Nothing is done yet — a brand new account has not created a workspace or
+       added a property, whatever the placeholder rail claimed. */
+    var rail = document.getElementById('setupRail');
+    if (rail) {
+      rail.innerHTML = '';
+      steps.forEach(function (st, i) {
+        if (i) {
+          var ln = document.createElement('span');
+          ln.className = 'rl-ln';
+          rail.appendChild(ln);
+        }
+        var el = document.createElement('div');
+        el.className = 'rl ' + (i === 0 ? 'active' : 'todo');
+        el.title = st.d || '';
+        el.innerHTML = '<span class="bub">' + (i + 1) + '</span>' +
+                       '<span class="lbl"></span>';
+        el.querySelector('.lbl').textContent = st.t;
+        rail.appendChild(el);
+      });
+    }
+
+    var pct = document.getElementById('heroPct');
+    if (pct) { pct.setAttribute('data-count', '0'); pct.textContent = '0%'; }
+
+    var eta = document.getElementById('heroEta');
+    if (eta) eta.innerHTML = '<b>0 of ' + steps.length + '</b> done · ~' + mins + ' min left';
+
+    var sub = document.getElementById('heroSub');
+    if (sub) sub.textContent = 'Your plan is ready: ' + steps.length + ' steps, about ' +
+      mins + ' minutes. Start with ' + steps[0].t.charAt(0).toLowerCase() + steps[0].t.slice(1) + '.';
+
+    var cta = document.getElementById('heroCta');
+    if (cta) cta.innerHTML = '';
+    if (cta) {
+      cta.appendChild(document.createTextNode(steps[0].t + ' '));
+      cta.insertAdjacentHTML('beforeend',
+        '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>');
+    }
+
+    /* Arriving straight from the flow is not the same as coming back a week
+       later, so only the first landing gets the arrival greeting. */
+    var params = new URLSearchParams(location.search);
+    if (params.get('view') === 'firstrun') {
+      var title = document.getElementById('heroTitle');
+      if (title) title.innerHTML = 'Your dashboard is ready <span class="wave">👋</span>';
+      params.delete('view');
+      var q = params.toString();
+      history.replaceState(null, '', location.pathname + (q ? '?' + q : ''));
+    }
+  })();
+
   // Count-up for KPI values + ring percentage (respects reduced motion)
   (function(){
     const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -494,18 +567,6 @@
     });
   })();
 
-  /* The guided setup writes chekin_onboarding when it finishes. Until then the
-     dashboard is generic, and skipping used to leave no way back — nothing
-     linked to onboarding.html and nothing read what it saved. */
-  (function(){
-    var done = false;
-    try {
-      var raw = localStorage.getItem('chekin_onboarding');
-      done = !!(raw && JSON.parse(raw));
-    } catch (e) { done = false; }
-    var band = document.getElementById('finishSetup');
-    if (band) band.classList.toggle('on', !done);
-  })();
 </script>
 </body>
 </html>
