@@ -375,6 +375,16 @@
     body.centred .demo-bar{bottom:150px;top:auto;right:12px;left:12px;max-width:none}
   }
 
+  /* The pending screen loops three dots for as long as it is on screen —
+     the one animation here that never stops on its own. Honour the system
+     preference rather than leaving it running. The spinner and the dots keep
+     a token movement so they still read as "working". */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+    .pending .dots i{animation:none;transform:scale(1);opacity:.55}
+    .captcha .spin{animation:none}
+  }
+
   .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   .acct-flag{position:fixed;right:22px;bottom:76px;z-index:199;display:none;align-items:center;gap:6px;
     padding:6px;border-radius:999px;background:var(--bg-dark);box-shadow:0 8px 22px rgba(22,22,67,.28)}
@@ -803,9 +813,8 @@
           <div class="dots"><i></i><i></i><i></i></div>
           <div class="line"><div class="in" id="pendLines">
             <p>Creating your account…</p>
-            <p>Setting up your account…</p>
+            <p>Setting up your workspace…</p>
             <p>Preparing your dashboard…</p>
-            <p>Adding the final touches…</p>
           </div></div>
         </div>
       </section>
@@ -927,6 +936,14 @@
        The markup's autofocus never fires because the screen is hidden at parse. */
     var firstField = target.querySelector('input:not([type=checkbox]):not([type=hidden])');
     if (firstField && !firstField.value) setTimeout(function () { firstField.focus(); }, 0);
+
+    /* Reached from the switcher or a bookmark there is no submit driving this
+       one, so it used to sit on its first line with the dots looping and no
+       way forward — a hung app, not a pending state. Run the same sequence it
+       runs in the real flow and land where the real flow lands. */
+    if (id === 'r-creating' && !pendingRunning) {
+      runPending(function () { show('r-welcome'); });
+    }
     if (mode === 'register') {
       var done = id === 'r-welcome';
       var accountStep = document.querySelector('.rstep[data-rail="account"]');
@@ -1561,7 +1578,11 @@
      the four were never shown — the screen promised a sequence and ran half
      of it. The dwell is derived from the total so editing the copy cannot
      silently drop a line again. */
+  /* Guards against re-entry: runPending calls show('r-creating') itself, and
+     show() starts runPending for anyone who arrives by hash. */
+  var pendingRunning = false;
   function runPending(done){
+    pendingRunning = true;
     var lines = document.getElementById('pendLines');
     var total = lines.children.length;
     var TOTAL_MS = 4000;
@@ -1576,7 +1597,7 @@
       lines.style.transform = 'translateY(-' + (i * 24) + 'px)';
       announcePending(lines.children[i].textContent);
     }, dwell);
-    setTimeout(function () { clearInterval(tick); done(); }, TOTAL_MS);
+    setTimeout(function () { clearInterval(tick); pendingRunning = false; done(); }, TOTAL_MS);
   }
 
   /* The four lines all sit in the DOM and only move, so a live region on the
