@@ -720,6 +720,21 @@
             </div>
             <p class="err">Enter a valid email address.</p>
           </div>
+          <div class="field" id="rn-pass-field">
+            <div class="fs has-eye">
+              <input id="rn-pass" type="password" placeholder="Set your password" autocomplete="new-password">
+              <fieldset><legend><span>Password</span></legend></fieldset>
+              <label for="rn-pass">Password</label>
+              <button class="eye" data-eye="rn-pass" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            </div>
+            <div class="reqs">
+              <span class="req" id="req-len"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>8+ characters</span>
+              <span class="req" id="req-upper"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Uppercase</span>
+              <span class="req" id="req-num"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Number</span>
+              <span class="req" id="req-sym"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Symbol</span>
+            </div>
+            <p class="err">Your password needs all four.</p>
+          </div>
           <div class="field" id="rn-name-field">
             <div class="fs">
               <input id="rn-name" type="text" placeholder="e.g. Marta Ferreira" autocomplete="name">
@@ -746,21 +761,6 @@
               </div>
             </div>
             <p class="err" id="rp-phone-err">Enter your phone number and its country code.</p>
-          </div>
-          <div class="field" id="rn-pass-field">
-            <div class="fs has-eye">
-              <input id="rn-pass" type="password" placeholder="Set your password" autocomplete="new-password">
-              <fieldset><legend><span>Password</span></legend></fieldset>
-              <label for="rn-pass">Password</label>
-              <button class="eye" data-eye="rn-pass" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-            </div>
-            <div class="reqs">
-              <span class="req" id="req-len"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>8+ characters</span>
-              <span class="req" id="req-upper"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Uppercase</span>
-              <span class="req" id="req-num"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Number</span>
-              <span class="req" id="req-sym"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Symbol</span>
-            </div>
-            <p class="err">Your password needs all four.</p>
           </div>
           <div class="cta">
             <button class="btn primary block" id="racct-next">Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
@@ -1511,9 +1511,11 @@
     ['re-email','rn-name','rn-pass','rp-phone'].forEach(function (id) {
       document.getElementById(id + '-field').classList.remove('invalid');
     });
+    /* Same order the fields appear in, so the caret always lands on the first
+       problem going down the form rather than jumping back up it. */
     if (!r.email) { document.getElementById('re-email-field').classList.add('invalid'); reEmail.focus(); return; }
-    if (!r.name)  { document.getElementById('rn-name-field').classList.add('invalid');  rnName.focus();  return; }
     if (!r.pass)  { document.getElementById('rn-pass-field').classList.add('invalid');  rnPass.focus();  updateAccount(); return; }
+    if (!r.name)  { document.getElementById('rn-name-field').classList.add('invalid');  rnName.focus();  return; }
     if (!r.phone) { document.getElementById('rp-phone-field').classList.add('invalid'); document.getElementById('rp-code').focus(); return; }
 
     state.email = reEmail.value.trim();
