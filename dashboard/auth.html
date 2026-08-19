@@ -53,6 +53,10 @@
      stands down here rather than saying it twice. */
   body.centred.on-login .aftercard{display:block}
   body.centred .rail-mode[data-railmode="auth"] .help{display:none}
+  /* The skip is a real choice, so it stays — but "take me to the dashboard"
+     framed it as an equal route to the same place, and it isn't: the answers
+     are what the dashboard is built from. */
+  .skipnote{margin:8px 0 0;text-align:center;max-width:34ch;margin-left:auto;margin-right:auto}
   .aftercard{display:none;margin-top:22px;font:500 13px var(--font-primary);color:var(--text-gray-dark);text-align:center;width:100%}
   .aftercard a{color:var(--text-brand);font-weight:600;text-decoration:none;cursor:pointer}
   .aftercard a:hover{text-decoration:underline}
@@ -828,7 +832,8 @@
           </ol>
           <div class="cta">
             <a class="btn primary block" href="onboarding.html">Start setup <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
-            <a class="skiplink" href="index.html">Skip — take me to the dashboard</a>
+            <a class="skiplink" href="index.html">Skip for now</a>
+            <p class="muted-note skipnote">The dashboard opens generic — these four answers are what tailor it.</p>
           </div>
         </div>
       </section>
