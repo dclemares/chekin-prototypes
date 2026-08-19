@@ -39,7 +39,7 @@
      centred, a headline with room to breathe, and the legal note held
      inside the card instead of floating under it. */
   body.centred .cwrap{justify-content:center;align-items:center}
-  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:384px;width:100%;margin:0}
+  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:344px;width:100%;margin:0}
   body.centred h1{font:700 36px/43px var(--font-primary);letter-spacing:-.03em;margin:0 0 10px}
   body.centred .lead{font:400 15.5px/23px var(--font-primary);color:var(--text-gray-dark);margin:0 0 28px;max-width:none}
   body.centred .acard{border-radius:16px;padding:22px 22px 20px}
@@ -204,7 +204,8 @@
   .fs.has-eye input{padding-right:46px}
   /* Dial-code select sits label-less beside the phone input */
   .fs.dial{width:100px;flex:none}
-  .fs.dial select{height:53px;margin-top:-5px;padding:0 8px 0 14px;cursor:pointer}
+  /* Was 53px pulled up by -5px, so it stood proud of the 48px field beside it. */
+  .fs.dial select{padding:0 8px 0 14px;cursor:pointer}
   .fs.dial:focus-within > fieldset{border-color:var(--text-brand);border-width:2px}
   .phone-row{display:flex;gap:10px;align-items:flex-start}
   .phone-row .fs:not(.dial){flex:1;min-width:0}
@@ -282,7 +283,7 @@
   [hidden]{display:none!important}
 
   /* Boxed auth/register card */
-  .acard{width:100%;max-width:384px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
+  .acard{width:100%;max-width:344px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
   /* Belt-and-braces: the button already fills .cta via .btn.block, but this
      guarantees centring even if a future button in here isn't full width. */
   .cta{display:flex;flex-direction:column;align-items:center}
@@ -733,11 +734,11 @@
               </div>
               <div class="fs">
                 <input id="rp-phone" type="tel" placeholder="600 000 000" autocomplete="tel">
-                <fieldset><legend><span>Phone number (optional)</span></legend></fieldset>
-                <label for="rp-phone">Phone number (optional)</label>
+                <fieldset><legend><span>Phone number</span></legend></fieldset>
+                <label for="rp-phone">Phone number</label>
               </div>
             </div>
-            <p class="err" id="rp-phone-err">Pick the country code for that number.</p>
+            <p class="err" id="rp-phone-err">Enter your phone number and its country code.</p>
             <p class="hint">Only for account security and urgent check-in alerts — never marketing.</p>
           </div>
           <div class="field" id="rn-pass-field">
@@ -754,16 +755,6 @@
               <span class="req" id="req-sym"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Symbol</span>
             </div>
             <p class="err">Your password needs all four.</p>
-          </div>
-          <div class="field">
-            <div class="ptq">What type of property do you manage?</div>
-            <div class="ptypes" id="rp-ptypes">
-              <button class="ptype" type="button" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
-              <button class="ptype" type="button" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
-              <button class="ptype" type="button" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
-              <button class="ptype" type="button" data-ptype="other"><span class="em">✳️</span>Other</button>
-            </div>
-            <p class="err" id="ptype-err">Pick the one closest to your business.</p>
           </div>
           <div class="cta">
             <button class="btn primary block" id="racct-next">Create account <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
@@ -1410,22 +1401,14 @@
       email: validEmail(reEmail.value),
       name:  rnName.value.trim().length >= 2,
       pass:  racctCard.classList.contains('from-google') || passOk(rnPass.value),
-      /* A number with no country code cannot be dialled, and this one is
-         collected to reach people about their own account. */
-      phone: !rpPhone.value.trim() || !!document.getElementById('rp-code').value,
-      ptype: !!state.ptype
+      /* Required: it is how we reach someone about their own account, and a
+         number with no country code cannot be dialled. */
+      phone: !!rpPhone.value.trim() && !!document.getElementById('rp-code').value,
+      ptype: true /* asked in the guided setup now, not here */
     };
   }
   [reEmail, rnName, rnPass, rpPhone].forEach(function (i) { i.addEventListener('input', updateAccount); });
 
-  Array.prototype.forEach.call(document.querySelectorAll('#rp-ptypes .ptype'), function (b) {
-    b.addEventListener('click', function () {
-      Array.prototype.forEach.call(document.querySelectorAll('#rp-ptypes .ptype'), function (x) { x.classList.remove('sel'); });
-      b.classList.add('sel');
-      state.ptype = b.dataset.ptype;
-      updateAccount();
-    });
-  });
   reEmail.addEventListener('blur', function () {
     reEmail.closest('.field').classList.toggle('invalid', reEmail.value.length > 0 && !validEmail(reEmail.value));
   });
@@ -1464,8 +1447,7 @@
     document.getElementById('racct-initial').textContent = name.charAt(0);
     document.getElementById('racct-who').textContent = email;
     racctCard.classList.add('from-google');
-    var q = document.getElementById('rp-ptypes');
-    if (q) q.scrollIntoView({ block: 'center' });
+    reEmail.blur();
   };
 
   gBtn.addEventListener('click', function () {
@@ -1514,10 +1496,8 @@
     ['re-email','rn-name','rn-pass','rp-phone'].forEach(function (id) {
       document.getElementById(id + '-field').classList.remove('invalid');
     });
-    document.getElementById('ptype-err').classList.remove('on');
     if (!r.email) { document.getElementById('re-email-field').classList.add('invalid'); reEmail.focus(); return; }
     if (!r.name)  { document.getElementById('rn-name-field').classList.add('invalid');  rnName.focus();  return; }
-    if (!r.ptype) { document.getElementById('ptype-err').classList.add('on'); document.getElementById('rp-ptypes').scrollIntoView({block:'center'}); return; }
     if (!r.pass)  { document.getElementById('rn-pass-field').classList.add('invalid');  rnPass.focus();  updateAccount(); return; }
     if (!r.phone) { document.getElementById('rp-phone-field').classList.add('invalid'); document.getElementById('rp-code').focus(); return; }
 

@@ -73,6 +73,12 @@
   @keyframes stepIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
   /* Selectable cards (generic) */
+  .ptypes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+  .ptype{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid var(--stroke-gray-lighter);border-radius:12px;background:var(--bg-white);font:600 13.5px var(--font-primary);color:var(--text-dark);cursor:pointer;transition:all .13s}
+  .ptype .em{font-size:16px;line-height:1}
+  .ptype:hover{border-color:var(--stroke-gray-medium)}
+  .ptype.sel{border-color:var(--text-brand);background:var(--bg-blue-light);color:var(--text-brand);box-shadow:0 0 0 3px rgba(56,92,248,.12)}
+
   .cards{display:grid;gap:14px}
   .cards.c2{grid-template-columns:1fr 1fr}
   .cards.c3{grid-template-columns:repeat(3,1fr)}
@@ -381,6 +387,14 @@
         <h1>How big is your portfolio?</h1>
         <p class="lead">We'll calibrate the dashboard — a single apartment and a 200-unit operation need very different tools.</p>
 
+        <div class="subq">What type of property do you manage?</div>
+        <div class="ptypes" id="ptypeCards">
+          <button class="ptype" type="button" data-ptype="vr"><span class="em">🏠</span>Vacation rentals</button>
+          <button class="ptype" type="button" data-ptype="hotel"><span class="em">🏨</span>Hotel / aparthotel</button>
+          <button class="ptype" type="button" data-ptype="camping"><span class="em">⛺</span>Camping / glamping</button>
+          <button class="ptype" type="button" data-ptype="other"><span class="em">✳️</span>Other</button>
+        </div>
+
         <div class="subq" id="sizeQ">How many properties?</div>
         <div class="cards c2" id="sizeCards"><!-- rendered by JS per property type --></div>
       </section>
@@ -620,7 +634,7 @@
   ];
 
   /* ───── State ───── */
-  const state = { countries:[], regions:[], primary:null, ptype:null, ptypeOther:'', size:null, sizeTier:null, manage:null, pms:null, prios:[] };
+  const state = { countries:[], regions:[], primary:null, ptype:null, ptypePicked:false, ptypeOther:'', size:null, sizeTier:null, manage:null, pms:null, prios:[] };
   const PTYPE_LABELS = { vr:'Vacation rentals', hotel:'Hotel / aparthotel', camping:'Camping / glamping', other:'Other' };
   const UNITS = { vr:'properties', hotel:'rooms', camping:'units', other:'properties' };
   const SIZE_Q = { vr:'How many properties?', hotel:'How many rooms across your hotels?', camping:'How many units or pitches?', other:'How many properties?' };
@@ -849,15 +863,34 @@
     refresh();
   });
 
-  /* Property type is answered during registration — it decides the subscription
-     type the backend needs at that point — so this step only asks for the size. */
+  /* Property type is asked here rather than at registration: it is the thing
+     that decides what "how big" even means — rooms, units or properties — so
+     the two belong on the same step. */
+  function setPtype(t){
+    state.ptypePicked = true;
+    state.ptype = SIZE_SETS[t] ? t : 'vr';
+    $$('#ptypeCards .ptype').forEach(b => {
+      const on = b.dataset.ptype === state.ptype;
+      b.classList.toggle('sel', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    $('#sizeQ').textContent = SIZE_Q[state.ptype] || SIZE_Q.other;
+    renderSizeCards();
+    refresh();
+  }
   function applyRegisteredPropertyType(){
+    /* Registration may still carry one from an older account; treat it as a
+       starting point, not an answer. */
     let stored = null;
     try { stored = localStorage.getItem('chekin_account_ptype'); } catch(e){}
     state.ptype = SIZE_SETS[stored] ? stored : 'vr';
     $('#sizeQ').textContent = SIZE_Q[state.ptype] || SIZE_Q.other;
     renderSizeCards();
+    if (SIZE_SETS[stored]) setPtype(stored);
   }
+  $$('#ptypeCards .ptype').forEach(b => {
+    b.addEventListener('click', () => setPtype(b.dataset.ptype));
+  });
 
   /* ───── Step 2: size (single select, tiers re-rendered per property type) ───── */
   function renderSizeCards(){
@@ -1187,7 +1220,7 @@
   /* ───── Validation + navigation ───── */
   function valid(){
     if (step === 1) return state.countries.length > 0;
-    if (step === 2) return !!state.size;
+    if (step === 2) return !!state.ptypePicked && !!state.size;
     if (step === 3) return state.manage && (state.manage !== 'pms' || !!state.pms);
     if (step === 6) return true; // connecting is optional — you can finish it later
     if (step === 4) return state.prios.length > 0; // regulated markets always have compliance locked in
@@ -1205,7 +1238,7 @@
   }
   const NEEDS = {
     1: 'Pick at least one country — that\'s what switches on the right legal modules.',
-    2: 'Pick the range closest to your portfolio.',
+    2: 'Tell us the property type and the range closest to your portfolio.',
     3: 'Tell us how your bookings reach you today.',
     4: 'Pick at least one — you can change it later.'
   };
