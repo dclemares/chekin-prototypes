@@ -330,8 +330,8 @@
   <aside class="rail">
     <img class="logo" src="ds/assets/logos/chekin-wordmark.png" alt="Chekin">
     <div class="steps" id="railSteps">
-      <div class="rstep" data-s="1"><span class="bub">1</span><div class="txt"><div class="t">Where you operate</div><div class="d">We tailor legal modules to your market.</div></div></div>
-      <div class="rstep" data-s="2"><span class="bub">2</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
+      <div class="rstep" data-s="1"><span class="bub">1</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
+      <div class="rstep" data-s="2"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">We tailor legal modules to your market.</div></div></div>
       <div class="rstep" data-s="3"><span class="bub">3</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
       <div class="rstep" data-s="4"><span class="bub">4</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
     </div>
@@ -617,8 +617,11 @@
   let step = 1;
   const TOTAL = 5;
   const LAST = 5;
-  const RAIL_OF = { 1:1, 3:2, 6:2, 4:3, 5:4 };
-  function flow(){ return (state.manage === 'pms' && state.pms) ? [1,3,6,4,5] : [1,3,4,5]; }
+  const RAIL_OF = { 3:1, 6:1, 1:2, 4:3, 5:4 };
+  /* Bookings first: it is the longest step and the only one that imports
+     anything, so getting the PMS authorising early leaves it syncing in the
+     background while the shorter questions get answered. */
+  function flow(){ return (state.manage === 'pms' && state.pms) ? [3,6,1,4,5] : [3,1,4,5]; }
 
   const $ = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
@@ -1402,7 +1405,9 @@
     // Debug: ?step=N jumps straight to a step (no validation)
     const raw = new URLSearchParams(location.search).get('step');
     const stepParam = raw ? parseInt(raw, 10) : null;
-    show(stepParam && !isNaN(stepParam) ? stepParam : (resumed || 1));
+    /* flow()[0], not a literal — the first step is whatever the flow says it
+       is, and hardcoding 1 here opened the setup on the second one. */
+    show(stepParam && !isNaN(stepParam) ? stepParam : (resumed || flow()[0]));
   }
 })();
 </script>

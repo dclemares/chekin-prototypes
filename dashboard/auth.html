@@ -491,8 +491,8 @@
     <div class="rail-mode" data-railmode="register">
       <div class="steps">
         <div class="rstep active" data-rail="account"><span class="bub"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></svg></span><div class="txt"><div class="t">Create your account</div><div class="d">Your details and your portfolio, in one form.</div></div></div>
-        <div class="rstep" data-rail="s1"><span class="bub">1</span><div class="txt"><div class="t">Where you operate</div><div class="d">We tailor legal modules to your market.</div></div></div>
-        <div class="rstep" data-rail="s3"><span class="bub">2</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
+        <div class="rstep" data-rail="s3"><span class="bub">1</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
+        <div class="rstep" data-rail="s1"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">We tailor legal modules to your market.</div></div></div>
         <div class="rstep" data-rail="s4"><span class="bub">3</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
         <div class="rstep" data-rail="s5"><span class="bub">4</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
       </div>
@@ -839,14 +839,14 @@
           <ol class="nextsteps">
             <li class="ns"><span class="no">1</span>
               <div class="ns-b">
-                <div class="ns-h"><span class="t">Where you operate</span><span class="eta">30 s</span></div>
-                <div class="d">Pick the countries and regions you operate in.</div>
+                <div class="ns-h"><span class="t">How you manage bookings</span><span class="eta">2 min</span></div>
+                <div class="d">Connect your PMS, or leave it for later.</div>
               </div>
             </li>
             <li class="ns"><span class="no">2</span>
               <div class="ns-b">
-                <div class="ns-h"><span class="t">How you manage bookings</span><span class="eta">2 min</span></div>
-                <div class="d">Connect your PMS, or leave it for later.</div>
+                <div class="ns-h"><span class="t">Where you operate</span><span class="eta">30 s</span></div>
+                <div class="d">Pick the countries and regions you operate in.</div>
               </div>
             </li>
             <li class="ns"><span class="no">3</span>
@@ -965,7 +965,8 @@
       accountStep.querySelector('.bub').innerHTML = done
         ? '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>'
         : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></svg>';
-      document.querySelector('.rstep[data-rail="s1"]').classList.toggle('active', done);
+      /* Whichever step the setup now opens on, not whichever is listed first */
+      document.querySelector('.rstep[data-rail="s3"]').classList.toggle('active', done);
     }
     document.getElementById('cbar').style.width = (target.getAttribute('data-progress') || 5) + '%';
     if (history.replaceState) history.replaceState(null, '', '#' + id);
