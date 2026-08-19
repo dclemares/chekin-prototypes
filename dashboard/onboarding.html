@@ -1201,15 +1201,22 @@
     renderChips();
     syncCta();
   }
-  /* Lives here rather than in show(): authorising the PMS changes the label but
-     not the step, so computing it on navigation alone left the button reading
-     "without connecting" after the account had just been connected. */
+  /* Lives here rather than in show(): authorising the PMS changes this but not
+     the step, so computing it on navigation alone left the footer still
+     offering to move on seconds after the account had connected. */
   function syncCta(){
     const arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
+    const next = $('#btnNext');
     const pending = step === 6 && !state.pmsConnected;
-    $('#btnNext').innerHTML = (step === LAST ? 'Go to my dashboard'
-                              : pending ? 'Continue without connecting'
-                              : 'Continue') + arrow;
+
+    /* Connecting is the path we want taken, so it stays the only primary on
+       this step: the authorise button in the card. A blue "Continue" in the
+       footer outranked it by position and read as the recommended way out.
+       Moving on stays available, one rung down. */
+    next.classList.toggle('primary', !pending);
+    next.classList.toggle('ghost', pending);
+    next.innerHTML = pending ? 'I\'ll connect later'
+                   : (step === LAST ? 'Go to my dashboard' : 'Continue') + arrow;
     $('#pmsLater').classList.toggle('on', pending);
   }
   function show(n){
