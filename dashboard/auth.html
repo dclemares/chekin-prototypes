@@ -203,8 +203,16 @@
   .fs.has-eye input{padding-right:46px}
   /* Dial-code select sits label-less beside the phone input */
   .fs.dial{width:100px;flex:none}
-  /* Was 53px pulled up by -5px, so it stood proud of the 48px field beside it. */
-  .fs.dial select{padding:0 8px 0 14px;cursor:pointer}
+  /* Was 53px pulled up by -5px, so it stood proud of the field beside it.
+     The native arrow belonged to the browser, not to this design system, and
+     "Code" rendered in value ink so an empty select looked answered. */
+  .fs.dial select{
+    padding:0 32px 0 14px;cursor:pointer;
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239696B9' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:right 11px center;background-size:13px;
+  }
+  .fs.dial select.empty{color:var(--text-gray-dark)}
   .fs.dial:focus-within > fieldset{border-color:var(--text-brand);border-width:2px}
   .phone-row{display:flex;gap:10px;align-items:flex-start}
   .phone-row .fs:not(.dial){flex:1;min-width:0}
@@ -738,7 +746,6 @@
               </div>
             </div>
             <p class="err" id="rp-phone-err">Enter your phone number and its country code.</p>
-            <p class="hint">Only for account security and urgent check-in alerts — never marketing.</p>
           </div>
           <div class="field" id="rn-pass-field">
             <div class="fs has-eye">
@@ -1342,6 +1349,15 @@
   /* ── Recovery chain ── */
   var recEmail = document.getElementById('rec-email');
   var recSend = document.getElementById('rec-send');
+  /* An unanswered select should read as unanswered. */
+  (function dialPlaceholder(){
+    var dial = document.getElementById('rp-code');
+    if (!dial) return;
+    var sync = function () { dial.classList.toggle('empty', !dial.value); };
+    dial.addEventListener('change', sync);
+    sync();
+  })();
+
   var recField = document.getElementById('rec-email-field');
   recEmail.addEventListener('input', function () { if (recField) recField.classList.remove('invalid'); });
   document.getElementById('rec-form').addEventListener('submit', function (e) {
