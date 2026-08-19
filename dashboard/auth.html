@@ -350,6 +350,7 @@
     body.centred .demo-bar{bottom:150px;top:auto;right:12px;left:12px;max-width:none}
   }
 
+  .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   .acct-flag{position:fixed;right:22px;bottom:76px;z-index:199;display:none;align-items:center;gap:6px;
     padding:6px;border-radius:999px;background:var(--bg-dark);box-shadow:0 8px 22px rgba(22,22,67,.28)}
   body.on-login .acct-flag{display:flex}
@@ -770,11 +771,12 @@
 
       <!-- ── Register · welcome → guided setup ── -->
       <section class="screen" data-screen="r-creating" data-mode="register" data-progress="14">
-        <div class="pending" role="status" aria-live="polite">
+        <div class="pending">
+          <p id="pend-say" role="status" aria-live="polite" class="sr-only"></p>
           <div class="mark"><svg viewBox="0 0 27 21" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8.77132 19.8332L0.670544 11.7095C0.241121 11.271 0 10.6772 0 10.0581C0 9.43909 0.241121 8.84516 0.670544 8.40668L2.5192 6.56852C2.96895 6.1403 3.56171 5.90204 4.17763 5.90204C4.79355 5.90204 5.38643 6.1403 5.83606 6.56852L10.4186 11.1605L21.0182 0.665703C21.4681 0.237936 22.0609 0 22.6766 0C23.2923 0 23.8851 0.237936 24.335 0.665703L26.1848 2.50496C26.6148 2.94321 26.8562 3.53714 26.8562 4.15635C26.8562 4.77568 26.6148 5.36961 26.1848 5.80774L14.1987 17.6784C14.1212 17.7908 14.0334 17.8957 13.9368 17.9916L12.0848 19.8332C11.6352 20.2615 11.0423 20.4998 10.4264 20.4998C9.81047 20.4998 9.21771 20.2615 8.76796 19.8332H8.77132Z"/></svg></div>
           <div class="dots"><i></i><i></i><i></i></div>
           <div class="line"><div class="in" id="pendLines">
-            <p>Checking your configuration…</p>
+            <p>Creating your account…</p>
             <p>Setting up your account…</p>
             <p>Preparing your dashboard…</p>
             <p>Adding the final touches…</p>
@@ -1475,16 +1477,34 @@
   });
 
   /* Rotating pending screen while the account is created */
+  /* Every line gets its turn. At 2200ms a line against a 3400ms total, two of
+     the four were never shown — the screen promised a sequence and ran half
+     of it. The dwell is derived from the total so editing the copy cannot
+     silently drop a line again. */
   function runPending(done){
     var lines = document.getElementById('pendLines');
-    var total = lines.children.length, i = 0;
+    var total = lines.children.length;
+    var TOTAL_MS = 4000;
+    var dwell = Math.round(TOTAL_MS / total);
+    var i = 0;
     lines.style.transform = 'translateY(0px)';
+    announcePending(lines.children[0].textContent);
     show('r-creating');
     var tick = setInterval(function () {
-      i = (i + 1) % total;
+      i += 1;
+      if (i >= total) { clearInterval(tick); return; }
       lines.style.transform = 'translateY(-' + (i * 24) + 'px)';
-    }, 2200);
-    setTimeout(function () { clearInterval(tick); done(); }, 3400);
+      announcePending(lines.children[i].textContent);
+    }, dwell);
+    setTimeout(function () { clearInterval(tick); done(); }, TOTAL_MS);
+  }
+
+  /* The four lines all sit in the DOM and only move, so a live region on the
+     container announces everything at once and then nothing. This mirrors the
+     current line into an empty region instead. */
+  function announcePending(text){
+    var el = document.getElementById('pend-say');
+    if (el) el.textContent = text;
   }
 
   acctNext.addEventListener('click', function () {
