@@ -39,7 +39,7 @@
      centred, a headline with room to breathe, and the legal note held
      inside the card instead of floating under it. */
   body.centred .cwrap{justify-content:center;align-items:center}
-  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:344px;width:100%;margin:0}
+  body.centred .screen{align-items:center;text-align:center;justify-content:center;flex:0 1 auto;max-width:384px;width:100%;margin:0}
   body.centred h1{font:700 36px/43px var(--font-primary);letter-spacing:-.03em;margin:0 0 10px}
   body.centred .lead{font:400 15.5px/23px var(--font-primary);color:var(--text-gray-dark);margin:0 0 28px;max-width:none}
   body.centred .acard{border-radius:16px;padding:22px 22px 20px}
@@ -93,7 +93,7 @@
        screens are one or two fields — anchoring the button to the bottom of
        the viewport just parked it 400px below the input it belongs to. */
     body.centred .cta{position:static;padding:0;background:none;border-top:none;z-index:auto}
-    body.centred .cta .btn{width:100%;height:50px}
+    body.centred .cta .btn{width:100%;height:48px}
 
     /* No card on phones: the buttons stand straight on the background, which
        is what makes the reference read as calm at this width. */
@@ -176,17 +176,16 @@
   .err.on{display:block}
 
   /* Floating-label field — notched outline, mirrors @chekinapp/ui Input */
-  .fs{position:relative;display:block;min-height:48px;text-align:left}
-  .fs input,.fs select{width:100%;height:48px;margin:0;padding:0 16px;border:0;border-radius:10px;background:var(--bg-white);font:500 16px var(--font-primary);color:var(--text-dark);outline:none}
+  .fs{position:relative;display:block;min-height:44px;text-align:left}
+  .fs input,.fs select{width:100%;height:44px;margin:0;padding:0 16px;border:0;border-radius:10px;background:var(--bg-white);font:500 15.5px var(--font-primary);color:var(--text-dark);outline:none}
   .fs input::placeholder{color:var(--text-gray-dark);opacity:0;transition:opacity .1s}
   .fs input:focus::placeholder{opacity:1}
   .fs > fieldset{position:absolute;top:-5px;left:0;right:0;bottom:0;margin:0;padding:0 13px;border:1px solid var(--field-line);border-radius:10px;pointer-events:none;transition:border-color .12s}
   .fs > fieldset > legend{visibility:hidden;display:block;float:none;width:auto;max-width:.01px;height:11px;padding:0;white-space:nowrap;font-size:.75em;transition:max-width 50ms ease-out}
   .fs > fieldset > legend > span{visibility:visible;display:inline-block;padding:0 5px;font:600 14px var(--font-primary);opacity:0}
-  /* 14px, not 12: the label's line box is 19.5px, so (48 - 19.5) / 2 lands at
-     14.25. At 12 it sat 2px high in every field on every screen. Tied to the
-     48px height — move one and the other has to follow. */
-  .fs > label{position:absolute;top:14px;left:13px;padding:0 3px;max-width:calc(100% - 26px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text-gray-dark);font:500 16px var(--font-primary);cursor:text;transition:top .1s ease-in,font-size .1s ease-in,color .12s}
+  /* Centres the resting label: the line box is 19.5px, so (44 - 19.5) / 2
+     lands at 12.25. Tied to the 44px height — move one and this follows. */
+  .fs > label{position:absolute;top:12px;left:13px;padding:0 3px;max-width:calc(100% - 26px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text-gray-dark);font:500 16px var(--font-primary);cursor:text;transition:top .1s ease-in,font-size .1s ease-in,color .12s}
   /* raised: focused, or holding a value */
   .fs input:focus ~ label,
   .fs input:not(:placeholder-shown) ~ label,
@@ -283,7 +282,7 @@
   [hidden]{display:none!important}
 
   /* Boxed auth/register card */
-  .acard{width:100%;max-width:344px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
+  .acard{width:100%;max-width:384px;text-align:left;background:var(--bg-white);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-xl);padding:26px 28px 24px}
   /* Belt-and-braces: the button already fills .cta via .btn.block, but this
      guarantees centring even if a future button in here isn't full width. */
   .cta{display:flex;flex-direction:column;align-items:center}
@@ -294,7 +293,7 @@
   .acard .btn.primary{width:100%;justify-content:center;margin-top:8px}
   .acard .terms{margin:14px 0 0;max-width:none;text-align:center}
   .acard-alt{max-width:460px;text-align:center;margin-top:18px}
-  .sso{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:48px;border:1px solid var(--field-line);border-radius:10px;background:var(--bg-white);font:600 14px var(--font-primary);color:var(--text-dark);cursor:pointer;transition:border-color .12s,background .12s}
+  .sso{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:44px;border:1px solid var(--field-line);border-radius:10px;background:var(--bg-white);font:600 14px var(--font-primary);color:var(--text-dark);cursor:pointer;transition:border-color .12s,background .12s}
   .sso:hover{border-color:var(--stroke-gray-medium);background:var(--bg-neutral-light)}
   .sso img,.sso svg{width:18px;height:18px}
   .or{display:flex;align-items:center;gap:14px;margin:18px 0;font:600 11px var(--font-primary);letter-spacing:.07em;text-transform:uppercase;color:var(--text-gray-medium)}
@@ -434,7 +433,7 @@
     .cta{position:fixed;left:0;right:0;bottom:0;z-index:120;display:flex;flex-direction:column;gap:2px;
          padding:12px 20px calc(12px + env(safe-area-inset-bottom));
          background:var(--bg-white);border-top:1px solid var(--field-line)}
-    .cta .btn{width:100%;height:50px}
+    .cta .btn{width:100%;height:48px}
     .cta .btn[style]{margin-top:0!important}
     .cta .skiplink{margin-top:6px}
     /* Clear the dock exactly — its height varies (a skip link rides along on
