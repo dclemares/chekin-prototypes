@@ -967,7 +967,9 @@
   };
   function renderPmsConnect(p){
     if (!p){ pmsConnect.innerHTML = ''; return; }
-    $('#pcTitle').textContent = `Connect ${p.name}`;
+    /* The grid label carries an ellipsis to signal "pick from a list"; it has
+       no business in a heading. */
+    $('#pcTitle').textContent = p.id === 'other' ? 'Tell us your PMS' : `Connect ${p.name}`;
     $('#pcLead').textContent = (PC_LEAD[p.kind] || PC_LEAD.form)(p);
     const logo = `<span class="lg" style="background:${p.bg}">${p.name[0]}</span>`;
     let f = `<h4>${logo} Connect ${p.name}</h4>`;
@@ -1267,8 +1269,11 @@
   function clearNeeds(){ $('#stepNeeds').classList.remove('on'); }
   function showNeeds(){
     const el = $('#stepNeeds');
-    el.textContent = (step === 3 && state.manage === 'pms' && !state.pms)
-      ? 'Choose your PMS from the list, or pick another option.'
+    el.textContent =
+      (step === 3 && state.manage === 'pms' && !state.pms)
+        ? 'Choose your PMS from the list, or pick another option.'
+      : (step === 2 && state.ptypePicked && !state.size)
+        ? 'Now pick the range closest to your portfolio.'
       : (NEEDS[step] || 'Make a choice to continue.');
     el.classList.add('on');
   }
@@ -1285,6 +1290,14 @@
     const arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
     const next = $('#btnNext');
     const pending = step === 6 && !state.pmsConnected;
+    const asking = pending && state.pms && state.pms.id === 'other';
+    /* Nothing to authorise when the integration does not exist yet — that
+       branch requests one, so the warning about importing was simply untrue. */
+    if (pending){
+      $('#pmsLater').textContent = asking
+        ? 'Send the request and our team follows up. Bookings stay manual until the integration is live.'
+        : 'Your properties and bookings won\'t import until you authorise it. You can do it later from the dashboard.';
+    }
 
     /* Connecting is the path we want taken, so it stays the only primary on
        this step: the authorise button in the card. A blue "Continue" in the
