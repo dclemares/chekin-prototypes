@@ -732,7 +732,13 @@
       let shown = 0;
       g.querySelectorAll('.country').forEach(card => {
         const c = COUNTRIES.find(x => x.code === card.dataset.code);
-        const hit = !q || c.name.toLowerCase().includes(q) || (c.scheme || '').toLowerCase().includes(q);
+        /* Regional forces count too: someone in Catalonia knows "Mossos"
+           long before they think to look under Spain. */
+        const subs = (c.subs || []).map(sb => `${sb.n} ${sb.s}`).join(' ').toLowerCase();
+        const hit = !q
+          || c.name.toLowerCase().includes(q)
+          || (c.scheme || '').toLowerCase().includes(q)
+          || subs.includes(q);
         card.classList.toggle('hide', !hit);
         if (hit) shown++;
       });
