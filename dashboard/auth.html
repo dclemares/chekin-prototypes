@@ -47,7 +47,6 @@
   body.centred .resend-row{justify-content:center}
   body.centred .reqs{justify-content:center}
   body.centred .or{margin:14px 0}
-  body.centred .stepno{display:none}
 
   /* Support sits under the card. The rail carries the same line, so it
      stands down here rather than saying it twice. */
@@ -156,7 +155,6 @@
   .cbar{height:4px;background:var(--stroke-gray-lighter)}
   .cbar i{display:block;height:100%;background:linear-gradient(90deg,#385CF8,#35E5BC);border-radius:0 2px 2px 0;transition:width .35s cubic-bezier(.3,.9,.3,1)}
   .cwrap{flex:1;display:flex;flex-direction:column;max-width:820px;width:100%;margin:0 auto;padding:36px 48px 40px}
-  .stepno{font:700 11px var(--font-primary);color:var(--text-brand);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px}
   h1{font:700 30px/38px var(--font-primary);letter-spacing:-.015em;margin:0 0 10px}
   /* show() focuses the heading to announce the new screen — don't paint a ring */
   h1:focus,h1:focus-visible{outline:none}
@@ -500,7 +498,6 @@
 
       <!-- ── Login ── -->
       <section class="screen boxed" data-screen="login" data-mode="auth" data-progress="6">
-        <p class="stepno" id="li-step">Get started</p>
         <h1 id="li-title">Every check-in, handled</h1>
         <p class="lead" id="li-lead">Log in or create your account with your work email.</p>
         <div class="acard">
@@ -579,7 +576,6 @@
 
       <!-- ── Two-factor ── -->
       <section class="screen boxed" data-screen="twofactor" data-mode="auth" data-progress="10">
-        <p class="stepno">Sign in · Security</p>
         <h1>Enter your code</h1>
         <p class="lead">We sent a 6-digit code to <b id="otp-addr">your email</b>. It expires in 10 minutes.</p>
         <div class="acard">
@@ -605,7 +601,6 @@
 
       <!-- ── Password recovery ── -->
       <section class="screen boxed" data-screen="recovery" data-mode="auth" data-progress="6">
-        <p class="stepno">Sign in · Recovery</p>
         <h1>Forgot your password?</h1>
         <p class="lead">We'll email you a link to set a new one.</p>
         <div class="acard">
@@ -630,7 +625,6 @@
       <!-- ── Check email ── -->
       <section class="screen boxed" data-screen="check-email" data-mode="auth" data-progress="6">
         <div class="bigmark mail"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m2 7 10 7L22 7"/></svg></div>
-        <p class="stepno">Sign in · Recovery</p>
         <h1>Check your email</h1>
         <p class="lead">We sent a reset link to <b id="check-email-addr">you@company.com</b>. It expires in 30 minutes.</p>
         <div class="acard">
@@ -649,7 +643,6 @@
 
       <!-- ── Reset password ── -->
       <section class="screen boxed" data-screen="reset" data-mode="auth" data-progress="6">
-        <p class="stepno">Sign in · Recovery</p>
         <h1>Reset your password</h1>
         <p class="lead">Setting a new password for <b id="reset-addr">your account</b>.</p>
         <div class="acard">
@@ -687,7 +680,6 @@
       <!-- ── Reset success ── -->
       <section class="screen boxed" data-screen="reset-success" data-mode="auth" data-progress="6">
         <div class="bigmark"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
-        <p class="stepno">Sign in · Recovery</p>
         <h1>Your password is set</h1>
         <p class="lead">Log in to <b id="done-addr">your account</b> with the new one. Everywhere else has been signed out — if that wasn't you, <button class="linklike" data-go="recovery">reset it again</button>.</p>
         <div class="acard">
@@ -699,7 +691,6 @@
 
       <!-- ── Register · one account form ── -->
       <section class="screen boxed" data-screen="r-account" data-mode="register" data-progress="8">
-        <p class="stepno">Create your account</p>
         <h1>Let's get you set up</h1>
         <p class="lead">Start your 14-day free trial — no credit card needed. About a minute; the questions about your business come next.</p>
         <div class="acard">
@@ -787,7 +778,6 @@
 
       <section class="screen boxed" data-screen="r-welcome" data-mode="register" data-progress="18">
         <div class="bigmark"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
-        <p class="stepno">Account created</p>
         <h1 id="welcome-title">Hey there, welcome to Chekin! 👋</h1>
         <p class="lead">Your account is ready. Four quick questions and we'll switch on exactly what your business needs — nothing more.</p>
         <div class="acard">
@@ -1094,7 +1084,6 @@
     liEmailField.style.display = '';
     liBanner.classList.remove('on');
     liPass.value = '';
-    document.getElementById('li-step').textContent = 'Get started';
     document.getElementById('li-title').textContent = 'Log in or sign up';
     document.getElementById('li-lead').textContent = "Enter your work email and we'll take you to the right place.";
     liSubmit.textContent = 'Continue';
@@ -1110,7 +1099,6 @@
     liIdentity.classList.add('on');
     liPassField.classList.add('on');
     liOptions.classList.add('on');
-    document.getElementById('li-step').textContent = 'Sign in';
     document.getElementById('li-title').textContent = 'Welcome back!';
     document.getElementById('li-lead').textContent = 'Enter your password to continue.';
     liSubmit.textContent = 'Log in';
