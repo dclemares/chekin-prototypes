@@ -183,6 +183,38 @@
   .pms.sel .lgimg{filter:none}
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
+  /* ── Step 2b — read from the PMS ── */
+  .scan{max-width:520px}
+  .scan-bar{height:4px;border-radius:2px;background:var(--stroke-gray-lighter);overflow:hidden;margin-bottom:18px}
+  .scan-bar i{display:block;height:100%;width:40%;border-radius:2px;background:linear-gradient(90deg,#385CF8,#35E5BC);animation:scanslide 1.1s ease-in-out infinite}
+  @keyframes scanslide{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+  .scan-list{list-style:none;margin:0;padding:0}
+  .scan-list li{position:relative;padding-left:24px;margin-bottom:9px;font:500 13.5px var(--font-primary);color:var(--text-gray-medium);transition:color .2s}
+  .scan-list li::before{content:"";position:absolute;left:2px;top:5px;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--stroke-gray-medium)}
+  .scan-list li.done{color:var(--text-dark)}
+  .scan-list li.done::before{border-color:var(--success);background:var(--success)}
+
+  .found{max-width:704px}
+  .found-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px}
+  .found-n b{font:700 22px var(--font-primary);color:var(--text-dark)}
+  .found-n span{font:400 14px var(--font-primary);color:var(--text-gray-dark);margin-left:8px}
+  .linkish{background:none;border:0;padding:0;cursor:pointer;font:600 13px var(--font-primary);color:var(--text-brand)}
+  .found-rows{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-white)}
+  .frow{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:center;padding:11px 15px}
+  .frow + .frow{border-top:1px solid var(--stroke-gray-lighter)}
+  .fflag{font-size:17px}
+  .fplace b{display:block;font:600 13.5px var(--font-primary);color:var(--text-dark)}
+  .fplace i{font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  .ftags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .tag{font:600 11px var(--font-primary);padding:3px 8px;border-radius:99px;white-space:nowrap}
+  .tag.reg{background:var(--bg-blue-light);color:var(--text-brand)}
+  .tag.tax{background:#FFF4E5;color:#B86A00}
+  .tag.none{background:var(--bg-neutral-light);color:var(--text-gray-medium)}
+  .found-tip{display:none;margin-top:14px;padding:12px 15px;border-radius:var(--radius-lg);background:var(--bg-success-light);
+    font:400 13px/19px var(--font-primary);color:var(--text-dark)}
+  .found-tip.on{display:block;animation:stepIn .3s ease}
+  .found-tip b{font-weight:700}
+
   /* Step 3b — PMS connect (credentials / OAuth / guide) */
   /* Connect on top, then what the integration does and the video side by side
      underneath. The card keeps a reading width of its own rather than
@@ -406,7 +438,7 @@
     <img class="logo" src="ds/assets/logos/chekin-wordmark.png" alt="Chekin">
     <div class="steps" id="railSteps">
       <div class="rstep" data-s="1"><span class="bub">1</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
-      <div class="rstep" data-s="2"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">We tailor legal modules to your market.</div></div></div>
+      <div class="rstep" data-s="2"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">Read from your PMS where we can.</div></div></div>
       <div class="rstep" data-s="3"><span class="bub">3</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
       <div class="rstep" data-s="4"><span class="bub">4</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
     </div>
@@ -504,6 +536,30 @@
         <h1 id="pcTitle">Connect your PMS</h1>
         <p class="lead" id="pcLead">Enter your credentials so we can import your properties and bookings.</p>
         <div class="pms-connect on" id="pmsConnect"></div>
+      </section>
+
+      <!-- STEP 2b · Read from the PMS instead of asking -->
+      <section class="panel" data-panel="7">
+        <h1 id="scanTitle">Reading your portfolio</h1>
+        <p class="lead" id="scanLead">One quick read of your properties — no import yet, so this takes seconds.</p>
+
+        <div class="scan" id="scanBusy">
+          <div class="scan-bar"><i></i></div>
+          <ul class="scan-list" id="scanSteps">
+            <li>Counting your properties</li>
+            <li>Locating them</li>
+            <li>Reading your average nightly rate</li>
+          </ul>
+        </div>
+
+        <div class="found reveal" id="scanFound">
+          <div class="found-head">
+            <div class="found-n"><b id="foundUnits">—</b><span id="foundWhere">—</span></div>
+            <button type="button" class="linkish" id="scanManual">Not right? Set it manually</button>
+          </div>
+          <div class="found-rows" id="foundRows"></div>
+          <div class="found-tip reveal" id="foundTip"></div>
+        </div>
       </section>
 
       <!-- STEP 4 · Priority -->
@@ -783,7 +839,7 @@
   let step = 1;
   const TOTAL = 5;
   const LAST = 5;
-  const RAIL_OF = { 3:1, 6:1, 1:2, 4:3, 5:4 };
+  const RAIL_OF = { 3:1, 6:1, 7:2, 1:2, 4:3, 5:4 };
   /* Bookings first: it is the longest step and the only one that imports
      anything, so getting the PMS authorising early leaves it syncing in the
      background while the shorter questions get answered. */
@@ -791,9 +847,15 @@
      A catalogue integration has no credentials and no authorise step, so it
      left a screen holding a heading and one sentence; that message belongs in
      the plan, which now carries it. */
+  /* Connect a PMS and we can read where the properties are, how many there
+     are and what they charge. Asking for that afterwards is asking for
+     something we already hold, so panel 7 shows it instead — and panel 1, the
+     question, only comes back if the read is wrong or there was no PMS. */
   function flow(){
     const connectable = state.manage === 'pms' && state.pms && state.pms.kind !== 'catalogue';
-    return connectable ? [3,6,1,4,5] : [3,1,4,5];
+    if (!connectable) return [3,1,4,5];
+    if (state.pmsConnected && !state.manualGeo) return [3,6,7,4,5];
+    return [3,6,1,4,5];
   }
 
   const $ = s => document.querySelector(s);
@@ -1043,6 +1105,104 @@
     if (isNaN(state.sizeTier)) state.sizeTier = null;
   }
   applyRegisteredPortfolio();
+
+  /* ───── Step 2b: read the portfolio instead of asking for it ─────
+     A real build makes two calls: this cheap read (how many, where, average
+     rate) and then the full import. The read is what earns the moment — it
+     tells someone their own situation before they have typed anything. Here
+     it is simulated, scaled off the portfolio size given at registration. */
+  const READ_SHAPE = [
+    { code:'ES', region:'Madrid',    share:.42 },
+    { code:'ES', region:'Barcelona', share:.23 },
+    { code:'ES', region:'Valencia',  share:.15 },
+    { code:'PT', region:'Lisbon',    share:.20 },
+  ];
+  const REGION_SCHEME = { 'Barcelona':'Catalonia' };  // region -> sub-scheme in COUNTRIES
+
+  function readPortfolio(){
+    const tier = state.sizeTier == null ? 1 : state.sizeTier;
+    const units = [4, 14, 60, 180][tier] || 14;
+    const rows = READ_SHAPE.map(r => ({ ...r, units: Math.max(1, Math.round(units * r.share)) }));
+    const total = rows.reduce((a, r) => a + r.units, 0);
+    /* Tier 2 and up are the portfolios where a high nightly rate is worth
+       flagging; below that the recommendation would be noise. */
+    const avg = [95, 140, 210, 260][tier] || 140;
+    return { units: total, rows, avg };
+  }
+
+  function applyRead(read){
+    const byCode = c => COUNTRIES.find(x => x.code === c);
+    state.countries = [...new Set(read.rows.map(r => r.code))].map(byCode).filter(Boolean);
+    state.regions = read.rows.map(r => REGION_SCHEME[r.region]).filter(Boolean);
+    state.primary = read.rows.slice().sort((a,b) => b.units - a.units)[0].code;
+    state.size = String(read.units);
+    state.readAvg = read.avg;
+  }
+
+  function renderFound(read){
+    const byCode = c => COUNTRIES.find(x => x.code === c);
+    const paises = [...new Set(read.rows.map(r => r.code))];
+    $('#foundUnits').textContent = read.units + (read.units === 1 ? ' property' : ' properties');
+    $('#foundWhere').textContent = paises.length === 1
+      ? 'all in ' + byCode(paises[0]).name
+      : 'across ' + paises.length + ' countries';
+
+    /* One row per place, each naming the scheme that place actually triggers —
+       Barcelona reports to the Mossos, the rest of Spain to SES.HOSPEDAJES. */
+    $('#foundRows').innerHTML = read.rows.map(r => {
+      const c = byCode(r.code);
+      const sub = (c.subs || []).find(x => x.n === REGION_SCHEME[r.region]);
+      const scheme = sub ? sub.s : c.scheme;
+      const bits = [];
+      if (scheme) bits.push(`<span class="tag reg">${scheme}</span>`);
+      if (c.tax)  bits.push(`<span class="tag tax">Tourist tax</span>`);
+      if (!bits.length) bits.push(`<span class="tag none">No registration required</span>`);
+      return `<div class="frow"><span class="fflag">${c.flag}</span>` +
+        `<span class="fplace"><b>${r.region}</b><i>${r.units} ${r.units === 1 ? 'property' : 'properties'}</i></span>` +
+        `<span class="ftags">${bits.join('')}</span></div>`;
+    }).join('');
+
+    const tip = $('#foundTip');
+    if (read.avg >= 180){
+      tip.innerHTML = `<b>Your average is ${read.avg}\u20ac a night.</b> At that rate a damaged flat costs more than a deposit covers, so we suggest switching on damage waivers as well.`;
+      tip.classList.add('on');
+    } else {
+      tip.classList.remove('on');
+      tip.innerHTML = '';
+    }
+  }
+
+  let scanRan = false;
+  function runScan(){
+    const busy = $('#scanBusy'), found = $('#scanFound');
+    const read = readPortfolio();
+    applyRead(read);
+    renderFound(read);
+    if (scanRan){ busy.style.display = 'none'; found.classList.add('on'); refresh(); return; }
+    scanRan = true;
+    busy.style.display = '';
+    found.classList.remove('on');
+    $('#scanTitle').textContent = 'Reading your portfolio';
+    $('#scanLead').textContent  = 'One quick read of your properties — no import yet, so this takes seconds.';
+    const items = $$('#scanSteps li');
+    items.forEach(li => li.classList.remove('done'));
+    items.forEach((li, i) => setTimeout(() => li.classList.add('done'), 500 + i * 550));
+    setTimeout(() => {
+      busy.style.display = 'none';
+      $('#scanTitle').textContent = `Here is what ${state.pms ? state.pms.name : 'your PMS'} told us`;
+      $('#scanLead').textContent  = 'Straight from your account — nothing to fill in. Check it looks right and carry on.';
+      found.classList.add('on');
+      refresh();
+    }, 2100);
+  }
+
+  $('#scanManual').addEventListener('click', () => {
+    /* The read can be wrong — a property with no address, a market we do not
+       cover. Falling back to the question has to stay one click away. */
+    state.manualGeo = true;
+    state.countries = []; state.regions = []; state.primary = null;
+    show(1);
+  });
 
   /* ───── Step 3: manage (single select) + PMS grid ───── */
   /* A wordmark says the brand better than its initial does, so it replaces the
@@ -1529,13 +1689,15 @@
     if (step === 1) return state.countries.length > 0;
     if (step === 3) return state.manage && (state.manage !== 'pms' || !!state.pms);
     if (step === 6) return true; // connecting is optional — you can finish it later
+    if (step === 7) return state.countries.length > 0; // false only while the read is still running
     if (step === 4) return state.prios.length > 0; // regulated markets always have compliance locked in
     return true;
   }
   const NEEDS = {
     1: 'Pick at least one country — that\'s what switches on the right legal modules.',
     3: 'Tell us how your bookings reach you today.',
-    4: 'Pick at least one — you can change it later.'
+    4: 'Pick at least one — you can change it later.',
+    7: 'Give it a second — we are still reading your properties.'
   };
   function clearNeeds(){ $('#stepNeeds').classList.remove('on'); }
   function showNeeds(){
@@ -1600,6 +1762,7 @@
     $('#cbar').style.width = ((i + 1) / f.length * 100) + '%';
     $('#btnBack').style.visibility = i > 0 ? 'visible' : 'hidden';
     $('#btnSkip').style.display = step === LAST ? 'none' : '';
+    if (step === 7) runScan();
     if (step === 4) setupPrioStep();
     if (step === LAST) renderPlan();
     refresh();
