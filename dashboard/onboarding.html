@@ -183,6 +183,20 @@
   .pms.sel .lgimg{filter:none}
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
+  .addons{display:none;margin-top:16px}
+  .addons.on{display:block;animation:stepIn .3s ease}
+  .ad-h{font:600 12.5px var(--font-primary);color:var(--text-dark);margin-bottom:8px}
+  .ad{display:grid;grid-template-columns:18px 1fr auto;gap:11px;align-items:start;padding:11px 14px;cursor:pointer;
+    border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:7px;transition:border-color .12s}
+  .ad:hover{border-color:var(--stroke-gray-medium)}
+  .ad:has(input:checked){border-color:var(--text-brand);background:var(--bg-blue-light)}
+  .ad input{margin:2px 0 0;accent-color:var(--text-brand);width:16px;height:16px}
+  .ad-b b{display:block;font:600 13px var(--font-primary);color:var(--text-dark)}
+  .ad-b i{font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark);font-style:normal}
+  .ad-why{font:600 11px var(--font-primary);color:var(--text-gray-medium);white-space:nowrap;padding-top:2px}
+  .ad-why.ask{color:var(--text-brand)}
+  @media (max-width:640px){ .ad{grid-template-columns:18px 1fr} .ad-why{grid-column:2;padding-top:4px} }
+
   /* A finished step is a receipt, not a task — it reads back, not forward. */
   .pl-item.is-done .t{color:var(--text-gray-dark)}
   .pl-item .no.ok{background:var(--bg-success-light);color:var(--success);display:grid;place-items:center}
@@ -570,6 +584,11 @@
           </div>
           <div class="found-rows" id="foundRows"></div>
           <div class="found-tip reveal" id="foundTip"></div>
+
+          <div class="addons reveal" id="addons">
+            <div class="ad-h">Worth switching on for a portfolio like yours</div>
+            <div id="addonList"></div>
+          </div>
         </div>
       </section>
 
@@ -693,7 +712,12 @@
 (function(){
   /* ───── Data ───── */
   const COUNTRIES = [
+    /* Registration is national; the tourist tax is not. Catalonia and the
+       Balearics charge one, Madrid and Valencia do not — telling a Madrid
+       host they owe a tax they do not owe discredits everything else on the
+       screen. taxRegions lists where it actually applies. */
     { code:'ES', flag:'🇪🇸', name:'Spain',       reg:true,  scheme:'SES.HOSPEDAJES', tax:true,
+      taxRegions:['Catalonia','Balearic Islands'],
       subs:[ { n:'Catalonia', s:"Mossos d'Esquadra" }, { n:'Basque Country', s:'Ertzaintza' }, { n:'Navarre', s:'Policía Foral' } ] },
     { code:'IT', flag:'🇮🇹', name:'Italy',       reg:true,  scheme:'Alloggiati Web', tax:true  },
     { code:'PT', flag:'🇵🇹', name:'Portugal',    reg:true,  scheme:'SIBA / AIMA',    tax:true  },
@@ -1164,23 +1188,24 @@
       const c = byCode(r.code);
       const sub = (c.subs || []).find(x => x.n === REGION_SCHEME[r.region]);
       const scheme = sub ? sub.s : c.scheme;
+      /* Only where the tax is really charged. Spain lists its regions; the
+         countries that levy it nationally have no taxRegions and keep the
+         country-wide flag. */
+      const taxHere = c.tax && (!c.taxRegions || c.taxRegions.includes(REGION_SCHEME[r.region] || r.region));
       const bits = [];
       if (scheme) bits.push(`<span class="tag reg">${scheme}</span>`);
-      if (c.tax)  bits.push(`<span class="tag tax">Tourist tax</span>`);
+      if (taxHere) bits.push(`<span class="tag tax">Tourist tax</span>`);
       if (!bits.length) bits.push(`<span class="tag none">No registration required</span>`);
       return `<div class="frow"><span class="fflag">${c.flag}</span>` +
         `<span class="fplace"><b>${r.region}</b><i>${r.units} ${r.units === 1 ? 'property' : 'properties'}</i></span>` +
         `<span class="ftags">${bits.join('')}</span></div>`;
     }).join('');
 
-    const tip = $('#foundTip');
-    if (read.avg >= 180){
-      tip.innerHTML = `<b>Your average is ${read.avg}\u20ac a night.</b> At that rate a damaged flat costs more than a deposit covers, so we suggest switching on damage waivers as well.`;
-      tip.classList.add('on');
-    } else {
-      tip.classList.remove('on');
-      tip.innerHTML = '';
-    }
+    renderAddons(read);
+    /* The waiver suggestion used to be written out here as well, in almost
+       the same words as the switch below it. One of them had to go, and a
+       banner you cannot act on is the weaker half. */
+    $('#foundTip').classList.remove('on');
   }
 
   /* The second call. The read told them what they have; this actually pulls it
@@ -1206,6 +1231,54 @@
       if (step === LAST) renderPlan();
     };
     importTimer = setInterval(tick, 900);
+  }
+
+  /* Recommendations, each tied to something the read actually found — volume,
+     nightly rate, markets. One of them is a question rather than a suggestion,
+     because whether the doors have smart locks is not in any PMS. Everything
+     here defaults on except that question: these are worth having, and the
+     honest way to sell them is to let someone switch them off. */
+  /* protect starts undefined on purpose: false would mean the user turned it
+     off, and we would never dare recommend it. */
+  state.addons = { id:true, locks:false };
+  function addonSpec(read){
+    const many = read.units >= 20;
+    const pricey = read.avg >= 180;
+    return [
+      { k:'id', t:'Guest ID verification',
+        d:`Every guest checked against their document before they arrive${many ? `, across all ${read.units} properties` : ''}.`,
+        why:'Included in your plan' },
+      { k:'protect', t:'Deposits and damage waivers',
+        d:pricey
+          ? `At ${read.avg}\u20ac a night a damaged flat costs more than a deposit covers, so the waiver takes the rest.`
+          : 'Take a deposit at check-in, or let guests pay a small waiver instead.',
+        why:pricey ? `Suggested \u2014 ${read.avg}\u20ac average` : 'Optional' },
+      { k:'locks', t:'Remote access',
+        d:'Send the door code or key with the check-in link, once the guest is verified.',
+        why:'Do your properties have smart locks?', ask:true },
+    ];
+  }
+  function renderAddons(read){
+    /* What we recommend arrives switched on. Suggesting something and leaving
+       it off asks the user to do the work of agreeing with us; leaving it on
+       and easy to undo is the honest version of selling it. The one we cannot
+       know stays off — it is a question, not a recommendation. */
+    if (read.avg >= 180 && state.addons.protect === undefined) state.addons.protect = true;
+    const box = $('#addonList');
+    box.innerHTML = addonSpec(read).map(a => `
+      <label class="ad" data-k="${a.k}">
+        <input type="checkbox" ${state.addons[a.k] ? 'checked' : ''}>
+        <span class="ad-b"><b>${a.t}</b><i>${a.d}</i></span>
+        <span class="ad-why${a.ask ? ' ask' : ''}">${a.why}</span>
+      </label>`).join('');
+    box.querySelectorAll('.ad input').forEach(i => {
+      i.addEventListener('change', e => {
+        const k = e.target.closest('.ad').dataset.k;
+        state.addons[k] = e.target.checked;
+        refresh();
+      });
+    });
+    $('#addons').classList.add('on');
   }
 
   let scanRan = false;
@@ -1592,6 +1665,12 @@
     if ((state.sizeTier ?? 0) >= 2){
       steps.push({ k:'team', phase:'Import', t:'Invite your team', d:'Owners, managers and front desk — each with the right permissions.', eta:3 });
     }
+    const ad = state.addons || {};
+    if (ad.protect) steps.push({ k:'protect', phase:'Protect', t:'Turn on deposits and damage waivers',
+      d:`Charged at check-in, released after checkout — or a waiver instead, so the guest pays a few euros and you carry no risk.`, eta:2 });
+    if (ad.locks) steps.push({ k:'locks', phase:'Protect', t:'Connect your smart locks',
+      d:'The code goes out with the check-in link, only once the guest is verified.', eta:3 });
+
     // One police step per regulated country — schemes differ, credentials differ
     // The main market goes first: that's where being non-compliant costs most.
     state.countries.filter(c => c.reg)
@@ -1612,13 +1691,18 @@
     return steps;
   }
 
-  const MOD_LABELS = { checkin:'Online check-in', id:'ID verification', police:'Police reporting', tax:'Tourist taxes', inbox:'Guest inbox', locks:'Remote access', cleaning:'Cleaning ops', upsell:'Upselling', guestapp:'Guest app' };
+  const MOD_LABELS = { checkin:'Online check-in', id:'ID verification', police:'Police reporting', tax:'Tourist taxes', protect:'Deposits & waivers', inbox:'Guest inbox', locks:'Remote access', cleaning:'Cleaning ops', upsell:'Upselling', guestapp:'Guest app' };
   function buildMods(){
     const on = ['checkin','id','guestapp'];
     if (regulated()) on.push('police');
     if (anyTax()) on.push('tax');
     if (state.prios.includes('ops')) on.push('inbox','locks','cleaning');
     if (state.prios.includes('revenue')) on.push('upsell');
+    /* Switched on from the read, not from the priority question */
+    const a = state.addons || {};
+    if (a.protect) on.push('protect');
+    if (a.locks) on.push('locks');
+    if (a.id === false) return [...new Set(on)].filter(k => k !== 'id');
     return [...new Set(on)];
   }
   const APPS = {
