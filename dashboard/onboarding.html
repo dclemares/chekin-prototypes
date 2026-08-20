@@ -189,9 +189,11 @@
      worth the width. Sized so both fit without scrolling. */
   .pms-connect{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;max-width:900px}
   .pc-does{background:var(--bg-neutral-light);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:15px 17px}
-  .pc-does h4{font:700 12.5px var(--font-primary);margin:0 0 9px;color:var(--text-dark)}
+  .pc-does h4{font:700 12.5px var(--font-primary);margin:0 0 10px;color:var(--text-dark)}
+  .pc-does h5{font:600 11px var(--font-primary);color:var(--text-gray-medium);text-transform:none;margin:12px 0 6px;letter-spacing:0}
+  .pc-does h5:first-of-type{margin-top:0}
   .pc-does ul{margin:0;padding:0;list-style:none}
-  .pc-does li{position:relative;padding-left:19px;margin-bottom:7px;font:400 12.5px/18px var(--font-primary);color:var(--text-gray-dark)}
+  .pc-does li{position:relative;padding-left:18px;margin-bottom:6px;font:400 12.5px/18px var(--font-primary);color:var(--text-gray-dark)}
   .pc-does li::before{content:"";position:absolute;left:0;top:6px;width:11px;height:7px;border-left:2px solid var(--success);border-bottom:2px solid var(--success);transform:rotate(-45deg)}
   .pc-does li.hi{color:var(--text-dark);font-weight:600}
   .pc-sync{margin:11px 0 0;padding-top:10px;border-top:1px solid var(--stroke-gray-lighter);font:500 12px var(--font-primary);color:var(--text-gray-medium)}
@@ -543,7 +545,7 @@
         <button class="btn ghost" id="btnBack" style="visibility:hidden"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>Back</button>
         <button class="btn primary" id="btnNext">Continue<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
         <p class="needs" id="stepNeeds" role="alert"></p>
-        <p class="later" id="pmsLater">Your properties and bookings won't import until you authorise it. You can do it later from the dashboard.</p>
+        <p class="later" id="pmsLater">Nothing imports until you authorise it. You can do it later from the dashboard.</p>
         <button class="skip" id="btnSkip">Skip for now</button>
       </div>
 
@@ -708,30 +710,30 @@
 
   const PMS = [
     { id:'guesty',
-      does:['Writes the check-in link onto the booking','Marks each booking as registered','Sends remote-access keys to the guest','Reports ID verification, payment, deposit, tax and damage-protection status','Adds your upselling link','Two-way guest messaging'], checkout:true, logo:'https://chekin.com/wp-content/uploads/2026/02/Guesty.svg',   name:'Guesty',    bg:'#0B3954', kind:'form',  video:'Z3eAVpF5xkY', site:'guesty.com',
+      imp:['Your properties and every booking','Lead guest name, email and phone','Payment items, paid and pending','Guest messages, both ways'], out:['Check-in link and registration status','Remote-access keys','ID, payment, deposit, tax and damage status','Your upselling link'], checkout:true, logo:'https://chekin.com/wp-content/uploads/2026/02/Guesty.svg',   name:'Guesty',    bg:'#0B3954', kind:'form',  video:'Z3eAVpF5xkY', site:'guesty.com',
       fields:[['integration_token','Integration Token','']],
       guide:[['Open Guesty','Go to <b>Integrations \u2192 Marketplace</b>, open the Chekin tile and press <b>Connect</b>.'],['Copy the token from the popup','Paste it here straight away \u2014 Guesty expires it four hours after it is generated.']],
       sync:'Guests can be registered from the moment it connects.' },
     { id:'hostaway',
-      does:['Writes the check-in link onto the booking','Marks each booking as registered','Sends remote-access keys to the guest','Reports ID verification and damage-protection status','Adds your upselling link'],
+      imp:['Every booking, with price and source','Lead guest phone','Payment items, paid and pending'], out:['Check-in link and registration status','Remote-access keys','ID verification and damage status','Your upselling link'],
       guide:[['Open Hostaway','Go to <b>Settings \u2192 Hostaway API</b>. Your Account ID is on that screen.'],['Create a key','Press Create, name it and choose <b>Partner</b>. Copy the secret key before you leave \u2014 Hostaway only shows it once.']], sync:'Both values come from that one screen.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-hostaway-2023.svg', name:'Hostaway',  bg:'#F5A623', kind:'form',  video:'lsqJOm-TsIg', site:'hostaway.com',
       fields:[['account_id','Account ID',''],['api_secret','API secret key','']] },
     { id:'lodgify',
-      does:['Writes the check-in message onto the booking','Sends the remote-access link to the guest','Lets you customise that message per property','Two-way guest messaging'],
+      imp:['Every booking, with price and language','Lead guest phone','Payment items, paid and pending','Guest messages, both ways'], out:['Check-in message, customisable per property','Remote-access link'],
       guide:[['Get your API key','In Lodgify, go to <b>Settings \u2192 Public API</b> and copy the key.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-lodgify-2023.svg',  name:'Lodgify',   bg:'#5A31F4', kind:'form',  video:'4_pz38vRROM', site:'lodgify.com',
       fields:[['api_key','API key','']] },
     { id:'smoobu',
-      does:['Writes the check-in link onto the booking','Marks each booking as registered','Sends remote-access keys to the guest','Adds your upselling link'],
+      imp:['Every booking, with price and language','Lead guest email and phone','Guest messages (in development)'], out:['Check-in link and registration status','Remote-access keys','Your upselling link'],
       guide:[['Open Smoobu','Go to <b>Settings \u2192 Marketplace</b>.'],['Add Chekin','Find Chekin in the list and add it.']], sync:'Reservations sync across every portal in real time.', logo:'https://chekin.com/wp-content/uploads/2026/02/Smoobu-logo.svg',   name:'Smoobu',    bg:'#00A699', kind:'oauth', video:'7IBjUKv70Ao', site:'smoobu.com' },
     { id:'avantio',
-      does:['Writes the check-in link onto the booking','Reports deposit status','Fills the invoicing client field','Two-way guest messaging'],
+      imp:['Your properties and every booking','Every guest on the booking, not just the lead','Lead guest email and phone','Guest messages, both ways'], out:['Check-in link','Deposit status','Invoicing client field'],
       guide:[['Ask Avantio for your API key','Request it through <b>Live Chat</b> inside your Avantio account \u2014 they reply on the same chat.']], sync:'Importing can take from seconds to a couple of minutes.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-avantio-2023.svg',  name:'Avantio',   bg:'#E4572E', kind:'form',  video:null, site:'avantio.com',
       fields:[['api_key','API key','']] },
     { id:'cloudbeds',
-      does:['Writes the check-in link onto the booking','Writes every guest\'s details onto the reservation','Marks each booking as registered','Sends remote-access keys to the guest'],
+      imp:['Your properties and every booking','Multi-room bookings','Lead guest, pre-created'], out:['Check-in link and registration status','Every guest\'s details onto the reservation','Remote-access keys'],
       guide:[['Authorise on Cloudbeds','We send you to Cloudbeds to approve access \u2014 nothing to copy.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2026/02/Cloudbeds.svg',name:'Cloudbeds', bg:'#1789FC', kind:'oauth', video:'zUlBKUhQTZY', site:'cloudbeds.com' },
     { id:'octorate',
-      does:['Writes the check-in message onto the booking','Writes every guest\'s details onto the reservation','Sends the remote-access link to the guest','Lets you customise that message per property'],
+      imp:['Your properties and every booking','Lead guest phone'], out:['Check-in message, customisable per property','Every guest\'s details onto the reservation','Remote-access link'],
       guide:[['Sign in to Octorate','We send you to Octorate to sign in and confirm the connection.']], icon:'ds/assets/pms/octorate.png', name:'Octorate',  bg:'#7C3AED', kind:'oauth', video:'G1cKQ3g5-3Y', site:'octorate.com' },
     { id:'other',    name:'Other\u2026',    bg:'#6B6B95', kind:'contact', video:null, site:null },
   ];
@@ -1129,12 +1131,20 @@
        PMS table — the one thing that genuinely differs between them. Guesty
        writes eleven kinds of status back and runs online check-out; Lodgify
        writes a message and a link. A shared blurb hid exactly that. */
+    /* Both directions, off the Import and Send back columns of the PMS table.
+       They are not the same everywhere: three of the seven do not list Rooms,
+       so they bring in bookings but not properties, and payment items only
+       arrive from three. Saying "properties and bookings sync" across the
+       board would have been wrong for most of them. */
     let info = '';
-    if (p.does && p.does.length){
-      info += `<aside class="pc-does"><h4>What this integration does</h4><ul>` +
-        p.does.map(d => `<li>${d}</li>`).join('') +
-        (p.checkout ? `<li class="hi">Online check-out, which most integrations cannot do</li>` : '') +
-        `</ul>${p.sync ? `<p class="pc-sync">${p.sync}</p>` : ''}</aside>`;
+    if (p.imp || p.out){
+      const bloque = (t, xs) => xs && xs.length
+        ? `<h5>${t}</h5><ul>${xs.map(x => `<li>${x}</li>`).join('')}</ul>` : '';
+      info += `<aside class="pc-does"><h4>What this integration does</h4>` +
+        bloque(`Brings in from ${p.name}`, p.imp) +
+        bloque(`Sends back to ${p.name}`, (p.out || []).concat(
+          p.checkout ? ['Online check-out, which most cannot do'] : [])) +
+        (p.sync ? `<p class="pc-sync">${p.sync}</p>` : '') + `</aside>`;
     } else if (p.sync){
       info += `<p class="pc-facts">${p.sync}</p>`;
     }
@@ -1511,7 +1521,9 @@
     if (pending){
       $('#pmsLater').textContent = asking
         ? 'Send the request and our team follows up. Bookings stay manual until the integration is live.'
-        : 'Your properties and bookings won\'t import until you authorise it. You can do it later from the dashboard.';
+        /* Not "your properties and bookings": three of the seven bring in
+           bookings only, so promising properties was wrong for most of them. */
+        : 'Nothing imports until you authorise it. You can do it later from the dashboard.';
     }
 
     /* Connecting is the path we want taken, so it stays the only primary on
