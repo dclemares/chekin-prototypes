@@ -734,7 +734,14 @@
   /* Bookings first: it is the longest step and the only one that imports
      anything, so getting the PMS authorising early leaves it syncing in the
      background while the shorter questions get answered. */
-  function flow(){ return (state.manage === 'pms' && state.pms) ? [3,6,1,4,5] : [3,1,4,5]; }
+  /* The connect panel only earns a place when there is something to connect.
+     A catalogue integration has no credentials and no authorise step, so it
+     left a screen holding a heading and one sentence; that message belongs in
+     the plan, which now carries it. */
+  function flow(){
+    const connectable = state.manage === 'pms' && state.pms && state.pms.kind !== 'catalogue';
+    return connectable ? [3,6,1,4,5] : [3,1,4,5];
+  }
 
   const $ = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
@@ -1084,9 +1091,11 @@
       f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>No credentials needed — your bookings flow in automatically once connected.</span></div>`;
       f += `<button class="pc-btn" id="pcGoNone">Connect with ${p.name}</button>`;
     } else if (p.kind === 'catalogue'){
-      /* The lead above already says this — repeating it inside a green box
-         says it twice in a row. */
-      f += `<button class="pc-btn" id="pcConsent">Continue with ${p.name}</button>`;
+      /* Nothing to connect here, so nothing to press. The button was wired to
+         the partner-consent dialog, which told you the PMS's own team would
+         call about a free account with them and asked you to agree to share
+         your data — none of which is what happens. The lead above carries the
+         whole message; the footer moves you on. */
     } else if (p.kind === 'consent'){
       f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Partner-assisted setup: the ${p.name} team gets in touch and onboards you personally.</span></div>`;
       f += `<button class="pc-btn" id="pcConsent">Continue with ${p.name}</button>`;
@@ -1270,7 +1279,11 @@
     const u = unit();
     if (state.manage === 'pms'){
       const n = state.pms && state.pms.id !== 'other' ? state.pms.name : 'your PMS';
-      steps.push({ k:'pms', phase:'Import', t:`Connect ${n}`, d:`Your ${u} and bookings sync automatically from day one.`, eta:2 });
+      /* A catalogue integration is not something the user connects, so the
+         plan cannot hand them a step that says they did. */
+      steps.push(state.pms && state.pms.kind === 'catalogue'
+        ? { k:'pms', phase:'Import', t:`We set up ${n} with you`, d:`Our team completes the connection once your account is live — then your ${u} and bookings sync on their own.`, eta:2 }
+        : { k:'pms', phase:'Import', t:`Connect ${n}`, d:`Your ${u} and bookings sync automatically from day one.`, eta:2 });
     } else if (state.manage === 'ota'){
       steps.push({ k:'ota', phase:'Import', t:'Link your Airbnb & Booking.com calendars', d:'New reservations import on their own — no PMS needed.', eta:3 });
     } else {
@@ -1400,7 +1413,12 @@
     }
     if (state.ptype) chips.push(state.ptype === 'other' && state.ptypeOther ? state.ptypeOther : PTYPE_LABELS[state.ptype]);
     if (state.size) chips.push(`${state.size} ${unit()}`);
-    if (state.manage === 'pms') chips.push(state.pms && state.pms.id !== 'other' ? `${state.pms.name} sync` : 'PMS sync');
+    /* "Mews sync" claims a sync that is not set up yet — the name alone is
+       what we actually know. */
+    if (state.manage === 'pms') chips.push(
+      !state.pms || state.pms.id === 'other' ? 'PMS sync'
+      : state.pms.kind === 'catalogue' ? state.pms.name
+      : `${state.pms.name} sync`);
     if (state.manage === 'ota') chips.push('OTA calendars');
     if (state.manage === 'manual') chips.push('Manual setup');
     const FOCUS = { compliance:'compliance', revenue:'revenue', ops:'operations' };
@@ -1443,7 +1461,11 @@
   function syncCta(){
     const arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
     const next = $('#btnNext');
-    const pending = step === 6 && !state.pmsConnected;
+    /* Only pending when there is something the user could actually do. A
+       catalogue integration has no credentials and no authorise step, so
+       offering "I'll connect later" invents a task that does not exist. */
+    const connectable = state.pms && state.pms.kind !== 'catalogue';
+    const pending = step === 6 && connectable && !state.pmsConnected;
     const asking = pending && state.pms && state.pms.id === 'other';
     /* Nothing to authorise when the integration does not exist yet — that
        branch requests one, so the warning about importing was simply untrue. */
