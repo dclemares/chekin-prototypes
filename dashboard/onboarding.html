@@ -484,7 +484,7 @@
             <div class="ic green"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg></div>
             <div>
               <div class="t">Stay legally compliant, effortlessly <span class="req" id="reqChip" style="display:none">Required in your market</span></div>
-              <div class="d">Police reporting, guest ID verification and tourist taxes — submitted automatically for every stay.</div>
+              <div class="d" id="compDesc">Police reporting, guest ID verification and tourist taxes — submitted automatically for every stay.</div>
             </div>
           </div>
           <div class="card prio" data-prio="revenue" tabindex="0">
@@ -1263,27 +1263,42 @@
      tax step for them — so dimming this card on registration alone told people
      compliance did not apply while the next screen handed them a compliance
      task. It follows whether anything is mandatory at all. */
+  /* This card was never a choice: buildMods() turns check-in, ID verification
+     and the guest app on regardless, and police and tax follow the country,
+     not this tick. So it states what you get rather than offering it — and it
+     is no longer greyed out where registration does not apply, which told
+     people they would not get ID verification when they do. */
   function setupPrioStep(){
     const comp = $('#prioCompliance');
     const police = regulated();
     const tax = anyTax();
     const mandatory = police || tax;
-    $('#reqChip').style.display = mandatory ? '' : 'none';
     comp.classList.remove('locked','dim');
+    comp.classList.add('locked');
+    const chip = $('#reqChip');
+    chip.style.display = '';
+    chip.textContent = mandatory ? 'Required in your market' : 'Included as standard';
+    $('#compDesc').textContent = mandatory
+      ? (police
+          ? 'Police reporting, guest ID verification and tourist taxes \u2014 submitted automatically for every stay.'
+          : 'Tourist taxes and guest ID verification \u2014 calculated and collected automatically for every stay.')
+      : 'Guest ID verification and a full guest record for every stay, ready if the rules change.';
     if (mandatory){
-      comp.classList.add('locked');
       if (!state.prios.includes('compliance')) state.prios.push('compliance');
       $('#prioTitle').textContent = 'Legal compliance is covered. What else matters?';
       $('#prioLead').textContent  = police
-        ? 'Police reporting and tourist taxes are mandatory where you operate — they’re already in your plan. Add as many extra focuses as you need.'
-        : 'No guest registration in your markets, but tourist tax is mandatory — it’s already in your plan. Add as many extra focuses as you need.';
+        ? 'Police reporting and tourist taxes are mandatory where you operate \u2014 they are already in your plan. Add as many extra focuses as you need.'
+        : 'No guest registration in your markets, but tourist tax is mandatory \u2014 it is already in your plan. Add as many extra focuses as you need.';
     } else {
-      comp.classList.add('dim');
+      /* Deliberately not added to prios: nothing downstream reads it, and
+         adding it would quietly satisfy the "pick at least one" gate on the
+         user\'s behalf. */
       state.prios = state.prios.filter(p => p !== 'compliance');
       $('#prioTitle').textContent = 'What matters most to you right now?';
-      $('#prioLead').textContent  = 'Good news — no guest registration or tourist tax applies in your markets. Pick one or several focuses; we’ll build your dashboard around them.';
+      $('#prioLead').textContent  = 'No guest registration or tourist tax applies in your markets, so ID verification is already on. Pick what else to build your dashboard around.';
     }
   }
+
   $$('#prioCards .card').forEach(c => {
     const pick = () => {
       if (c.classList.contains('locked') || c.classList.contains('dim')) return;
