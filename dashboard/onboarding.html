@@ -184,7 +184,13 @@
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
   /* Step 3b — PMS connect (credentials / OAuth / guide) */
-  .pms-connect{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+  /* One column. Split in two, the steps ran ~240px against a 395px video
+     column beside them, and the pair sat in the top third of the panel with
+     300px of nothing underneath. Stacked at reading width it fills the space
+     and the sequence stays vertical, which is how a sequence reads. */
+  .pms-connect{max-width:620px}
+  .pc-facts{margin:15px 2px 0;font:400 13px/20px var(--font-primary);color:var(--text-gray-medium)}
+  .pc-facts i{font-style:normal;color:var(--stroke-gray-medium);padding:0 4px}
   /* ── Connect: the guide is the layout ── */
   .pc-steps{list-style:none;margin:0;padding:0;counter-reset:pc}
   .pc-step{display:grid;grid-template-columns:26px 1fr;gap:13px;position:relative;padding-bottom:20px}
@@ -201,12 +207,9 @@
   .pc-step p b{font-weight:600;color:var(--text-dark)}
   .pc-step p{margin:3px 0 0;font:400 13px/19px var(--font-primary);color:var(--text-gray-dark)}
   .pc-step b + p{margin-top:2px}
-  .pc-after{background:var(--bg-neutral-light);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:15px 17px;margin-bottom:16px}
-  .pc-after h4{font:700 13px var(--font-primary);margin:0 0 8px}
-  .pc-after ul{margin:0;padding-left:16px;font:400 12.5px/20px var(--font-primary);color:var(--text-gray-dark)}
-  .pc-site{display:inline-block;margin-top:10px;font:600 12.5px var(--font-primary);color:var(--text-brand);text-decoration:none}
 
-  .pc-form{background:#fff;border:1.5px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-card)}
+  .pc-form.bare{background:none;border:0;box-shadow:none;padding:0}
+  .pc-form{background:#fff;border:1.5px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:22px 24px;box-shadow:var(--shadow-card)}
   .pc-form h4{font:700 14px var(--font-primary);margin:0 0 14px;display:flex;align-items:center;gap:9px}
   .pc-form .lg{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font:800 11px var(--font-primary);color:#fff}
   .pc-field{margin-bottom:13px}
@@ -229,13 +232,18 @@
   .pc-err.on{display:block}
   .pc-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4}
   .pc-btn.done{background:var(--success);box-shadow:none}
-  .pc-info h4{font:700 14px var(--font-primary);margin:0 0 7px}
-  .pc-info p{font:400 13px/19px var(--font-primary);color:var(--text-gray-dark);margin:0 0 12px}
-  .pc-info a{color:var(--text-brand);font-weight:600;text-decoration:none}
-  .pc-info ul{margin:0 0 14px;padding-left:17px;font:400 12.5px/20px var(--font-primary);color:var(--text-gray-dark)}
-  .pc-vlabel{font:700 10px var(--font-primary);color:var(--text-gray-medium);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px}
-  .pc-video{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--stroke-gray-lighter);aspect-ratio:16/9;background:#161643}
+  .pc-video{position:relative;display:block;width:100%;padding:0;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--stroke-gray-lighter);aspect-ratio:16/9;background:#161643;margin-top:18px;cursor:pointer}
+  .pc-video img{width:100%;height:100%;object-fit:cover;display:block}
   .pc-video iframe{width:100%;height:100%;border:none;display:block}
+  .pc-video.playing{cursor:default}
+  .pc-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.3);transition:transform .14s}
+  .pc-play svg{width:24px;height:24px;fill:var(--text-brand);stroke:none;margin-left:3px}
+  .pc-video:hover .pc-play{transform:translate(-50%,-50%) scale(1.07)}
+  .pc-video:focus-visible{outline:2px solid var(--text-brand);outline-offset:2px}
+  /* The caption rides on the poster so it costs no vertical space of its own */
+  .pc-vcap{position:absolute;left:0;right:0;bottom:0;padding:22px 14px 11px;text-align:left;
+    font:600 12.5px var(--font-primary);color:#fff;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.72) 100%)}
 
   .ovl{position:fixed;inset:0;background:rgba(22,22,67,.5);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}
   .ovl.on{display:flex}
@@ -1076,7 +1084,8 @@
       f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>No credentials needed — your bookings flow in automatically once connected.</span></div>`;
       f += `<button class="pc-btn" id="pcGoNone">Connect with ${p.name}</button>`;
     } else if (p.kind === 'catalogue'){
-      f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>${p.name} is supported. Our team completes the connection with you once your account is live — no credentials to find right now.</span></div>`;
+      /* The lead above already says this — repeating it inside a green box
+         says it twice in a row. */
       f += `<button class="pc-btn" id="pcConsent">Continue with ${p.name}</button>`;
     } else if (p.kind === 'consent'){
       f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Partner-assisted setup: the ${p.name} team gets in touch and onboards you personally.</span></div>`;
@@ -1091,16 +1100,22 @@
        heading over an empty paragraph is worse than no panel at all. */
     /* What used to sit here was the vendor's own marketing copy, which is no
        help while you are trying to connect. This says what happens after. */
-    let info = '';
-    if (p.id !== 'other'){
-      info += `<div class="pc-after"><h4>Once it is connected</h4><ul>` +
-        `<li>Your properties and bookings import automatically.</li>` +
-        `<li>Guests get the check-in link without you sending it.</li>` +
-        (p.sync ? `<li>${p.sync}</li>` : '') +
-        `</ul>${p.site ? `<a class="pc-site" href="https://${p.site}" target="_blank" rel="noopener">${p.site} \u2197</a>` : ''}</div>`;
-    }
+    /* One line of facts rather than a boxed list: two of the three bullets
+       were identical on every integration, so the box was mostly furniture. */
+    /* Only the fact that differs per integration. The other two were the same
+       everywhere and the footer already promises them, so listing all three
+       here wrapped into a line that read as broken fragments. */
+    let info = p.sync ? `<p class="pc-facts">${p.sync}</p>` : '';
     if (p.video){
-      info += `<p class="pc-vlabel">How to connect ${p.name} with Chekin</p><div class="pc-video"><iframe src="https://www.youtube.com/embed/${p.video}" title="How to connect ${p.name} with Chekin" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
+      /* A facade, not the embed: YouTube's own poster arrives wrapped in its
+         chrome and pulls its player in on every visit, for a video most people
+         never open. The iframe is built on click. maxres is the true 16:9
+         frame — hqdefault is 4:3 with bars baked in, which showed as grey
+         bands once it was stretched to fill. */
+      info += `<button type="button" class="pc-video" data-yt="${p.video}" aria-label="Play: how to connect ${p.name} with Chekin">` +
+        `<img src="https://i.ytimg.com/vi/${p.video}/maxresdefault.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${p.video}/hqdefault.jpg'">` +
+        `<span class="pc-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>` +
+        `<span class="pc-vcap">How to connect ${p.name} with Chekin</span></button>`;
     }
 
     /* The steps are the screen. Everything the guide says to do in the other
@@ -1115,7 +1130,13 @@
         `<li class="pc-step last"><span class="pc-n">${guide.length + 1}</span><div>${f}</div></li></ol>`
       : f;
 
-    pmsConnect.innerHTML = `<div class="pc-form">${body}</div><div class="pc-info">${info}</div>`;
+    /* A card exists to hold something. With no steps and no fields there is
+       only a button, and a border drawn around one button is furniture. */
+    /* Test the markup, not the data: "Other" builds its one field inline
+       rather than declaring it in fields[], so checking p.fields stripped the
+       card off a form that has one. */
+    const bare = !guide.length && f.indexOf('data-pcf') === -1;
+    pmsConnect.innerHTML = `<div class="pc-form${bare ? ' bare' : ''}">${body}</div>${info}`;
 
     const done = btn => { btn.classList.add('done'); btn.disabled = true; btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> ${p.name} connected`; state.pmsConnected = true; refresh(); };
     const go = $('#pcGo');
@@ -1142,6 +1163,14 @@
     if (goNone) goNone.addEventListener('click', () => { goNone.disabled = true; goNone.textContent = 'Connecting…'; setTimeout(() => done(goNone), 800); });
     const oauthBtn = $('#pcOauth');
     if (oauthBtn) oauthBtn.addEventListener('click', () => runOauth(p, () => done(oauthBtn)));
+    const vid = pmsConnect.querySelector('.pc-video[data-yt]');
+    if (vid) vid.addEventListener('click', () => {
+      const id = vid.dataset.yt;
+      const box = document.createElement('div');
+      box.className = 'pc-video playing';
+      box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="How to connect ${p.name} with Chekin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+      vid.replaceWith(box);
+    });
     const consentBtn = $('#pcConsent');
     if (consentBtn) consentBtn.addEventListener('click', () => openConsent(p, () => done(consentBtn)));
   }
