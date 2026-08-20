@@ -184,16 +184,20 @@
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
   /* Step 3b — PMS connect (credentials / OAuth / guide) */
-  /* Two columns again, but earning it this time: the right one carries what
-     this integration can actually do, which differs enough between them to be
-     worth the width. Sized so both fit without scrolling. */
-  .pms-connect{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;max-width:900px}
-  .pc-does{background:var(--bg-neutral-light);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:15px 17px}
+  /* Connect on top, then what the integration does and the video side by side
+     underneath. The card keeps a reading width of its own rather than
+     stretching across the row — an API key field 850px wide helps nobody. */
+  /* .cwrap leaves 724px, not 900 — the list gets the wider track because it
+     is text and wraps; the video only needs enough to stay legible. */
+  .pms-connect{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px 24px;align-items:start}
+  .pc-form{grid-column:1 / -1;max-width:640px}
+  .pms-connect.novid .pc-does{grid-column:1 / -1;max-width:640px}
+  .pc-does{background:var(--bg-neutral-light);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:13px 16px}
   .pc-does h4{font:700 12.5px var(--font-primary);margin:0 0 10px;color:var(--text-dark)}
   .pc-does h5{font:600 11px var(--font-primary);color:var(--text-gray-medium);text-transform:none;margin:12px 0 6px;letter-spacing:0}
   .pc-does h5:first-of-type{margin-top:0}
   .pc-does ul{margin:0;padding:0;list-style:none}
-  .pc-does li{position:relative;padding-left:18px;margin-bottom:6px;font:400 12.5px/18px var(--font-primary);color:var(--text-gray-dark)}
+  .pc-does li{position:relative;padding-left:18px;margin-bottom:5px;font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark)}
   .pc-does li::before{content:"";position:absolute;left:0;top:6px;width:11px;height:7px;border-left:2px solid var(--success);border-bottom:2px solid var(--success);transform:rotate(-45deg)}
   .pc-does li.hi{color:var(--text-dark);font-weight:600}
   .pc-sync{margin:11px 0 0;padding-top:10px;border-top:1px solid var(--stroke-gray-lighter);font:500 12px var(--font-primary);color:var(--text-gray-medium)}
@@ -202,7 +206,7 @@
   .pc-facts i{font-style:normal;color:var(--stroke-gray-medium);padding:0 4px}
   /* ── Connect: the guide is the layout ── */
   .pc-steps{list-style:none;margin:0;padding:0;counter-reset:pc}
-  .pc-step{display:grid;grid-template-columns:26px 1fr;gap:13px;position:relative;padding-bottom:20px}
+  .pc-step{display:grid;grid-template-columns:26px 1fr;gap:13px;position:relative;padding-bottom:15px}
   /* The rail joins the numbers so the eye reads it as one sequence. It stops
      at the last step because there is nothing after it to join to. */
   .pc-step:not(.last)::before{content:"";position:absolute;left:12.5px;top:28px;bottom:2px;width:1.5px;background:var(--stroke-gray-lighter)}
@@ -218,10 +222,14 @@
   .pc-step b + p{margin-top:2px}
 
   .pc-form.bare{background:none;border:0;box-shadow:none;padding:0}
-  .pc-form{background:#fff;border:1.5px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:22px 24px;box-shadow:var(--shadow-card)}
+  .pc-form{background:#fff;border:1.5px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:19px 22px;box-shadow:var(--shadow-card)}
   .pc-form h4{font:700 14px var(--font-primary);margin:0 0 14px;display:flex;align-items:center;gap:9px}
   .pc-form .lg{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font:800 11px var(--font-primary);color:#fff}
   .pc-field{margin-bottom:13px}
+  .pc-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  /* Side by side they were 119px each on a phone — too narrow to read a
+     secret key you have just pasted. */
+  @media (max-width:640px){ .pc-pair{grid-template-columns:1fr;gap:0} }
   .pc-step.last .pc-field:first-child{margin-top:2px}
   .pc-field label{display:block;font:600 12.5px var(--font-primary);margin-bottom:6px}
   .pc-field input{width:100%;height:40px;padding:0 12px;border-radius:9px;border:1.5px solid var(--stroke-gray-light);font:500 13px var(--font-primary);outline:none;color:var(--text-dark)}
@@ -241,7 +249,7 @@
   .pc-err.on{display:block}
   .pc-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4}
   .pc-btn.done{background:var(--success);box-shadow:none}
-  .pc-video{position:relative;display:block;width:100%;padding:0;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--stroke-gray-lighter);aspect-ratio:16/9;background:#161643;margin-top:18px;cursor:pointer}
+  .pc-video{position:relative;display:block;width:100%;padding:0;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--stroke-gray-lighter);aspect-ratio:16/9;background:#161643;cursor:pointer}
   .pc-video img{width:100%;height:100%;object-fit:cover;display:block}
   .pc-video iframe{width:100%;height:100%;border:none;display:block}
   .pc-video.playing{cursor:default}
@@ -1095,9 +1103,14 @@
     let f = '';
     if (p.kind === 'form'){
       if (p.note) f += `<div class="pc-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg><span>${p.note}</span></div>`;
+      /* Two credentials from the same screen sit on one row — they are short
+         values, and stacking them cost a whole field's height for nothing. */
+      const par = p.fields.length === 2 && !p.fields.some(x => x[2]);
+      if (par) f += `<div class="pc-pair">`;
       p.fields.forEach((fl, i) => {
         f += `<div class="pc-field"><label for="pcf-${i}">${fl[1]}</label><input id="pcf-${i}" data-pcf type="text" placeholder="${/assword/.test(fl[1]) ? '••••••••' : 'Paste it here'}">${fl[2] ? `<p class="hint">${fl[2]}</p>` : ''}</div>`;
       });
+      if (par) f += `</div>`;
       f += `<p class="pc-err" id="pcErr" role="alert"></p>`;
       f += `<button class="pc-btn" id="pcGo">Connect with ${p.name}</button>`;
     } else if (p.kind === 'oauth'){
@@ -1178,8 +1191,8 @@
        rather than declaring it in fields[], so checking p.fields stripped the
        card off a form that has one. */
     const bare = !guide.length && f.indexOf('data-pcf') === -1;
-    pmsConnect.innerHTML = `<div class="pc-form${bare ? ' bare' : ''}">${body}</div>` +
-      (info ? `<div class="pc-side">${info}</div>` : '');
+    pmsConnect.innerHTML = `<div class="pc-form${bare ? ' bare' : ''}">${body}</div>${info}`;
+    pmsConnect.classList.toggle('novid', !p.video);
 
     const done = btn => { btn.classList.add('done'); btn.disabled = true; btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> ${p.name} connected`; state.pmsConnected = true; refresh(); };
     const go = $('#pcGo');
