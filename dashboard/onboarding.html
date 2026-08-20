@@ -695,41 +695,23 @@
     { id:'guesty', logo:'https://chekin.com/wp-content/uploads/2026/02/Guesty.svg',   name:'Guesty',    bg:'#0B3954', kind:'form',  video:'Z3eAVpF5xkY', site:'guesty.com',
       fields:[['integration_token','Integration Token','']],
       guide:[['Open Guesty','Go to <b>Integrations \u2192 Marketplace</b>, open the Chekin tile and press <b>Connect</b>.'],['Copy the token from the popup','Paste it here straight away \u2014 Guesty expires it four hours after it is generated.']],
-      sync:'Guests can be registered from the moment it connects.',
-      desc:'Guesty simplifies managing hospitality businesses with its all-in-one platform, automating operations to save time and increase revenue.',
-      benefits:['Flexible solutions for every business','Unlock your listings\u2019 true potential','Boost operational productivity'] },
+      sync:'Guests can be registered from the moment it connects.' },
     { id:'hostaway',
       guide:[['Open Hostaway','Go to <b>Settings \u2192 Hostaway API</b>. Your Account ID is on that screen.'],['Create a key','Press Create, name it and choose <b>Partner</b>. Copy the secret key before you leave \u2014 Hostaway only shows it once.']], sync:'Both values come from that one screen.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-hostaway-2023.svg', name:'Hostaway',  bg:'#F5A623', kind:'form',  video:'lsqJOm-TsIg', site:'hostaway.com',
-      fields:[['account_id','Account ID',''],['api_secret','API secret key','']],
-      desc:'Hostaway is the fast-growing vacation rental platform combining channel management, automation and analytics for professional managers.',
-      benefits:['Deep channel integrations','Powerful automations & workflows','Reporting built for scale'] },
+      fields:[['account_id','Account ID',''],['api_secret','API secret key','']] },
     { id:'lodgify',
       guide:[['Get your API key','In Lodgify, go to <b>Settings \u2192 Public API</b> and copy the key.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-lodgify-2023.svg',  name:'Lodgify',   bg:'#5A31F4', kind:'form',  video:'4_pz38vRROM', site:'lodgify.com',
-      fields:[['api_key','API key','']],
-      desc:'Lodgify is vacation rental software that lets you create a website, sync availability across channels and manage all bookings in one place.',
-      benefits:['Channel manager for Airbnb, Booking.com & Vrbo','Direct booking website included','Automated guest communication'] },
+      fields:[['api_key','API key','']] },
     { id:'smoobu',
-      guide:[['Open Smoobu','Go to <b>Settings \u2192 Marketplace</b>.'],['Add Chekin','Find Chekin in the list and add it.']], sync:'Reservations sync across every portal in real time.', logo:'https://chekin.com/wp-content/uploads/2026/02/Smoobu-logo.svg',   name:'Smoobu',    bg:'#00A699', kind:'oauth', video:'7IBjUKv70Ao', site:'smoobu.com',
-      desc:'Smoobu is the all-in-one software for short-term and vacation rentals: channel manager, PMS, website builder and guest guide.',
-      benefits:['Real-time sync across all portals','One calendar for every booking','Guest guide & online check-in links'] },
+      guide:[['Open Smoobu','Go to <b>Settings \u2192 Marketplace</b>.'],['Add Chekin','Find Chekin in the list and add it.']], sync:'Reservations sync across every portal in real time.', logo:'https://chekin.com/wp-content/uploads/2026/02/Smoobu-logo.svg',   name:'Smoobu',    bg:'#00A699', kind:'oauth', video:'7IBjUKv70Ao', site:'smoobu.com' },
     { id:'avantio',
       guide:[['Ask Avantio for your API key','Request it through <b>Live Chat</b> inside your Avantio account \u2014 they reply on the same chat.']], sync:'Importing can take from seconds to a couple of minutes.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-avantio-2023.svg',  name:'Avantio',   bg:'#E4572E', kind:'form',  video:null, site:'avantio.com',
-      fields:[['api_key','API key','']],
-      
-      desc:'Avantio\u2019s property management software is an all-in-one solution, available in 7 languages, supporting agencies across the globe.',
-      benefits:['Fully customisable, ready to integrate','Streamlines processes to maximize revenue'] },
+      fields:[['api_key','API key','']] },
     { id:'cloudbeds',
-      guide:[['Authorise on Cloudbeds','We send you to Cloudbeds to approve access \u2014 nothing to copy.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2026/02/Cloudbeds.svg',name:'Cloudbeds', bg:'#1789FC', kind:'oauth', video:'zUlBKUhQTZY', site:'cloudbeds.com',
-      desc:'The Cloudbeds Hospitality Platform integrates operations, revenue management, distribution channels and growth marketing tools.',
-      benefits:['Streamline operations and automate workflows','Modernize your guest experience','Data delivered, insights revealed'] },
+      guide:[['Authorise on Cloudbeds','We send you to Cloudbeds to approve access \u2014 nothing to copy.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2026/02/Cloudbeds.svg',name:'Cloudbeds', bg:'#1789FC', kind:'oauth', video:'zUlBKUhQTZY', site:'cloudbeds.com' },
     { id:'octorate',
-      guide:[['Sign in to Octorate','We send you to Octorate to sign in and confirm the connection.']], icon:'ds/assets/pms/octorate.png', name:'Octorate',  bg:'#7C3AED', kind:'oauth', video:'G1cKQ3g5-3Y', site:'octorate.com',
-      
-      desc:'Octorate is an all-in-one cloud solution for hotels, B&Bs and vacation rentals: channel manager, booking engine and PMS.',
-      benefits:['All-in-one cloud suite','Fast channel synchronisation'] },
-    { id:'other',    name:'Other\u2026',    bg:'#6B6B95', kind:'contact', video:null, site:null,
-      desc:'Don\u2019t see your PMS? Tell us which one you use \u2014 our team will contact you about the integration. You can start without it today.',
-      benefits:[] },
+      guide:[['Sign in to Octorate','We send you to Octorate to sign in and confirm the connection.']], icon:'ds/assets/pms/octorate.png', name:'Octorate',  bg:'#7C3AED', kind:'oauth', video:'G1cKQ3g5-3Y', site:'octorate.com' },
+    { id:'other',    name:'Other\u2026',    bg:'#6B6B95', kind:'contact', video:null, site:null },
   ];
 
   /* ───── State ───── */
@@ -1299,7 +1281,7 @@
   }
   const APPS = {
     revenue: [ {n:'Upselling Store', bg:'#385CF8'}, {n:'StayFi', bg:'#7C3AED'}, {n:'Late Check-out Deals', bg:'#F59E0B'}, {n:'Local Experiences', bg:'#0F9F80'} ],
-    ops:     [ {n:'WhatsApp Inbox', bg:'#25D366'}, {n:'Nuki Smart Locks', bg:'#111827'}, {n:'Cleaning Scheduler', bg:'#0F9F80'}, {n:'Team Tasks', bg:'#F59E0B'} ],
+    ops:     [ {n:'WhatsApp Inbox', bg:'#25D366'}, {n:'Nuki Smart Locks', bg:'#111827'}, {n:'Cleaning Scheduler', bg:'#0F9F80'}, {n:'Team Tasks', bg:'#F59E0B'} ]
   };
 
   function renderPlan(){
@@ -1491,7 +1473,7 @@
         pms: state.pms ? state.pms.name : null,
         prios: state.prios,
         steps: buildPlan(),
-        mods: buildMods(),
+        mods: buildMods()
       }));
     } catch(e){}
   }
