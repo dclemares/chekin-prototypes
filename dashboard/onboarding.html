@@ -1086,13 +1086,13 @@
         f += `<div class="pc-field"><label for="pcf-${i}">${fl[1]}</label><input id="pcf-${i}" data-pcf type="text" placeholder="${/assword/.test(fl[1]) ? '••••••••' : 'Paste it here'}">${fl[2] ? `<p class="hint">${fl[2]}</p>` : ''}</div>`;
       });
       f += `<p class="pc-err" id="pcErr" role="alert"></p>`;
-      f += `<button class="pc-btn" id="pcGo">Connect ${p.name}</button>`;
+      f += `<button class="pc-btn" id="pcGo">Connect with ${p.name}</button>`;
     } else if (p.kind === 'oauth'){
       f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Secure OAuth — you approve access on ${p.name}'s own site, and we never see your password.</span></div>`;
       f += `<button class="pc-btn" id="pcOauth">Connect with ${p.name} <svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></button>`;
     } else if (p.kind === 'none'){
       f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>No credentials needed — your bookings flow in automatically once connected.</span></div>`;
-      f += `<button class="pc-btn" id="pcGoNone">Connect ${p.name}</button>`;
+      f += `<button class="pc-btn" id="pcGoNone">Connect with ${p.name}</button>`;
     } else if (p.kind === 'catalogue'){
       f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>${p.name} is supported. Our team completes the connection with you once your account is live — no credentials to find right now.</span></div>`;
       f += `<button class="pc-btn" id="pcConsent">Continue with ${p.name}</button>`;
