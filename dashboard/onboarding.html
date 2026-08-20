@@ -704,7 +704,7 @@
       desc:'Hostaway is the fast-growing vacation rental platform combining channel management, automation and analytics for professional managers.',
       benefits:['Deep channel integrations','Powerful automations & workflows','Reporting built for scale'] },
     { id:'lodgify',
-      guide:[['Open Lodgify','Go to <b>Settings \u2192 Public API</b>.'],['Copy the API key','That single key is all we need.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-lodgify-2023.svg',  name:'Lodgify',   bg:'#5A31F4', kind:'form',  video:'4_pz38vRROM', site:'lodgify.com',
+      guide:[['Get your API key','In Lodgify, go to <b>Settings \u2192 Public API</b> and copy the key.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-lodgify-2023.svg',  name:'Lodgify',   bg:'#5A31F4', kind:'form',  video:'4_pz38vRROM', site:'lodgify.com',
       fields:[['api_key','API key','']],
       desc:'Lodgify is vacation rental software that lets you create a website, sync availability across channels and manage all bookings in one place.',
       benefits:['Channel manager for Airbnb, Booking.com & Vrbo','Direct booking website included','Automated guest communication'] },
@@ -713,7 +713,7 @@
       desc:'Smoobu is the all-in-one software for short-term and vacation rentals: channel manager, PMS, website builder and guest guide.',
       benefits:['Real-time sync across all portals','One calendar for every booking','Guest guide & online check-in links'] },
     { id:'avantio',
-      guide:[['Ask Avantio for your API key','Request it through <b>Live Chat</b> inside your Avantio account.'],['Wait for their reply','They send the key back on the same chat.']], sync:'Importing can take from seconds to a couple of minutes.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-avantio-2023.svg',  name:'Avantio',   bg:'#E4572E', kind:'form',  video:null, site:'avantio.com',
+      guide:[['Ask Avantio for your API key','Request it through <b>Live Chat</b> inside your Avantio account \u2014 they reply on the same chat.']], sync:'Importing can take from seconds to a couple of minutes.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-avantio-2023.svg',  name:'Avantio',   bg:'#E4572E', kind:'form',  video:null, site:'avantio.com',
       fields:[['api_key','API key','']],
       
       desc:'Avantio\u2019s property management software is an all-in-one solution, available in 7 languages, supporting agencies across the globe.',
@@ -1054,8 +1054,18 @@
 
   /* ── PMS connect: credentials / OAuth / partner consent + guide ── */
   const pmsConnect = $('#pmsConnect');
+  /* The steps carry the instructions now, so the lead earns its place by
+     saying what to go and fetch before you start — named exactly, and only
+     as many as there really are. "Credentials" for a single key read as a
+     username and a password. */
   const PC_LEAD = {
-    form:    p => `Enter your ${p.name} credentials so we can import your properties and bookings.`,
+    form:    p => {
+      const f = p.fields || [];
+      /* Labels keep their own casing — lowercasing turned "API key" into
+         "api key" and "Account ID" into "account id". */
+      if (f.length === 1) return `One thing from ${p.name}: your ${f[0][1]}.`;
+      return `Two things from ${p.name}: your ${f.map(x => x[1]).join(' and your ')}.`;
+    },
     oauth:   p => `Authorize Chekin in your ${p.name} account — there are no credentials to copy.`,
     none:    p => `${p.name} connects without any extra credentials.`,
     consent: p => `${p.name} onboarding is partner-assisted — confirm and their team gets in touch.`,
