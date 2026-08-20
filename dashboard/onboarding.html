@@ -184,11 +184,18 @@
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
   /* Step 3b — PMS connect (credentials / OAuth / guide) */
-  /* One column. Split in two, the steps ran ~240px against a 395px video
-     column beside them, and the pair sat in the top third of the panel with
-     300px of nothing underneath. Stacked at reading width it fills the space
-     and the sequence stays vertical, which is how a sequence reads. */
-  .pms-connect{max-width:620px}
+  /* Two columns again, but earning it this time: the right one carries what
+     this integration can actually do, which differs enough between them to be
+     worth the width. Sized so both fit without scrolling. */
+  .pms-connect{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;max-width:900px}
+  .pc-does{background:var(--bg-neutral-light);border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);padding:15px 17px}
+  .pc-does h4{font:700 12.5px var(--font-primary);margin:0 0 9px;color:var(--text-dark)}
+  .pc-does ul{margin:0;padding:0;list-style:none}
+  .pc-does li{position:relative;padding-left:19px;margin-bottom:7px;font:400 12.5px/18px var(--font-primary);color:var(--text-gray-dark)}
+  .pc-does li::before{content:"";position:absolute;left:0;top:6px;width:11px;height:7px;border-left:2px solid var(--success);border-bottom:2px solid var(--success);transform:rotate(-45deg)}
+  .pc-does li.hi{color:var(--text-dark);font-weight:600}
+  .pc-sync{margin:11px 0 0;padding-top:10px;border-top:1px solid var(--stroke-gray-lighter);font:500 12px var(--font-primary);color:var(--text-gray-medium)}
+  @media (max-width:900px){ .pms-connect{grid-template-columns:1fr} }
   .pc-facts{margin:15px 2px 0;font:400 13px/20px var(--font-primary);color:var(--text-gray-medium)}
   .pc-facts i{font-style:normal;color:var(--stroke-gray-medium);padding:0 4px}
   /* ── Connect: the guide is the layout ── */
@@ -700,24 +707,31 @@
   ];
 
   const PMS = [
-    { id:'guesty', logo:'https://chekin.com/wp-content/uploads/2026/02/Guesty.svg',   name:'Guesty',    bg:'#0B3954', kind:'form',  video:'Z3eAVpF5xkY', site:'guesty.com',
+    { id:'guesty',
+      does:['Writes the check-in link onto the booking','Marks each booking as registered','Sends remote-access keys to the guest','Reports ID verification, payment, deposit, tax and damage-protection status','Adds your upselling link','Two-way guest messaging'], checkout:true, logo:'https://chekin.com/wp-content/uploads/2026/02/Guesty.svg',   name:'Guesty',    bg:'#0B3954', kind:'form',  video:'Z3eAVpF5xkY', site:'guesty.com',
       fields:[['integration_token','Integration Token','']],
       guide:[['Open Guesty','Go to <b>Integrations \u2192 Marketplace</b>, open the Chekin tile and press <b>Connect</b>.'],['Copy the token from the popup','Paste it here straight away \u2014 Guesty expires it four hours after it is generated.']],
       sync:'Guests can be registered from the moment it connects.' },
     { id:'hostaway',
+      does:['Writes the check-in link onto the booking','Marks each booking as registered','Sends remote-access keys to the guest','Reports ID verification and damage-protection status','Adds your upselling link'],
       guide:[['Open Hostaway','Go to <b>Settings \u2192 Hostaway API</b>. Your Account ID is on that screen.'],['Create a key','Press Create, name it and choose <b>Partner</b>. Copy the secret key before you leave \u2014 Hostaway only shows it once.']], sync:'Both values come from that one screen.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-hostaway-2023.svg', name:'Hostaway',  bg:'#F5A623', kind:'form',  video:'lsqJOm-TsIg', site:'hostaway.com',
       fields:[['account_id','Account ID',''],['api_secret','API secret key','']] },
     { id:'lodgify',
+      does:['Writes the check-in message onto the booking','Sends the remote-access link to the guest','Lets you customise that message per property','Two-way guest messaging'],
       guide:[['Get your API key','In Lodgify, go to <b>Settings \u2192 Public API</b> and copy the key.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-lodgify-2023.svg',  name:'Lodgify',   bg:'#5A31F4', kind:'form',  video:'4_pz38vRROM', site:'lodgify.com',
       fields:[['api_key','API key','']] },
     { id:'smoobu',
+      does:['Writes the check-in link onto the booking','Marks each booking as registered','Sends remote-access keys to the guest','Adds your upselling link'],
       guide:[['Open Smoobu','Go to <b>Settings \u2192 Marketplace</b>.'],['Add Chekin','Find Chekin in the list and add it.']], sync:'Reservations sync across every portal in real time.', logo:'https://chekin.com/wp-content/uploads/2026/02/Smoobu-logo.svg',   name:'Smoobu',    bg:'#00A699', kind:'oauth', video:'7IBjUKv70Ao', site:'smoobu.com' },
     { id:'avantio',
+      does:['Writes the check-in link onto the booking','Reports deposit status','Fills the invoicing client field','Two-way guest messaging'],
       guide:[['Ask Avantio for your API key','Request it through <b>Live Chat</b> inside your Avantio account \u2014 they reply on the same chat.']], sync:'Importing can take from seconds to a couple of minutes.', logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-avantio-2023.svg',  name:'Avantio',   bg:'#E4572E', kind:'form',  video:null, site:'avantio.com',
       fields:[['api_key','API key','']] },
     { id:'cloudbeds',
+      does:['Writes the check-in link onto the booking','Writes every guest\'s details onto the reservation','Marks each booking as registered','Sends remote-access keys to the guest'],
       guide:[['Authorise on Cloudbeds','We send you to Cloudbeds to approve access \u2014 nothing to copy.']], sync:'Bookings refresh every 3 hours.', logo:'https://chekin.com/wp-content/uploads/2026/02/Cloudbeds.svg',name:'Cloudbeds', bg:'#1789FC', kind:'oauth', video:'zUlBKUhQTZY', site:'cloudbeds.com' },
     { id:'octorate',
+      does:['Writes the check-in message onto the booking','Writes every guest\'s details onto the reservation','Sends the remote-access link to the guest','Lets you customise that message per property'],
       guide:[['Sign in to Octorate','We send you to Octorate to sign in and confirm the connection.']], icon:'ds/assets/pms/octorate.png', name:'Octorate',  bg:'#7C3AED', kind:'oauth', video:'G1cKQ3g5-3Y', site:'octorate.com' },
     { id:'other',    name:'Other\u2026',    bg:'#6B6B95', kind:'contact', video:null, site:null },
   ];
@@ -1111,10 +1125,19 @@
        help while you are trying to connect. This says what happens after. */
     /* One line of facts rather than a boxed list: two of the three bullets
        were identical on every integration, so the box was mostly furniture. */
-    /* Only the fact that differs per integration. The other two were the same
-       everywhere and the footer already promises them, so listing all three
-       here wrapped into a line that read as broken fragments. */
-    let info = p.sync ? `<p class="pc-facts">${p.sync}</p>` : '';
+    /* What this particular integration can do, off the Send back column of the
+       PMS table — the one thing that genuinely differs between them. Guesty
+       writes eleven kinds of status back and runs online check-out; Lodgify
+       writes a message and a link. A shared blurb hid exactly that. */
+    let info = '';
+    if (p.does && p.does.length){
+      info += `<aside class="pc-does"><h4>What this integration does</h4><ul>` +
+        p.does.map(d => `<li>${d}</li>`).join('') +
+        (p.checkout ? `<li class="hi">Online check-out, which most integrations cannot do</li>` : '') +
+        `</ul>${p.sync ? `<p class="pc-sync">${p.sync}</p>` : ''}</aside>`;
+    } else if (p.sync){
+      info += `<p class="pc-facts">${p.sync}</p>`;
+    }
     if (p.video){
       /* A facade, not the embed: YouTube's own poster arrives wrapped in its
          chrome and pulls its player in on every visit, for a video most people
@@ -1145,7 +1168,8 @@
        rather than declaring it in fields[], so checking p.fields stripped the
        card off a form that has one. */
     const bare = !guide.length && f.indexOf('data-pcf') === -1;
-    pmsConnect.innerHTML = `<div class="pc-form${bare ? ' bare' : ''}">${body}</div>${info}`;
+    pmsConnect.innerHTML = `<div class="pc-form${bare ? ' bare' : ''}">${body}</div>` +
+      (info ? `<div class="pc-side">${info}</div>` : '');
 
     const done = btn => { btn.classList.add('done'); btn.disabled = true; btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> ${p.name} connected`; state.pmsConnected = true; refresh(); };
     const go = $('#pcGo');
