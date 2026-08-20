@@ -1154,6 +1154,25 @@
   ];
   const REGION_SCHEME = { 'Barcelona':'Catalonia' };  // region -> sub-scheme in COUNTRIES
 
+  /* Rates per guest per night, checked against the current rules rather than
+     remembered. Barcelona is two taxes stacked, which is why it is quoted with
+     its breakdown — a host who sees 9.50 and knows the Generalitat charges
+     4.50 needs to see where the rest comes from. Verified August 2026:
+     Catalonia Llei 2/2026 in force since 1 April, Lisbon holding at 4 since
+     the September 2024 rise. These belong in a table someone maintains — a
+     tourist tax changes more often than a product does. */
+  const TAX_RATE = {
+    'Barcelona': { amount:'\u20ac9.50', note:'\u20ac4.50 Catalonia + \u20ac5.00 city surcharge' },
+    'Catalonia': { amount:'\u20ac1.75', note:'Outside Barcelona' },
+    'Balearic Islands': { amount:'\u20ac1\u2013\u20ac4', note:'By category and season' },
+    'Lisbon':    { amount:'\u20ac4.00', note:'Ages 13+, capped at 7 nights' },
+  };
+  function taxFor(c, region){
+    if (!c.tax) return null;
+    if (c.taxRegions && !c.taxRegions.includes(REGION_SCHEME[region] || region)) return null;
+    return TAX_RATE[region] || TAX_RATE[REGION_SCHEME[region]] || { amount:'', note:'' };
+  }
+
   function readPortfolio(){
     const tier = state.sizeTier == null ? 1 : state.sizeTier;
     const units = [4, 14, 60, 180][tier] || 14;
@@ -1191,13 +1210,14 @@
       /* Only where the tax is really charged. Spain lists its regions; the
          countries that levy it nationally have no taxRegions and keep the
          country-wide flag. */
-      const taxHere = c.tax && (!c.taxRegions || c.taxRegions.includes(REGION_SCHEME[r.region] || r.region));
+      const tax = taxFor(c, r.region);
       const bits = [];
       if (scheme) bits.push(`<span class="tag reg">${scheme}</span>`);
-      if (taxHere) bits.push(`<span class="tag tax">Tourist tax</span>`);
+      if (tax) bits.push(`<span class="tag tax">Tourist tax${tax.amount ? ' ' + tax.amount : ''}</span>`);
       if (!bits.length) bits.push(`<span class="tag none">No registration required</span>`);
       return `<div class="frow"><span class="fflag">${c.flag}</span>` +
-        `<span class="fplace"><b>${r.region}</b><i>${r.units} ${r.units === 1 ? 'property' : 'properties'}</i></span>` +
+        `<span class="fplace"><b>${r.region}</b><i>${r.units} ${r.units === 1 ? 'property' : 'properties'}` +
+        `${tax && tax.note ? ` \u00b7 ${tax.note}` : ''}</i></span>` +
         `<span class="ftags">${bits.join('')}</span></div>`;
     }).join('');
 
