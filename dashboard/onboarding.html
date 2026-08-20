@@ -183,6 +183,17 @@
   .pms.sel .lgimg{filter:none}
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
+  /* A finished step is a receipt, not a task — it reads back, not forward. */
+  .pl-item.is-done .t{color:var(--text-gray-dark)}
+  .pl-item .no.ok{background:var(--bg-success-light);color:var(--success);display:grid;place-items:center}
+  .pl-item .no.ok svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:3}
+  .pl-item .no.run{background:var(--bg-blue-light);position:relative}
+  .pl-item .no.run::after{content:"";position:absolute;inset:6px;border-radius:50%;border:2px solid var(--text-brand);border-top-color:transparent;animation:rot .8s linear infinite}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .pl-item .eta.ok{color:var(--success);font-weight:600}
+  .pl-item .eta.run{color:var(--text-brand);font-weight:600}
+  .r2.r2done .b svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:3}
+
   /* ── Step 2b — read from the PMS ── */
   .scan{max-width:520px}
   .scan-bar{height:4px;border-radius:2px;background:var(--stroke-gray-lighter);overflow:hidden;margin-bottom:18px}
@@ -1172,6 +1183,31 @@
     }
   }
 
+  /* The second call. The read told them what they have; this actually pulls it
+     in, and there is no reason to make anyone watch it — it starts when they
+     leave the diagnosis and runs while they answer the last question. By the
+     plan it is usually finished, which is why the plan no longer opens by
+     asking them to connect something they connected three steps ago. */
+  let importTimer = null;
+  function startImport(){
+    if (state.importing || state.imported) return;
+    state.importing = true;
+    state.importDone = 0;
+    const total = Number(state.size) || 12;
+    const tick = () => {
+      state.importDone = Math.min(total, state.importDone + Math.max(1, Math.round(total / 7)));
+      if (state.importDone >= total){
+        clearInterval(importTimer);
+        importTimer = null;
+        state.importing = false;
+        state.imported = true;
+      }
+      renderChips();
+      if (step === LAST) renderPlan();
+    };
+    importTimer = setInterval(tick, 900);
+  }
+
   let scanRan = false;
   function runScan(){
     const busy = $('#scanBusy'), found = $('#scanFound');
@@ -1537,9 +1573,17 @@
       const n = state.pms && state.pms.id !== 'other' ? state.pms.name : 'your PMS';
       /* A catalogue integration is not something the user connects, so the
          plan cannot hand them a step that says they did. */
-      steps.push(state.pms && state.pms.kind === 'catalogue'
-        ? { k:'pms', phase:'Import', t:`We set up ${n} with you`, d:`Our team completes the connection once your account is live — then your ${u} and bookings sync on their own.`, eta:2 }
-        : { k:'pms', phase:'Import', t:`Connect ${n}`, d:`Your ${u} and bookings sync automatically from day one.`, eta:2 });
+      /* Already connected and imported: this is not a task, it is a receipt.
+         Charging two minutes for it padded the total with time already
+         spent. */
+      steps.push(
+        state.pms && state.pms.kind === 'catalogue'
+          ? { k:'pms', phase:'Import', t:`We set up ${n} with you`, d:`Our team completes the connection once your account is live — then your ${u} and bookings sync on their own.`, eta:2 }
+        : state.imported
+          ? { k:'pms', phase:'Import', done:true, t:`${state.size} ${u} imported from ${n}`, d:`Bookings keep arriving on their own from here.`, eta:0 }
+        : state.importing
+          ? { k:'pms', phase:'Import', busy:true, t:`Importing your ${u} from ${n}`, d:`${state.importDone} of ${state.size} so far — it finishes on its own, you do not have to wait.`, eta:0 }
+          : { k:'pms', phase:'Import', t:`Connect ${n}`, d:`Your ${u} and bookings sync automatically from day one.`, eta:2 });
     } else if (state.manage === 'ota'){
       steps.push({ k:'ota', phase:'Import', t:'Link your Airbnb & Booking.com calendars', d:'New reservations import on their own — no PMS needed.', eta:3 });
     } else {
@@ -1587,11 +1631,22 @@
     const list = $('#planList');
     list.innerHTML = '';
     let total = 0;
+    /* Numbering counts what is left to do. Including the finished import made
+       the first thing they actually have to do "step 2". */
+    let n = 0;
     steps.forEach((s, i) => {
       total += s.eta;
+      if (!s.done && !s.busy) n += 1;
       const el = document.createElement('div');
       el.className = 'pl-item';
-      el.innerHTML = `<span class="no">${i+1}</span><div><div class="t">${s.t}</div><div class="d">${s.d}</div></div><span class="eta">~${s.eta} min</span>`;
+      el.className = 'pl-item' + (s.done ? ' is-done' : s.busy ? ' is-busy' : '');
+      const marca = s.done
+        ? `<span class="no ok"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`
+        : s.busy ? `<span class="no run"></span>` : `<span class="no">${n}</span>`;
+      const eta = s.eta ? `<span class="eta">~${s.eta} min</span>`
+        : s.done ? `<span class="eta ok">done</span>`
+        : s.busy ? `<span class="eta run">running</span>` : '';
+      el.innerHTML = `${marca}<div><div class="t">${s.t}</div><div class="d">${s.d}</div></div>${eta}`;
       list.appendChild(el);
     });
     $('#planTotal span').textContent = `You can be live in about ${total} minutes.`;
@@ -1603,10 +1658,15 @@
     const rail = $('#pvRail');
     rail.innerHTML = '';
     const SHOWN = 4;
+    /* Same numbering rule as the list it mirrors: a finished import is not
+       step 1 of what is left. */
+    let m = 0;
     steps.slice(0, SHOWN).forEach((s, i) => {
       const r = document.createElement('div');
-      r.className = 'r2' + (i === 0 ? ' first' : '');
-      r.innerHTML = `<span class="b">${i+1}</span>${s.t}`;
+      r.className = 'r2' + (i === 0 ? ' first' : '') + (s.done || s.busy ? ' r2done' : '');
+      if (!s.done && !s.busy) m += 1;
+      const b = s.done ? '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>' : s.busy ? '·' : m;
+      r.innerHTML = `<span class="b">${b}</span>${s.t}`;
       rail.appendChild(r);
     });
     /* A miniature may abbreviate; it may not do so silently. Seven steps were
@@ -1671,7 +1731,11 @@
     if (state.size) chips.push(`${state.size} ${unit()}`);
     /* "Mews sync" claims a sync that is not set up yet — the name alone is
        what we actually know. */
-    if (state.manage === 'pms') chips.push(
+    /* The import is happening behind this screen, so the chip reports it
+       rather than repeating the PMS name we already showed. */
+    if (state.importing) chips.push(`Importing ${state.importDone} of ${state.size}\u2026`);
+    else if (state.imported) chips.push(`${state.size} ${unit()} imported`);
+    else if (state.manage === 'pms') chips.push(
       !state.pms || state.pms.id === 'other' ? 'PMS sync'
       : state.pms.kind === 'catalogue' ? state.pms.name
       : `${state.pms.name} sync`);
@@ -1763,6 +1827,7 @@
     $('#btnBack').style.visibility = i > 0 ? 'visible' : 'hidden';
     $('#btnSkip').style.display = step === LAST ? 'none' : '';
     if (step === 7) runScan();
+    if (step !== 7 && state.pmsConnected) startImport();
     if (step === 4) setupPrioStep();
     if (step === LAST) renderPlan();
     refresh();
