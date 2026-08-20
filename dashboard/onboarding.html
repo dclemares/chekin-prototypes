@@ -718,36 +718,36 @@
 
   const PMS = [
     { id:'guesty',
-      sync:'Webhooks, so bookings land as Guesty pushes them. A sweep every 3 hours catches anything missed.',
+      sync:'Bookings appear as soon as they are made in Guesty. We check again every 3 hours in case one slips through.',
       imp:['Your properties and every booking','Lead guest name, email and phone','Payment items, paid and pending','Guest messages, both ways'], out:['Check-in link and registration status','Remote-access keys','ID, payment, deposit, tax and damage status','Your upselling link'], checkout:true, logo:'https://chekin.com/wp-content/uploads/2026/02/Guesty.svg',   name:'Guesty',    bg:'#0B3954', kind:'form',  video:'Z3eAVpF5xkY', site:'guesty.com',
       fields:[['integration_token','Integration Token','']],
       guide:[['Open Guesty','Go to <b>Integrations \u2192 Marketplace</b>, open the Chekin tile and press <b>Connect</b>.'],['Copy the token from the popup','Paste it here straight away \u2014 Guesty expires it four hours after it is generated.']],
        },
     { id:'hostaway',
-      sync:'Webhooks, so bookings land as Hostaway pushes them. A sweep every 3 hours catches anything missed.',
+      sync:'Bookings appear as soon as they are made in Hostaway. We check again every 3 hours in case one slips through.',
       imp:['Every booking, with price and source','Lead guest phone','Payment items, paid and pending'], out:['Check-in link and registration status','Remote-access keys','ID verification and damage status','Your upselling link'],
       guide:[['Open Hostaway','Go to <b>Settings \u2192 Hostaway API</b>. Your Account ID is on that screen.'],['Create a key','Press Create, name it and choose <b>Partner</b>. Copy the secret key before you leave \u2014 Hostaway only shows it once.']], logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-hostaway-2023.svg', name:'Hostaway',  bg:'#F5A623', kind:'form',  video:'lsqJOm-TsIg', site:'hostaway.com',
       fields:[['account_id','Account ID',''],['api_secret','API secret key','']] },
     { id:'lodgify',
-      sync:'Webhooks, so bookings land as Lodgify pushes them. A sweep every 3 hours catches anything missed.',
+      sync:'Bookings appear as soon as they are made in Lodgify. We check again every 3 hours in case one slips through.',
       imp:['Every booking, with price and language','Lead guest phone','Payment items, paid and pending','Guest messages, both ways'], out:['Check-in message, customisable per property','Remote-access link'],
       guide:[['Get your API key','In Lodgify, go to <b>Settings \u2192 Public API</b> and copy the key.']], logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-lodgify-2023.svg',  name:'Lodgify',   bg:'#5A31F4', kind:'form',  video:'4_pz38vRROM', site:'lodgify.com',
       fields:[['api_key','API key','']] },
     { id:'smoobu',
-      sync:'Webhooks, so bookings land as Smoobu pushes them. A sweep every 3 hours catches anything missed.',
+      sync:'Bookings appear as soon as they are made in Smoobu. We check again every 3 hours in case one slips through.',
       imp:['Every booking, with price and language','Lead guest email and phone','Guest messages (in development)'], out:['Check-in link and registration status','Remote-access keys','Your upselling link'],
       guide:[['Open Smoobu','Go to <b>Settings \u2192 Marketplace</b>.'],['Add Chekin','Find Chekin in the list and add it.']], logo:'https://chekin.com/wp-content/uploads/2026/02/Smoobu-logo.svg',   name:'Smoobu',    bg:'#00A699', kind:'oauth', video:'7IBjUKv70Ao', site:'smoobu.com' },
     { id:'avantio',
-      sync:'Webhooks, so bookings land as Avantio pushes them. A sweep every hour catches anything missed.',
+      sync:'Bookings appear as soon as they are made in Avantio. We check again every hour in case one slips through.',
       imp:['Your properties and every booking','Every guest on the booking, not just the lead','Lead guest email and phone','Guest messages, both ways'], out:['Check-in link','Deposit status','Invoicing client field'],
       guide:[['Ask Avantio for your API key','Request it through <b>Live Chat</b> inside your Avantio account \u2014 they reply on the same chat.']], logo:'https://chekin.com/wp-content/uploads/2023/11/Logo-avantio-2023.svg',  name:'Avantio',   bg:'#E4572E', kind:'form',  video:null, site:'avantio.com',
       fields:[['api_key','API key','']] },
     { id:'cloudbeds',
-      sync:'Webhooks, so bookings land as Cloudbeds pushes them. A sweep every 3 hours catches anything missed.',
+      sync:'Bookings appear as soon as they are made in Cloudbeds. We check again every 3 hours in case one slips through.',
       imp:['Your properties and every booking','Multi-room bookings','Lead guest, pre-created'], out:['Check-in link and registration status','Every guest\'s details onto the reservation','Remote-access keys'],
       guide:[['Authorise on Cloudbeds','We send you to Cloudbeds to approve access \u2014 nothing to copy.']], logo:'https://chekin.com/wp-content/uploads/2026/02/Cloudbeds.svg',name:'Cloudbeds', bg:'#1789FC', kind:'oauth', video:'zUlBKUhQTZY', site:'cloudbeds.com' },
     { id:'octorate',
-      sync:'Webhooks, so bookings land as Octorate pushes them. A sweep every 3 hours catches anything missed.',
+      sync:'Bookings appear as soon as they are made in Octorate. We check again every 3 hours in case one slips through.',
       imp:['Your properties and every booking','Lead guest phone'], out:['Check-in message, customisable per property','Every guest\'s details onto the reservation','Remote-access link'],
       guide:[['Sign in to Octorate','We send you to Octorate to sign in and confirm the connection.']], icon:'ds/assets/pms/octorate.png', name:'Octorate',  bg:'#7C3AED', kind:'oauth', video:'G1cKQ3g5-3Y', site:'octorate.com' },
     { id:'other',    name:'Other\u2026',    bg:'#6B6B95', kind:'contact', video:null, site:null },
@@ -1026,6 +1026,9 @@
   /* A wordmark says the brand better than its initial does, so it replaces the
      name rather than sitting beside it — printing both would say it twice.
      Everything without one keeps the monogram the grid already used. */
+  /* Cloudbeds already ends in an s, and "Cloudbeds's" is not a word. */
+  function poss(n){ return /s$/i.test(n) ? n + "\u2019" : n + "\u2019s"; }
+
   function pmsMark(p){
     if (p.logo) return `<img class="lgimg" src="${p.logo}" alt="${p.name}" loading="lazy">`;
     /* A square brand icon sits where the monogram sat, so the name stays —
@@ -1094,7 +1097,7 @@
       if (f.length === 1) return `One thing from ${p.name}: your ${f[0][1]}.`;
       return `Two things from ${p.name}: your ${f.map(x => x[1]).join(' and your ')}.`;
     },
-    oauth:   p => `Authorize Chekin in your ${p.name} account — there are no credentials to copy.`,
+    oauth:   p => `Nothing to copy — you approve it inside ${p.name} and come straight back.`,
     none:    p => `${p.name} connects without any extra credentials.`,
     consent: p => `${p.name} onboarding is partner-assisted — confirm and their team gets in touch.`,
     contact: p => `Tell us which PMS you use and our team will reach out about the integration.`,
@@ -1121,7 +1124,9 @@
       f += `<p class="pc-err" id="pcErr" role="alert"></p>`;
       f += `<button class="pc-btn" id="pcGo">Connect with ${p.name}</button>`;
     } else if (p.kind === 'oauth'){
-      f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Secure OAuth — you approve access on ${p.name}'s own site, and we never see your password.</span></div>`;
+      /* "Secure OAuth" names the mechanism, which nobody managing apartments
+         needs. What matters to them is that they type nothing here. */
+      f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>You approve this on ${poss(p.name)} own site. We never see your password.</span></div>`;
       f += `<button class="pc-btn" id="pcOauth">Connect with ${p.name} <svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></button>`;
     } else if (p.kind === 'none'){
       f += `<div class="pc-easy"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>No credentials needed — your bookings flow in automatically once connected.</span></div>`;
