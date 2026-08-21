@@ -1195,6 +1195,7 @@
     state.primary = read.rows.slice().sort((a,b) => b.units - a.units)[0].code;
     state.size = String(read.units);
     state.readAvg = read.avg;
+    state.geoFromRead = true;
   }
 
   function renderFound(read){
@@ -1305,13 +1306,26 @@
     $('#addons').classList.add('on');
   }
 
+  function scanResultCopy(){
+    $('#scanTitle').textContent = `Here is what ${state.pms ? state.pms.name : 'your PMS'} told us`;
+    $('#scanLead').textContent  = 'Straight from your account — nothing to fill in. Check it looks right and carry on.';
+  }
   let scanRan = false;
   function runScan(){
     const busy = $('#scanBusy'), found = $('#scanFound');
     const read = readPortfolio();
     applyRead(read);
     renderFound(read);
-    if (scanRan){ busy.style.display = 'none'; found.classList.add('on'); refresh(); return; }
+    /* Coming back to a read that already happened: show the result, and say so
+       — the branch used to leave the heading on "Reading your portfolio" over
+       a finished diagnosis. */
+    if (scanRan){
+      busy.style.display = 'none';
+      found.classList.add('on');
+      scanResultCopy();
+      refresh();
+      return;
+    }
     scanRan = true;
     busy.style.display = '';
     found.classList.remove('on');
@@ -1322,8 +1336,7 @@
     items.forEach((li, i) => setTimeout(() => li.classList.add('done'), 500 + i * 550));
     setTimeout(() => {
       busy.style.display = 'none';
-      $('#scanTitle').textContent = `Here is what ${state.pms ? state.pms.name : 'your PMS'} told us`;
-      $('#scanLead').textContent  = 'Straight from your account — nothing to fill in. Check it looks right and carry on.';
+      scanResultCopy();
       found.classList.add('on');
       refresh();
     }, 2100);
@@ -1370,10 +1383,33 @@
      the search turned up — so marking it has to sweep both, or picking a
      result leaves the card above it still looking chosen. */
   function choosePms(p){
+    /* A connection belongs to one PMS. Swapping the choice used to leave
+       pmsConnected true, so the flow skipped the connect step for a PMS that
+       was never connected and then showed the previous one's read — "here is
+       what Lodgify told us" on a screen where Smoobu had just been picked. */
+    if (state.pms && state.pms.id !== p.id) forgetConnection();
     $$('.pms').forEach(x => x.classList.toggle('sel', x.dataset.pms === p.id));
     state.pms = p;
     renderPmsConnect(p);
     refresh();
+  }
+
+  /* Everything downstream of a connection: the connection itself, the read it
+     produced, the import it started and the manual override someone may have
+     chosen instead of it. */
+  function forgetConnection(){
+    state.pmsConnected = false;
+    state.manualGeo = false;
+    state.importing = false; state.imported = false; state.importDone = 0;
+    if (importTimer){ clearInterval(importTimer); importTimer = null; }
+    if (state.geoFromRead){
+      state.countries = []; state.regions = []; state.primary = null;
+      state.geoFromRead = false;
+    }
+    scanRan = false;
+    const found = $('#scanFound'), busy = $('#scanBusy');
+    if (found) found.classList.remove('on');
+    if (busy) busy.style.display = '';
   }
   PMS.forEach(p => pmsGrid.appendChild(pmsCard(p)));
 
@@ -1597,7 +1633,7 @@
       c.classList.add('sel');
       state.manage = c.dataset.manage;
       $('#pmsPick').classList.toggle('on', state.manage === 'pms');
-      if (state.manage !== 'pms') { state.pms = null; state.pmsConnected = false; $$('.pms').forEach(x => x.classList.remove('sel')); renderPmsConnect(null); }
+      if (state.manage !== 'pms') { forgetConnection(); state.pms = null; $$('.pms').forEach(x => x.classList.remove('sel')); renderPmsConnect(null); }
       refresh();
       /* Choosing PMS opens the list of them below the fold — same as step 1's
          follow-ups, and with Continue pushed out of sight behind it. */
@@ -1988,6 +2024,13 @@
         size: state.size, sizeTier: state.sizeTier,
         manage: state.manage,
         pms: state.pms ? state.pms.id : null,
+        /* Without these, leaving from the read and coming back landed on step
+           one: flow() saw no connection, step 7 was not in it, and show()
+           fell through to the first panel. */
+        pmsConnected: !!state.pmsConnected,
+        geoFromRead: !!state.geoFromRead,
+        manualGeo: !!state.manualGeo,
+        imported: !!state.imported,
         prios: state.prios
       }));
     } catch(e){}
@@ -2011,6 +2054,24 @@
     if (p.manage){
       const mc = document.querySelector(`.card.manage[data-manage="${p.manage}"]`);
       if (mc) mc.click();
+    }
+    if (p.pms){
+      const chosen = PMS.concat(PMS_MORE).find(x => x.id === p.pms);
+      /* choosePms would call forgetConnection on the way in, so the flags are
+         put back after it, not before. */
+      if (chosen) choosePms(chosen);
+      state.pmsConnected = !!p.pmsConnected;
+      state.geoFromRead = !!p.geoFromRead;
+      state.manualGeo = !!p.manualGeo;
+      state.imported = !!p.imported;
+      if (state.pmsConnected){
+        scanRan = true;   // the read already happened; do not replay the scan
+        const btn = document.querySelector('#pmsConnect .pc-btn');
+        if (btn && state.pms){
+          btn.classList.add('done'); btn.disabled = true;
+          btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> ${state.pms.name} connected`;
+        }
+      }
     }
     (p.prios || []).forEach(k => {
       const pc = document.querySelector(`.card.prio[data-prio="${k}"]`);
