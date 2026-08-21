@@ -183,44 +183,48 @@
   .pms.sel .lgimg{filter:none}
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
-  .zone{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:6px;overflow:hidden}
-  .zhead{display:grid;grid-template-columns:30px 1fr 18px;gap:11px;align-items:center;width:100%;padding:11px 14px;background:none;border:0;cursor:pointer;text-align:left}
+  .zone{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:5px;overflow:hidden}
   .zshield{width:30px;height:30px;border-radius:9px;background:var(--bg-blue-light);display:grid;place-items:center}
   .zshield svg{width:15px;height:15px;stroke:var(--text-brand);fill:none;stroke-width:2}
   .ztitle b{display:block;font:600 13.5px var(--font-primary);color:var(--text-dark)}
   .ztitle i{font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
-  .zchev svg{width:14px;height:14px;stroke:var(--text-gray-medium);fill:none;stroke-width:2.4;transition:transform .18s}
-  .zone.open .zchev svg{transform:rotate(180deg)}
-  .zbody{display:none;padding:0 14px 12px 55px}
-  .zone.open .zbody{display:block}
-  .zsets{border-top:1px solid var(--stroke-gray-lighter);padding-top:10px}
-  .zset{display:grid;grid-template-columns:17px auto 1fr;gap:9px;align-items:center;margin-bottom:7px;font:600 12.5px var(--font-primary);color:var(--text-dark);cursor:pointer}
-  .zset i{font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
-  .zset input{margin:0;accent-color:var(--text-brand);width:15px;height:15px}
-  .zset.locked,.zset.off{cursor:default}
-  .zset .lock{width:15px;height:15px;border-radius:4px;background:var(--success);display:grid;place-items:center}
-  .zset .lock svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3.4}
-  .zset .dash{color:var(--stroke-gray-medium);text-align:center;font-weight:700}
-  .zset.off{color:var(--text-gray-medium)}
-  .zdetail{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:11px;padding-top:10px;border-top:1px solid var(--stroke-gray-lighter)}
-  .zdetail h6{font:600 11px var(--font-primary);color:var(--text-gray-medium);margin:0 0 6px}
-  .zreq ul{margin:0;padding:0;list-style:none}
-  .zreq li{position:relative;padding-left:16px;margin-bottom:4px;font:400 12px/16px var(--font-primary);color:var(--text-gray-dark)}
-  .zreq li::before{content:"";position:absolute;left:0;top:5px;width:9px;height:6px;border-left:1.8px solid var(--success);border-bottom:1.8px solid var(--success);transform:rotate(-45deg)}
-  .zk{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:4px;font:400 12px var(--font-primary);color:var(--text-gray-dark)}
-  .zk b{font:600 11px var(--font-primary);background:var(--bg-neutral-light);border-radius:99px;padding:2px 8px;white-space:nowrap}
-  @media (max-width:640px){ .zdetail{grid-template-columns:1fr} .zbody{padding-left:14px} }
 
-  .addons{display:none;margin-top:16px}
+  .zhead2{display:grid;grid-template-columns:30px 1fr;gap:11px;align-items:center;padding:10px 14px 0}
+  .zreqline{margin:5px 14px 0 55px;padding:0;font:400 11.5px/16px var(--font-primary);color:var(--text-gray-dark)}
+  .zreqline b{font:700 10px var(--font-primary);color:var(--text-gray-medium);text-transform:uppercase;letter-spacing:.05em;margin-right:5px}
+  .fxs{padding:4px 14px 9px}
+  .fx{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:3px 0;border-top:1px solid var(--stroke-gray-lighter)}
+  .fx:first-child{border-top:0}
+  .fx-main{display:grid;grid-template-columns:16px auto 1fr;gap:9px;align-items:center;cursor:pointer;min-width:0}
+  .fx.off .fx-main{cursor:default}
+  .fx input{margin:0;accent-color:var(--text-brand);width:15px;height:15px}
+  .fx-lock{width:15px;height:15px;border-radius:4px;background:var(--success);display:grid;place-items:center}
+  .fx-lock svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3.4}
+  .fx-dash{color:var(--stroke-gray-medium);text-align:center;font-weight:700}
+  .fx-t{font:600 12.5px var(--font-primary);color:var(--text-dark);white-space:nowrap}
+  .fx-n{font:400 12px var(--font-primary);color:var(--text-gray-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fx.off .fx-t{color:var(--text-gray-medium)}
+  .fx-set{background:none;border:0;padding:2px 4px;cursor:pointer;font:600 12px var(--font-primary);color:var(--text-brand);flex-shrink:0}
+  .fx-set.open{text-decoration:underline}
+  .zsettings{margin:0 14px 12px;padding:11px 13px;border-radius:10px;background:var(--bg-blue-light)}
+  .zsettings[hidden]{display:none}
+  .zs{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .zs span{font:600 12px var(--font-primary);color:var(--text-dark)}
+  .zs select{height:30px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
+    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 8px;max-width:60%}
+  .zs-note{margin:2px 0 0;font:400 11.5px var(--font-primary);color:var(--text-gray-medium)}
+  @media (max-width:640px){ .fx{flex-wrap:wrap} .fx-n{white-space:normal} }
+
+  .addons{display:none;margin-top:12px}
   .addons.on{display:block;animation:stepIn .3s ease}
-  .ad-h{font:600 12.5px var(--font-primary);color:var(--text-dark);margin-bottom:8px}
-  .ad{display:grid;grid-template-columns:18px 1fr auto;gap:11px;align-items:start;padding:11px 14px;cursor:pointer;
+  .ad-h{font:600 12px var(--font-primary);color:var(--text-gray-medium);margin-bottom:5px}
+  .ad{display:grid;grid-template-columns:18px 1fr auto;gap:11px;align-items:center;padding:8px 14px;cursor:pointer;
     border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:7px;transition:border-color .12s}
   .ad:hover{border-color:var(--stroke-gray-medium)}
   .ad:has(input:checked){border-color:var(--text-brand);background:var(--bg-blue-light)}
   .ad input{margin:2px 0 0;accent-color:var(--text-brand);width:16px;height:16px}
   .ad-b b{display:block;font:600 13px var(--font-primary);color:var(--text-dark)}
-  .ad-b i{font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark);font-style:normal}
+  .ad-b i{font:400 12px/16px var(--font-primary);color:var(--text-gray-dark);font-style:normal}
   .ad-why{font:600 11px var(--font-primary);color:var(--text-gray-medium);white-space:nowrap;padding-top:2px}
   .ad-why.ask{color:var(--text-brand)}
   @media (max-width:640px){ .ad{grid-template-columns:18px 1fr} .ad-why{grid-column:2;padding-top:4px} }
@@ -255,7 +259,7 @@
     border-radius:var(--radius-lg);background:var(--bg-blue-light);font:400 13px var(--font-primary);color:var(--text-dark)}
   .backtoread[hidden]{display:none}
   .found{max-width:704px}
-  .found-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px}
+  .found-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:10px}
   .found-n b{font:700 22px var(--font-primary);color:var(--text-dark)}
   .found-n span{font:400 14px var(--font-primary);color:var(--text-gray-dark);margin-left:8px}
   .linkish{background:none;border:0;padding:0;cursor:pointer;font:600 13px var(--font-primary);color:var(--text-brand)}
@@ -449,7 +453,7 @@
   .achip .lg{width:16px;height:16px;border-radius:5px;display:grid;place-items:center;color:#fff;font:800 9px var(--font-primary)}
 
   /* Footer nav */
-  .cfoot{display:flex;align-items:center;gap:12px;padding-top:36px;margin-top:auto}
+  .cfoot{display:flex;align-items:center;gap:12px;padding-top:28px;margin-top:auto}
   /* Nothing is wrong here — a choice is simply missing — so this is the warn
      register, not the error one. A grey button never said which choice. */
   .needs{display:none;margin:0;padding:8px 12px;border-radius:8px;background:var(--warn-bg);
@@ -1224,20 +1228,30 @@
      Where we do not hold the retention it is left out rather than guessed —
      an invented retention period is a worse lie than a missing one. */
   const COMPLY = {
-    'SES.HOSPEDAJES': {
-      req:['Reporting to SES Hospedajes','Government ID or passport','Official document data retention'],
-      keep:[['Document data','3 years'],['Identity data','Deleted after validation'],['Form data','3 years']] },
-    "Mossos d'Esquadra": {
-      req:["Reporting to the Mossos d'Esquadra",'Government ID or passport','Official document data retention'],
-      keep:[['Document data','3 years'],['Identity data','Deleted after validation'],['Form data','3 years']] },
-    'SIBA / AIMA': {
-      req:['Reporting to SIBA / AIMA','Government ID or passport'], keep:null },
-    'Alloggiati Web': {
-      req:['Reporting to Alloggiati Web','Government ID or passport'], keep:null },
-    'Gästeblatt':   { req:['Reporting to the Gästeblatt','Government ID or passport'], keep:null },
-    'eVisitor':     { req:['Reporting to eVisitor','Government ID or passport'], keep:null },
-    'Meldeschein':  { req:['Reporting to the Meldeschein','Government ID or passport'], keep:null },
+    'SES.HOSPEDAJES':   { req:'Report every guest \u00b7 government ID \u00b7 keep records 3 years' },
+    "Mossos d'Esquadra":{ req:'Report every guest \u00b7 government ID \u00b7 keep records 3 years' },
+    'SIBA / AIMA':      { req:'Report every guest \u00b7 government ID' },
+    'Alloggiati Web':   { req:'Report every guest within 24h \u00b7 government ID' },
+    'G\u00e4steblatt':      { req:'Report every guest \u00b7 government ID' },
+    'eVisitor':         { req:'Report every guest \u00b7 government ID' },
+    'Meldeschein':      { req:'Report every guest \u00b7 government ID' },
   };
+
+  /* The settings someone might want to change for one group and not another.
+     Two per feature: enough to be a real setting, few enough to stay readable
+     inside the card. */
+  const FEATURE_SETS = {
+    police: [
+      { k:'when', t:'Send to the authorities', opts:['As soon as check-in is done','The evening before arrival'] },
+      { k:'who',  t:'Who gets reported',       opts:['Every guest','Adults only'] } ],
+    id: [
+      { k:'who',  t:'Who is verified',   opts:['Every guest','Lead guest only'] },
+      { k:'docs', t:'Documents accepted', opts:['Passport, ID card and licence','Passport and ID card'] } ],
+    tax: [
+      { k:'when', t:'Charged',   opts:['With the check-in payment','On arrival, at the property'] },
+      { k:'kids', t:'Exemptions', opts:['Apply local age exemptions','Charge every guest'] } ],
+  };
+
 
   function taxFor(c, region){
     if (!c.tax) return null;
@@ -1296,41 +1310,79 @@
     if (!state.zoneTax) state.zoneTax = {};
     zonas.forEach(z => { if (z.tax && state.zoneTax[z.key] === undefined) state.zoneTax[z.key] = true; });
 
-    $('#foundRows').innerHTML = zonas.map((z, i) => {
+    /* Everything that matters is on the face of the card: what the law asks
+       for, what we recommend, and a switch for each. Settings are one click
+       in, because most people never change them — but when they do it is for
+       one group and not another, which is why they live here. */
+    if (!state.zoneFeat) state.zoneFeat = {};
+    zonas.forEach(z => {
+      if (!state.zoneFeat[z.key]) state.zoneFeat[z.key] = { id:true, sets:{} };
+    });
+
+    /* Wire the DOM by index, not by key: the key is "scheme|amount", so using
+       it with a pipe separator split "Mossos d'Esquadra|\u20ac9.50|tax" into the
+       wrong three pieces and the settings drawer opened empty. */
+    const featRow = (z, zi, kind, on, locked, label, note) => {
+      const dis = locked ? 'disabled' : '';
+      const box = locked
+        ? `<span class="fx-lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`
+        : `<input type="checkbox" data-zi="${zi}" data-kind="${kind}" ${on ? 'checked' : ''} ${dis}>`;
+      return `<div class="fx${on ? ' on' : ''}">
+        <label class="fx-main">${box}<span class="fx-t">${label}</span><span class="fx-n">${note}</span></label>
+        ${FEATURE_SETS[kind] ? `<button type="button" class="fx-set" data-zi="${zi}" data-kind="${kind}">Settings</button>` : ''}
+      </div>`;
+    };
+
+    $('#foundRows').innerHTML = zonas.map((z, zi) => {
       const cm = COMPLY[z.scheme];
-      const req = cm ? cm.req.map(x => `<li>${x}</li>`).join('') : '';
-      const keep = cm && cm.keep
-        ? `<div class="zkeep"><h6>Retention policy</h6>` +
-          cm.keep.map(k => `<div class="zk"><span>${k[0]}</span><b>${k[1]}</b></div>`).join('') + `</div>`
-        : '';
-      const taxRow = z.tax
-        ? `<label class="zset"><input type="checkbox" data-ztax="${z.key}" ${state.zoneTax[z.key] ? 'checked' : ''}>
-             <span>Tourist tax</span><i>${z.tax.amount} per guest, per night${z.tax.note ? ' \u00b7 ' + z.tax.note : ''}</i></label>`
-        : `<div class="zset off"><span class="dash">—</span><span>Tourist tax</span><i>Not charged where these properties are</i></div>`;
-      const policeRow = z.scheme
-        ? `<div class="zset locked"><span class="lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
-             <span>Police reporting</span><i>Required by law \u2014 cannot be switched off</i></div>`
-        : `<div class="zset off"><span class="dash">\u2014</span><span>Police reporting</span><i>No guest registration required here</i></div>`;
-      return `<div class="zone${i === 0 ? ' open' : ''}">
-        <button type="button" class="zhead" data-zone="${i}">
+      const F = state.zoneFeat[z.key];
+      const filas = [];
+      if (z.scheme) filas.push(featRow(z, zi, 'police', true, true, 'Police reporting', 'Required by law'));
+      filas.push(featRow(z, zi, 'id', F.id, false, 'Guest ID verification', 'We recommend it — not required here'));
+      if (z.tax) filas.push(featRow(z, zi, 'tax', state.zoneTax[z.key], false, 'Tourist tax',
+        `${z.tax.amount} per guest, per night`));
+      else filas.push(`<div class="fx off"><span class="fx-main"><span class="fx-dash">\u2014</span><span class="fx-t">Tourist tax</span><span class="fx-n">Not charged where these properties are</span></span></div>`);
+      return `<div class="zone" data-zk="${z.key}">
+        <div class="zhead2">
           <span class="zshield"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg></span>
-          <span class="ztitle"><b>${z.scheme || 'No registration'}</b><i>${z.flag} ${z.places.join(', ')} \u00b7 ${z.units} ${z.units === 1 ? 'property' : 'properties'}</i></span>
-          <span class="zchev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
-        </button>
-        <div class="zbody">
-          <div class="zsets">${policeRow}${taxRow}</div>
-          ${req || keep ? `<div class="zdetail">${req ? `<div class="zreq"><h6>Requirements</h6><ul>${req}</ul></div>` : ''}${keep}</div>` : ''}
+          <span class="ztitle"><b>${z.scheme || 'No registration required'}</b><i>${z.flag} ${z.places.join(', ')} \u00b7 ${z.units} ${z.units === 1 ? 'property' : 'properties'}</i></span>
         </div>
+        ${cm ? `<p class="zreqline"><b>Required here</b> ${cm.req}</p>` : ''}
+        <div class="fxs">${filas.join('')}</div>
+        <div class="zsettings" hidden></div>
       </div>`;
     }).join('');
 
-    $$('#foundRows .zhead').forEach(h => h.addEventListener('click', () => {
-      h.closest('.zone').classList.toggle('open');
-    }));
-    $$('#foundRows [data-ztax]').forEach(i => i.addEventListener('change', e => {
-      e.stopPropagation();
-      state.zoneTax[e.target.dataset.ztax] = e.target.checked;
+    $$('#foundRows [data-zi]').forEach(i => i.addEventListener('change', e => {
+      if (e.target.tagName !== 'INPUT') return;
+      const k = zonas[+e.target.dataset.zi].key, kind = e.target.dataset.kind;
+      if (kind === 'tax') state.zoneTax[k] = e.target.checked;
+      else state.zoneFeat[k][kind] = e.target.checked;
+      e.target.closest('.fx').classList.toggle('on', e.target.checked);
       refresh();
+    }));
+
+    $$('#foundRows .fx-set').forEach(b => b.addEventListener('click', () => {
+      const zk = zonas[+b.dataset.zi].key, kind = b.dataset.kind;
+      const zona = b.closest('.zone');
+      const box = zona.querySelector('.zsettings');
+      const abierto = box.dataset.kind === kind && !box.hidden;
+      $$('#foundRows .fx-set').forEach(x => x.classList.remove('open'));
+      if (abierto){ box.hidden = true; box.dataset.kind = ''; return; }
+      const F = state.zoneFeat[zk];
+      box.dataset.kind = kind;
+      box.hidden = false;
+      b.classList.add('open');
+      box.innerHTML = FEATURE_SETS[kind].map(sp => {
+        const cur = (F.sets[kind] && F.sets[kind][sp.k]) || sp.opts[0];
+        return `<div class="zs"><span>${sp.t}</span><select data-zi="${b.dataset.zi}" data-kind="${kind}" data-field="${sp.k}">` +
+          sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select></div>`;
+      }).join('') + `<p class="zs-note">Applies to the ${zonas[+b.dataset.zi].units} properties in this group only.</p>`;
+      box.querySelectorAll('select[data-field]').forEach(sel => sel.addEventListener('change', e => {
+        const k = zonas[+e.target.dataset.zi].key, kd = e.target.dataset.kind, field = e.target.dataset.field;
+        state.zoneFeat[k].sets[kd] = state.zoneFeat[k].sets[kd] || {};
+        state.zoneFeat[k].sets[kd][field] = e.target.value;
+      }));
     }));
 
     renderAddons(read);
@@ -1377,12 +1429,8 @@
     const many = read.units >= 20;
     const pricey = read.avg >= 180;
     return [
-      /* Not a legal requirement anywhere we operate — it is what makes the
-         legal part run without anyone touching it, which is a different and
-         better argument than pretending it is mandatory. */
-      { k:'id', t:'Guest ID verification',
-        d:`Checks the document itself, so what goes to the police is right the first time${many ? ` \u2014 across all ${read.units} properties` : ''}.`,
-        why:'Always recommended' },
+      /* ID verification now lives inside each zone, where it can be set per
+         group — repeating it here would be the same switch in two places. */
       { k:'protect', t:'Deposits and damage waivers',
         d:pricey
           ? `At ${read.avg}\u20ac a night a damaged flat costs more than a deposit covers, so the waiver takes the rest.`
@@ -1418,7 +1466,7 @@
 
   function scanResultCopy(){
     $('#scanTitle').textContent = `Here is what ${state.pms ? state.pms.name : 'your PMS'} told us`;
-    $('#scanLead').textContent  = 'Straight from your account — nothing to fill in. Check it looks right and carry on.';
+    $('#scanLead').textContent  = 'Straight from your account. Check it looks right and carry on.';
   }
   let scanRan = false;
   function runScan(){
@@ -1857,15 +1905,28 @@
     if (ad.locks) steps.push({ k:'locks', phase:'Protect', t:'Connect your smart locks',
       d:'The code goes out with the check-in link, only once the guest is verified.', eta:3 });
 
-    // One police step per regulated country — schemes differ, credentials differ
-    // The main market goes first: that's where being non-compliant costs most.
-    state.countries.filter(c => c.reg)
-      .sort((a, b) => (b.code === state.primary) - (a.code === state.primary))
-      .forEach(c => {
-      const mine = (c.subs || []).map(sb => sb.n).filter(n => state.regions.includes(n));
-      const extra = mine.length ? ' + ' + mine.join(', ') : '';
-      steps.push({ k:'police', phase:'Legal', t:`Police reporting — ${c.scheme}`, d:`${c.name}${extra} — every guest submitted automatically, within the legal deadline.`, eta:4, scheme:c.scheme, country:c.name });
-    });
+    /* One police step per zone, so the plan names the same schemes the
+       diagnosis just named. Grouping by country instead printed
+       "SES.HOSPEDAJES — Spain + Catalonia" one screen after telling them
+       Barcelona reports to Mossos. Biggest group first: that is where being
+       non-compliant costs most. */
+    const zonasReg = (state.zones || []).filter(z => z.scheme);
+    if (zonasReg.length){
+      zonasReg.slice().sort((a, b) => b.units - a.units).forEach(z => {
+        steps.push({ k:'police', phase:'Legal', t:`Police reporting — ${z.scheme}`,
+          d:`${z.places.join(', ')} · ${z.units} ${unit()} — every guest submitted automatically, within the legal deadline.`,
+          eta:4, scheme:z.scheme, country:z.country });
+      });
+    } else {
+      // No read to group by (manual setup): fall back to one step per country.
+      state.countries.filter(c => c.reg)
+        .sort((a, b) => (b.code === state.primary) - (a.code === state.primary))
+        .forEach(c => {
+        const mine = (c.subs || []).map(sb => sb.n).filter(n => state.regions.includes(n));
+        const extra = mine.length ? ' + ' + mine.join(', ') : '';
+        steps.push({ k:'police', phase:'Legal', t:`Police reporting — ${c.scheme}`, d:`${c.name}${extra} — every guest submitted automatically, within the legal deadline.`, eta:4, scheme:c.scheme, country:c.name });
+      });
+    }
     if (anyTax() && taxOn()) steps.push({ k:'tax', phase:'Legal', t:'Enable tourist tax auto-calculation', d:'Calculated and collected per stay, per your local rates.', eta:2 });
     if (state.prios.includes('ops')){
       steps.push({ k:'ops', phase:'Operations', t:'Set up your operations hub', d:'Guest inbox, smart locks, and cleaning turnovers that schedule themselves.', eta:6 });
@@ -1889,7 +1950,10 @@
     const a = state.addons || {};
     if (a.protect) on.push('protect');
     if (a.locks) on.push('locks');
-    if (a.id === false) return [...new Set(on)].filter(k => k !== 'id');
+    const zonasConId = !state.zones || !state.zones.length
+      ? true
+      : state.zones.some(z => state.zoneFeat && state.zoneFeat[z.key] && state.zoneFeat[z.key].id);
+    if (!zonasConId) return [...new Set(on)].filter(k => k !== 'id');
     return [...new Set(on)];
   }
   const APPS = {
