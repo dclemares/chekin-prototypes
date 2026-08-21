@@ -215,6 +215,21 @@
   .zs-note{margin:2px 0 0;font:400 11.5px var(--font-primary);color:var(--text-gray-medium)}
   @media (max-width:640px){ .fx{flex-wrap:wrap} .fx-n{white-space:normal} }
 
+  .fx-tag{flex-shrink:0;font:600 10.5px var(--font-primary);color:var(--text-gray-medium);text-transform:uppercase;
+    letter-spacing:.04em;background:var(--bg-gray-light);border-radius:20px;padding:3px 9px;white-space:nowrap}
+
+  /* The grouping screen: places and counts only. What each group has to do is
+     the next screen's job — saying it twice made the first one redundant. */
+  .grp-why{margin:0 0 10px;font:400 13px/19px var(--font-primary);color:var(--text-gray-dark);max-width:60ch}
+  .grp{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:center;padding:11px 14px;
+    border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:7px}
+  .grp-flag{font-size:19px;line-height:1}
+  .grp-t b{display:block;font:600 13.5px var(--font-primary);color:var(--text-dark)}
+  .grp-t i{font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  .grp-n{font:600 13px var(--font-primary);color:var(--text-dark);white-space:nowrap}
+
+  #railSteps .rstep[hidden]{display:none}
+
   .addons{display:none;margin-top:12px}
   .addons.on{display:block;animation:stepIn .3s ease}
   .ad-h{font:600 12px var(--font-primary);color:var(--text-gray-medium);margin-bottom:5px}
@@ -506,8 +521,9 @@
     <div class="steps" id="railSteps">
       <div class="rstep" data-s="1"><span class="bub">1</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
       <div class="rstep" data-s="2"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">Read from your PMS where we can.</div></div></div>
-      <div class="rstep" data-s="3"><span class="bub">3</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
-      <div class="rstep" data-s="4"><span class="bub">4</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
+      <div class="rstep" data-s="3" id="railLegal" hidden><span class="bub">3</span><div class="txt"><div class="t">Legal compliance</div><div class="d">Set per group, ready to change.</div></div></div>
+      <div class="rstep" data-s="4"><span class="bub">4</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
+      <div class="rstep" data-s="5"><span class="bub">5</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
     </div>
     <div class="plan-so-far">
       <div class="h">Your setup so far</div>
@@ -632,6 +648,16 @@
             <div class="found-n"><b id="foundUnits">—</b><span id="foundWhere">—</span></div>
             <button type="button" class="linkish" id="scanManual">Not right? Set it manually</button>
           </div>
+          <p class="grp-why">We put them into groups by where they are, because the rules change from one region to the next. Each group is set up on its own in the next step.</p>
+          <div class="grps" id="groupRows"></div>
+        </div>
+      </section>
+
+      <!-- STEP 3 · What each group has to do -->
+      <section class="panel" data-panel="8">
+        <h1 id="cmpTitle">One set of rules per group</h1>
+        <p class="lead">Already switched on the way we would set it up. Change anything that does not fit.</p>
+        <div class="found">
           <div class="found-rows" id="foundRows"></div>
           <div class="found-tip reveal" id="foundTip"></div>
 
@@ -924,7 +950,7 @@
   let step = 1;
   const TOTAL = 5;
   const LAST = 5;
-  const RAIL_OF = { 3:1, 6:1, 7:2, 1:2, 4:3, 5:4 };
+  const RAIL_OF = { 3:1, 6:1, 7:2, 1:2, 8:3, 4:4, 5:5 };
   /* Bookings first: it is the longest step and the only one that imports
      anything, so getting the PMS authorising early leaves it syncing in the
      background while the shorter questions get answered. */
@@ -939,7 +965,7 @@
   function flow(){
     const connectable = state.manage === 'pms' && state.pms && state.pms.kind !== 'catalogue';
     if (!connectable) return [3,1,4,5];
-    if (state.pmsConnected && !state.manualGeo) return [3,6,7,4,5];
+    if (state.pmsConnected && !state.manualGeo) return [3,6,7,8,4,5];
     return [3,6,1,4,5];
   }
 
@@ -1240,10 +1266,9 @@
   /* The settings someone might want to change for one group and not another.
      Two per feature: enough to be a real setting, few enough to stay readable
      inside the card. */
+  /* No police entry: reporting is set up once the credentials are filed with
+     the authority, so the row carries a "Set up later" tag and no dropdown. */
   const FEATURE_SETS = {
-    police: [
-      { k:'when', t:'Send to the authorities', opts:['As soon as check-in is done','The evening before arrival'] },
-      { k:'who',  t:'Who gets reported',       opts:['Every guest','Adults only'] } ],
     id: [
       { k:'who',  t:'Who is verified',   opts:['Every guest','Lead guest only'] },
       { k:'docs', t:'Documents accepted', opts:['Passport, ID card and licence','Passport and ID card'] } ],
@@ -1284,9 +1309,10 @@
     const byCode = c => COUNTRIES.find(x => x.code === c);
     const paises = [...new Set(read.rows.map(r => r.code))];
     $('#foundUnits').textContent = read.units + (read.units === 1 ? ' property' : ' properties');
-    $('#foundWhere').textContent = paises.length === 1
+    const donde = paises.length === 1
       ? 'all in ' + byCode(paises[0]).name
       : 'across ' + paises.length + ' countries';
+    $('#foundWhere').textContent = donde + ` \u00b7 \u20ac${read.avg} average night`;
 
     /* Grouped by the scheme each place answers to, not by country: Madrid and
        Valencia share SES.HOSPEDAJES, Barcelona reports to the Mossos instead.
@@ -1300,7 +1326,7 @@
       const key = (scheme || 'none') + '|' + (tax ? tax.amount : '');
       let z = zonas.find(x => x.key === key);
       if (!z){
-        z = { key, scheme, tax, flag:c.flag, country:c.name, places:[], units:0 };
+        z = { key, scheme, tax, flag:c.flag, country:c.name, places:[], units:0, regional: !!sub };
         zonas.push(z);
       }
       z.places.push(r.region);
@@ -1319,17 +1345,32 @@
       if (!state.zoneFeat[z.key]) state.zoneFeat[z.key] = { id:true, sets:{} };
     });
 
+    /* The first screen shows the grouping and nothing else: which places we
+       put together and how many properties are in each. */
+    $('#groupRows').innerHTML = zonas.map(z => `
+      <div class="grp">
+        <span class="grp-flag">${z.flag}</span>
+        <span class="grp-t"><b>${z.places.join(', ')}</b><i>${z.regional ? z.country + ' \u2014 this region has rules of its own' : z.country}</i></span>
+        <span class="grp-n">${z.units} ${z.units === 1 ? 'property' : 'properties'}</span>
+      </div>`).join('');
+
     /* Wire the DOM by index, not by key: the key is "scheme|amount", so using
        it with a pipe separator split "Mossos d'Esquadra|\u20ac9.50|tax" into the
        wrong three pieces and the settings drawer opened empty. */
-    const featRow = (z, zi, kind, on, locked, label, note) => {
+    const featRow = (z, zi, kind, on, locked, label, note, tag) => {
       const dis = locked ? 'disabled' : '';
       const box = locked
         ? `<span class="fx-lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`
         : `<input type="checkbox" data-zi="${zi}" data-kind="${kind}" ${on ? 'checked' : ''} ${dis}>`;
+      /* A tag instead of a link where there is nothing to set yet: reporting
+         needs credentials filed with the authority, which is the plan step
+         further down, not a dropdown here. */
+      const right = tag
+        ? `<span class="fx-tag">${tag}</span>`
+        : FEATURE_SETS[kind] ? `<button type="button" class="fx-set" data-zi="${zi}" data-kind="${kind}">Settings</button>` : '';
       return `<div class="fx${on ? ' on' : ''}">
         <label class="fx-main">${box}<span class="fx-t">${label}</span><span class="fx-n">${note}</span></label>
-        ${FEATURE_SETS[kind] ? `<button type="button" class="fx-set" data-zi="${zi}" data-kind="${kind}">Settings</button>` : ''}
+        ${right}
       </div>`;
     };
 
@@ -1337,7 +1378,7 @@
       const cm = COMPLY[z.scheme];
       const F = state.zoneFeat[z.key];
       const filas = [];
-      if (z.scheme) filas.push(featRow(z, zi, 'police', true, true, 'Police reporting', 'Required by law'));
+      if (z.scheme) filas.push(featRow(z, zi, 'police', true, true, 'Police reporting', 'Required by law', 'Set up later'));
       filas.push(featRow(z, zi, 'id', F.id, false, 'Guest ID verification', 'We recommend it — not required here'));
       if (z.tax) filas.push(featRow(z, zi, 'tax', state.zoneTax[z.key], false, 'Tourist tax',
         `${z.tax.amount} per guest, per night`));
@@ -2159,12 +2200,19 @@
     const i = f.indexOf(step);
     $$('.panel').forEach(p => p.classList.toggle('on', +p.dataset.panel === step));
     const rs = RAIL_OF[step];
+    /* No read, no groups to configure: the compliance step does not exist on
+       the manual path, and a rail that lists it there promises a screen that
+       never arrives. Numbering counts what is actually shown. */
+    $('#railLegal').hidden = f.indexOf(8) < 0;
+    let vis = 0;
     $$('#railSteps .rstep').forEach(r => {
       const s = +r.dataset.s;
+      if (r.hidden) return;
+      vis += 1;
       r.classList.toggle('done', s < rs);
       r.classList.toggle('active', s === rs);
       if (s < rs) r.querySelector('.bub').innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
-      else r.querySelector('.bub').textContent = s;
+      else r.querySelector('.bub').textContent = vis;
     });
     $('#cbar').style.width = ((i + 1) / f.length * 100) + '%';
     $('#btnBack').style.visibility = i > 0 ? 'visible' : 'hidden';
@@ -2175,6 +2223,10 @@
       if (puede) $('#useReadPms').textContent = state.pms.name;
     }
     if (step === 7) runScan();
+    /* Resumed straight into the compliance step: the read ran in an earlier
+       session, not in this page load, so the groups it configures would not
+       exist. Replay the result, not the animation. */
+    if (step === 8 && !$('#foundRows').children.length){ scanRan = true; runScan(); }
     if (step !== 7 && state.pmsConnected) startImport();
     if (step === 4) setupPrioStep();
     if (step === LAST) renderPlan();
