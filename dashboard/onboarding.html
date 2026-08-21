@@ -188,7 +188,7 @@
      room for its own status, the fact that matters (who receives the report,
      the rate being charged) and its own switch. */
   .zone{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);
-    box-shadow:var(--shadow-card);margin-bottom:9px;overflow:hidden}
+    box-shadow:var(--shadow-card);margin-bottom:8px;overflow:hidden}
 
   .zhead3{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;
     padding:10px 16px;border-bottom:1px solid var(--stroke-gray-lighter);background:var(--bg-blue-light)}
@@ -282,8 +282,26 @@
   /* ───────── Property protection ─────────
      Two options instead of three, so the grid splits in half rather than
      leaving a gap where a third feature would be. */
+  /* The sell, once, above the groups: what it is for, why it pays, and
+     someone explaining it in a minute for the people who would rather watch. */
+  .psell{display:grid;grid-template-columns:1fr 228px;gap:22px;align-items:start;margin-bottom:12px}
+  .psell-t h1{margin:0 0 6px;font:700 27px/1.15 var(--font-primary);color:var(--text-dark);letter-spacing:-.025em}
+  .psell-t p{margin:0 0 9px;font:400 13.5px/20px var(--font-primary);color:var(--text-gray-dark)}
+  .psell-w{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+  .psell-w li{position:relative;padding-left:22px;font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark)}
+  .psell-w li::before{content:"";position:absolute;left:0;top:2px;width:14px;height:14px;border-radius:50%;
+    background:var(--bg-success-light);
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.4' d='M20 6 9 17l-5-5'/></svg>") center/9px no-repeat,linear-gradient(#000,#000);
+    -webkit-mask-composite:xor;mask-composite:exclude}
+  .psell-w li::after{content:"";position:absolute;left:0;top:2px;width:14px;height:14px;border-radius:50%;background:var(--success);
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.4' d='M20 6 9 17l-5-5'/></svg>") center/10px no-repeat;
+    mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.4' d='M20 6 9 17l-5-5'/></svg>") center/10px no-repeat}
+  .psell-w b{color:var(--text-dark);font-weight:700;margin-right:4px}
+  .psell .pc-video{border-radius:12px}
+  @media (max-width:760px){ .psell{grid-template-columns:1fr} }
+
   #protRows .zgrid{grid-template-columns:1fr 1fr}
-  .zpreview{margin:0;padding:6px 16px 7px;border-top:1px solid var(--stroke-gray-lighter);background:var(--bg-screen);
+  .zpreview{margin:0;padding:5px 16px 6px;border-top:1px solid var(--stroke-gray-lighter);background:var(--bg-screen);
     font:400 12px/16px var(--font-primary);color:var(--text-gray-dark)}
   .zpreview b{font-weight:700;color:var(--text-dark)}
   .zpreview.mal{background:var(--warn-bg);color:var(--text-warn)}
@@ -760,10 +778,22 @@
 
       <!-- STEP 4 · Property protection -->
       <section class="panel" data-panel="9">
-        <h1 id="prTitle">Protect your properties from damage</h1>
-        <p class="lead" id="prLead">One bad stay costs more than a month of good ones.</p>
-
         <div class="found">
+          <div class="psell">
+            <div class="psell-t">
+              <h1 id="prTitle">Protect your properties from damage</h1>
+              <p id="prLead">Things break, and the bill turns up whether you planned for it or not.</p>
+              <ul class="psell-w">
+                <li><b>Financial backup</b> Your properties are covered against what nobody saw coming.</li>
+                <li><b>Immediate charges</b> The money arrives online the moment they check in, not after you have chased it.</li>
+              </ul>
+            </div>
+            <button type="button" class="pc-video" id="prVideo" data-yt="WHgS5t5Qc6s" aria-label="Play: how damage protection works">
+              <img src="https://i.ytimg.com/vi/WHgS5t5Qc6s/maxresdefault.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/WHgS5t5Qc6s/hqdefault.jpg'">
+              <span class="pc-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="pc-vcap">How damage protection works</span>
+            </button>
+          </div>
           <div id="protRows"></div>
           <p class="grp-foot" id="prFoot"></p>
         </div>
@@ -1430,8 +1460,11 @@
     deposit: [
       { k:'amount', t:'Deposit amount', type:'num', suffix:'\u20ac', def:'200,00',
         d:'Held on the card, released after checkout.' },
-      { k:'dtype',  t:'Type of deposit', opts:['Pre-authorisation','Retention'],
-        d:'A pre-authorisation reserves the amount; a retention takes it and gives it back.' },
+      { k:'dtype',  t:'Type of deposit', opts:['Retention','Pre-authorisation'],
+        d:'A retention takes the money and gives it back; a pre-authorisation only reserves it.' },
+      { k:'drel',   t:'Days to release after check-out', type:'num', def:'7',
+        showIf:{ k:'dtype', v:'Retention' },
+        d:'When the money goes back, counting from check-out. A retention can be held for at most 30 days after it was taken.' },
       { k:'dfees',  t:'The guest pays the payment fees', type:'toggle', on:false },
       { k:'skip',   t:'Booking sources excluded', opt:true, opts:['None','Airbnb','Booking.com','Airbnb and Booking.com'] },
     ],
@@ -1536,7 +1569,10 @@
     }
     const amt = fieldValue(FEATURE_SETS.deposit[0], z, sets);
     const tip = fieldValue(FEATURE_SETS.deposit[1], z, sets);
-    return `${amt} \u20ac held on the card<div class="ft-d">${tip}, released after checkout</div>`;
+    const rel = fieldValue(FEATURE_SETS.deposit[2], z, sets);
+    return `${amt} \u20ac held on the card<div class="ft-d">${tip === 'Retention'
+      ? `Returned ${rel} ${+rel === 1 ? 'day' : 'days'} after check-out`
+      : 'Reserved on the card, released after check-out'}</div>`;
   }
 
   /* Same shape as compliance: a card per group, a switch per option and the
@@ -1576,7 +1612,7 @@
   const EXPORTABLE = {
     tax:     { t:'Apply how it is charged to the other groups', f:['exname','exrule','skip','fees'] },
     program: { t:'Apply these settings to the other groups',    f:['plan','fee','addfee','skip'] },
-    deposit: { t:'Apply these settings to the other groups',    f:['amount','dtype','dfees','skip'] },
+    deposit: { t:'Apply these settings to the other groups',    f:['amount','dtype','drel','dfees','skip'] },
     id:      { t:'Apply these settings to the other groups',    f:['method','who','when','skip','block','keep','days'] },
   };
 
@@ -1588,6 +1624,18 @@
 
   function renderProtect(){
     const zonas = protZonas();
+    /* Same facade as the connect step: a poster and our own button, with the
+       iframe built only once someone asks for it. */
+    const vid = $('#prVideo');
+    if (vid && !vid.dataset.wired){
+      vid.dataset.wired = '1';
+      vid.addEventListener('click', () => {
+        const box = document.createElement('div');
+        box.className = 'pc-video playing';
+        box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${vid.dataset.yt}?autoplay=1" title="How damage protection works" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+        vid.replaceWith(box);
+      });
+    }
     const avg = state.readAvg || null;
     $('#prLead').innerHTML = avg
       ? `At <b>\u20ac${avg} a night</b>, one bad stay costs more than a week of good ones \u2014 and the guest can carry it, not you.`
@@ -1597,11 +1645,11 @@
       const F = state.zoneFeat[z.key];
       const apagado = F.prot === 'off';
       return [
-        tile({ badge:'We recommend it', tone:'rec', title:'Damage protection', help:'program',
+        tile({ title:'Damage protection', help:'program',
           ctl:swi(zi, 'program', F.program && !apagado, apagado), off:!F.program || apagado,
           body:caraDe(z, 'program'), live:'program',
           foot: apagado ? '' : setBtn(zi, 'program') }),
-        tile({ badge:'Traditional option', title:'Security deposit', help:'deposit',
+        tile({ title:'Security deposit', help:'deposit',
           ctl:swi(zi, 'deposit', F.deposit && !apagado, apagado), off:!F.deposit || apagado,
           body:caraDe(z, 'deposit'), live:'deposit',
           foot: apagado ? '' : setBtn(zi, 'deposit') }),
@@ -1678,7 +1726,7 @@
      of properties, a feature, a switch, and settings behind it. They share
      the components so they cannot drift apart. */
   const tile = (bits) => `<div class="ft${bits.off ? ' off' : ''}">
-      <span class="ft-badge${bits.tone ? ' ' + bits.tone : ''}">${bits.badge}</span>
+      ${bits.badge ? `<span class="ft-badge${bits.tone ? ' ' + bits.tone : ''}">${bits.badge}</span>` : ''}
       <div class="ft-h"><span class="ft-t">${bits.title}</span>${bits.help
         ? `<button type="button" class="ft-q" data-help="${bits.help}" aria-label="What is this?">?</button>` : ''}${bits.ctl || ''}</div>
       <div class="ft-b" ${bits.live ? `data-live="${bits.live}"` : ''}>${bits.body}</div>
@@ -1729,9 +1777,15 @@
     $$(`${rootSel} .sw input`).forEach(i => i.addEventListener('change', e => {
       const z = zonas[+e.target.dataset.zi];
       const redibuja = toggleZona(z, e.target.dataset.kind, e.target.checked);
-      if (redibuja){ montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn, pieFn); }
-      else e.target.closest('.ft').classList.toggle('off', !e.target.checked);
-      if (alCambiar) alCambiar();
+      if (redibuja){
+        montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn, pieFn);
+        if (alCambiar) alCambiar();
+      } else {
+        e.target.closest('.ft').classList.toggle('off', !e.target.checked);
+        /* Switching an option off changes what the guest is offered, and the
+           line that states it has to move with the switch. */
+        refrescaCaras();
+      }
       renderChips();
       guardaZonas();
       refresh();
