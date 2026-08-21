@@ -274,14 +274,29 @@
 
   /* The grouping screen: places and counts only. What each group has to do is
      the next screen's job — saying it twice made the first one redundant. */
-  .grp-why{margin:0 0 10px;font:400 13px/19px var(--font-primary);color:var(--text-gray-dark);max-width:60ch}
-  .grp{display:grid;grid-template-columns:28px 1fr auto;gap:13px;align-items:center;padding:13px 16px;
+  .grp-why{margin:0 0 14px;font:400 13.5px/21px var(--font-primary);color:var(--text-gray-dark);max-width:68ch}
+  .grp-why b{color:var(--text-dark)}
+  .stats{display:flex;gap:30px;flex-wrap:wrap}
+  .stat b{font:700 24px var(--font-primary);color:var(--text-dark);letter-spacing:-.025em;margin-right:6px}
+  .stat span{font:600 13px var(--font-primary);color:var(--text-dark)}
+  .stat i{display:block;font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal;margin-top:1px}
+
+  .grp{display:grid;grid-template-columns:28px 1fr auto;gap:14px;align-items:center;padding:14px 16px;
     border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);
     box-shadow:var(--shadow-card);margin-bottom:8px}
   .grp-flag{font-size:21px;line-height:1}
-  .grp-t b{display:block;font:700 14.5px var(--font-primary);color:var(--text-dark);letter-spacing:-.01em}
-  .grp-t i{font:400 12px var(--font-primary);color:var(--text-gray-dark);font-style:normal}
-  .grp-n{font:600 12.5px var(--font-primary);color:var(--text-gray-dark);white-space:nowrap}
+  .grp-m{min-width:0}
+  .grp-m b{display:block;font:700 14.5px var(--font-primary);color:var(--text-dark);letter-spacing:-.01em}
+  .grp-m > i{display:block;font:400 12px var(--font-primary);color:var(--text-gray-dark);font-style:normal;margin-top:1px}
+  .grp-foot{margin:14px 0 0;padding-left:19px;position:relative;font:400 12.5px/18px var(--font-primary);color:var(--text-gray-medium);max-width:68ch}
+  .grp-foot::before{content:"";position:absolute;left:0;top:5px;width:9px;height:9px;border-radius:50%;
+    border:1.5px solid var(--stroke-gray-medium)}
+  .gbar{display:block;height:4px;border-radius:4px;background:var(--bg-neutral-light);margin-top:8px;max-width:270px;overflow:hidden}
+  .gbar i{display:block;height:100%;border-radius:4px;background:var(--text-brand)}
+  .grp-r{text-align:right;white-space:nowrap}
+  .grp-r b{display:block;font:700 13.5px var(--font-primary);color:var(--text-dark)}
+  .grp-r i{font:400 11.5px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  @media (max-width:640px){ .grp{grid-template-columns:28px 1fr} .grp-r{grid-column:2;text-align:left;margin-top:6px} }
 
   #railSteps .rstep[hidden]{display:none}
 
@@ -329,7 +344,7 @@
     border-radius:var(--radius-lg);background:var(--bg-blue-light);font:400 13px var(--font-primary);color:var(--text-dark)}
   .backtoread[hidden]{display:none}
   .found{max-width:704px}
-  .found-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:10px}
+  .found-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px}
   .found-n b{font:700 22px var(--font-primary);color:var(--text-dark)}
   .found-n span{font:400 14px var(--font-primary);color:var(--text-gray-dark);margin-left:8px}
   .linkish{background:none;border:0;padding:0;cursor:pointer;font:600 13px var(--font-primary);color:var(--text-brand)}
@@ -700,11 +715,12 @@
 
         <div class="found reveal" id="scanFound">
           <div class="found-head">
-            <div class="found-n"><b id="foundUnits">—</b><span id="foundWhere">—</span></div>
+            <div class="stats" id="foundStats"></div>
             <button type="button" class="linkish" id="scanManual">Not right? Set it manually</button>
           </div>
-          <p class="grp-why">We named and grouped them by where they are, because the rules change from one region to the next. <b>Next you set up each group</b> — what gets reported, who gets verified and what is charged.</p>
+          <p class="grp-why">We put them into groups by where they are, because the rules change from one region to the next. <b>Next you set up each group</b> — what gets reported, who gets verified and what is charged.</p>
           <div class="grps" id="groupRows"></div>
+          <p class="grp-foot" id="grpFoot"></p>
         </div>
       </section>
 
@@ -1279,11 +1295,15 @@
      rate) and then the full import. The read is what earns the moment — it
      tells someone their own situation before they have typed anything. Here
      it is simulated, scaled off the portfolio size given at registration. */
+  /* rate is that region's nightly price against the portfolio average. A read
+     that returns where the properties are but not what they charge leaves the
+     groups looking interchangeable, and they are not: Barcelona both costs
+     more and is taxed more. */
   const READ_SHAPE = [
-    { code:'ES', region:'Madrid',    share:.42 },
-    { code:'ES', region:'Barcelona', share:.23 },
-    { code:'ES', region:'Valencia',  share:.15 },
-    { code:'PT', region:'Lisbon',    share:.20 },
+    { code:'ES', region:'Madrid',    share:.42, rate:1.00 },
+    { code:'ES', region:'Barcelona', share:.23, rate:1.35 },
+    { code:'ES', region:'Valencia',  share:.15, rate:0.78 },
+    { code:'PT', region:'Lisbon',    share:.20, rate:1.10 },
   ];
   const REGION_SCHEME = { 'Barcelona':'Catalonia' };  // region -> sub-scheme in COUNTRIES
 
@@ -1426,6 +1446,7 @@
     const tier = state.sizeTier == null ? 1 : state.sizeTier;
     const units = [4, 14, 60, 180][tier] || 14;
     const rows = READ_SHAPE.map(r => ({ ...r, units: Math.max(1, Math.round(units * r.share)) }));
+    rows.forEach(r => { r.avg = Math.round(([95, 140, 210, 260][tier] || 140) * r.rate); });
     const total = rows.reduce((a, r) => a + r.units, 0);
     /* Tier 2 and up are the portfolios where a high nightly rate is worth
        flagging; below that the recommendation would be noise. */
@@ -1446,11 +1467,9 @@
   function renderFound(read){
     const byCode = c => COUNTRIES.find(x => x.code === c);
     const paises = [...new Set(read.rows.map(r => r.code))];
-    $('#foundUnits').textContent = read.units + (read.units === 1 ? ' property' : ' properties');
     const donde = paises.length === 1
       ? 'all in ' + byCode(paises[0]).name
       : 'across ' + paises.length + ' countries';
-    $('#foundWhere').textContent = donde + ` \u00b7 \u20ac${read.avg} average night`;
 
     /* Grouped by the scheme each place answers to, not by country: Madrid and
        Valencia share SES.HOSPEDAJES, Barcelona reports to the Mossos instead.
@@ -1464,11 +1483,12 @@
       const key = (scheme || 'none') + '|' + (tax ? tax.amount : '');
       let z = zonas.find(x => x.key === key);
       if (!z){
-        z = { key, scheme, tax, flag:c.flag, country:c.name, places:[], units:0, regional: !!sub, name:'' };
+        z = { key, scheme, tax, flag:c.flag, country:c.name, places:[], units:0, gasto:0, regional: !!sub, name:'' };
         zonas.push(z);
       }
       z.places.push(r.region);
       z.units += r.units;
+      z.gasto = (z.gasto || 0) + r.avg * r.units;
     });
     /* The group is named after the places in it, not after the authority it
        answers to: "Madrid & Valencia" is what the user recognises, and the
@@ -1477,6 +1497,8 @@
       z.name = z.places.length === 1
         ? z.places[0]
         : z.places.slice(0, -1).join(', ') + ' & ' + z.places[z.places.length - 1];
+      z.avg = Math.round(z.gasto / z.units);
+      z.share = Math.round(z.units / read.units * 100);
     });
     state.zones = zonas;
     if (!state.zoneTax) state.zoneTax = {};
@@ -1493,12 +1515,36 @@
 
     /* The first screen shows the grouping and nothing else: which places we
        put together and how many properties are in each. */
+    /* Three numbers, because those are the three the read actually went and
+       got. The count answers "did it find everything", the groups answer "why
+       am I about to be asked three times", the rate is what makes a portfolio
+       worth protecting later. */
+    $('#foundStats').innerHTML = `
+      <div class="stat"><b>${read.units}</b><span>${read.units === 1 ? 'property' : 'properties'}</span><i>${donde}</i></div>
+      <div class="stat"><b>${zonas.length}</b><span>${zonas.length === 1 ? 'group' : 'groups'}</span><i>by where they are</i></div>
+      <div class="stat"><b>\u20ac${read.avg}</b><span>a night</span><i>average across your bookings</i></div>`;
+
+    /* Each group carries its weight and its rate: without them three rows of
+       place names look interchangeable, and the one that is 57% of the
+       portfolio is the one worth reading twice. */
     $('#groupRows').innerHTML = zonas.map(z => `
       <div class="grp">
         <span class="grp-flag">${z.flag}</span>
-        <span class="grp-t"><b>${z.name}</b><i>${z.regional ? z.country + ' \u2014 this region has rules of its own' : z.country}</i></span>
-        <span class="grp-n">${z.units} ${z.units === 1 ? 'property' : 'properties'}</span>
+        <div class="grp-m">
+          <b>${z.name}</b>
+          <i>${z.regional ? z.country + ' \u2014 this region has rules of its own' : z.country}</i>
+          <span class="gbar"><i style="width:${z.share}%"></i></span>
+        </div>
+        <div class="grp-r">
+          <b>${z.units} ${z.units === 1 ? 'property' : 'properties'}</b>
+          <i>${z.share}% of your portfolio \u00b7 \u20ac${z.avg} a night</i>
+        </div>
       </div>`).join('');
+
+    /* Worth saying plainly: reading an account and importing from it are not
+       the same thing, and someone who has just watched us list their
+       properties is entitled to wonder which one just happened. */
+    $('#grpFoot').innerHTML = `This was a read, not an import \u2014 nothing in ${state.pms ? state.pms.name : 'your PMS'} was touched. Your ${read.units} ${read.units === 1 ? 'property comes' : 'properties come'} across in the background while you finish setting up.`;
 
     /* Wire the DOM by index, not by key: the key is "scheme|amount", so using
        it with a pipe separator split "Mossos d'Esquadra|\u20ac9.50|tax" into the
