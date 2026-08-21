@@ -300,6 +300,78 @@
   .psell .pc-video{border-radius:12px}
   @media (max-width:760px){ .psell{grid-template-columns:1fr} }
 
+  /* ───────── White label ─────────
+     The two panes are a drawing of the guest app, not the guest app: the same
+     screens the guest actually gets, repainted in the colours the account's
+     own website uses, so "your brand" is something you look at rather than
+     something we promise. */
+  .bhead{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px}
+  .bplan{flex-shrink:0;margin-top:6px;font:700 10px var(--font-primary);letter-spacing:.06em;text-transform:uppercase;
+    color:var(--success);background:var(--bg-success-light);border-radius:20px;padding:5px 11px}
+  .bwrap{display:grid;grid-template-columns:1fr 400px;gap:24px;align-items:start}
+  .bwins{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:11px}
+  .bwins li{position:relative;padding-left:23px;font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark)}
+  .bwins b{display:block;font:700 13px var(--font-primary);color:var(--text-dark);margin-bottom:1px}
+  .bwins li::before{content:"";position:absolute;left:0;top:3px;width:15px;height:15px;background:var(--text-brand);
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.2' d='M20 6 9 17l-5-5'/></svg>") center/12px no-repeat;
+    mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.2' d='M20 6 9 17l-5-5'/></svg>") center/12px no-repeat}
+  .btook{margin-bottom:14px}
+  .btook-h{font:700 9.5px var(--font-primary);letter-spacing:.07em;text-transform:uppercase;
+    color:var(--text-gray-medium);margin-bottom:8px}
+  .btook-r{display:flex;flex-wrap:wrap;gap:8px}
+  .bsw{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border:1px solid var(--stroke-gray-lighter);
+    border-radius:20px;background:var(--bg-white);font:600 11px var(--font-primary);color:var(--text-dark)}
+  .bsw i{width:14px;height:14px;border-radius:50%;display:block;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+  .bsw b{width:16px;text-align:center;font:700 11px var(--font-primary);color:var(--text-dark)}
+  .bsw b.bser{font-family:Georgia,'Times New Roman',serif;font-size:12px}
+  .bsw em{font-style:normal;font-weight:400;color:var(--text-gray-medium);font-size:10.5px}
+  .bswitch{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;cursor:pointer;background:var(--bg-white);
+    border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);box-shadow:var(--shadow-card)}
+  .bswitch .sw{margin-top:1px}
+  .bswitch-t b{display:block;font:700 13px var(--font-primary);color:var(--text-dark)}
+  .bswitch-t i{font:400 12px/16px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+
+  /* The account's own palette, read off its website: navy, gold, white. */
+  .bphones{display:grid;grid-template-columns:1fr 1fr;gap:14px;--nv:#000029;--gd:#967126}
+  .ph{border:1px solid var(--stroke-gray-light);border-radius:16px;overflow:hidden;background:#fff;
+    box-shadow:0 10px 24px rgba(22,22,67,.10)}
+  .ph-top{height:34px;display:flex;align-items:center;justify-content:center;gap:6px;border-bottom:1px solid #ECECF1;background:#fff}
+  .ph-top.back{justify-content:flex-start;padding:0 10px}
+  .ph-back{font:400 17px/1 var(--font-primary);color:var(--nv);margin-right:4px}
+  .h10{font:700 15px/1 Georgia,'Times New Roman',serif;color:var(--nv);letter-spacing:.02em;display:flex;align-items:baseline;gap:4px}
+  .h10 em{font:400 6.5px/1 var(--font-primary);font-style:normal;letter-spacing:.18em;color:var(--gd)}
+  .h10.sm{font-size:13px}
+  .ph-body{padding:11px 11px 13px;background:#FAFAFB}
+  .ph-h{font:700 15px/1.15 Georgia,'Times New Roman',serif;color:var(--nv);margin-bottom:3px}
+  .ph-h u{text-decoration:none;color:var(--gd)}
+  .ph-sub{font:400 9px/13px var(--font-primary);color:#6A6A78;margin-bottom:9px}
+  .ph-stay{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;background:var(--nv);
+    border-radius:9px;padding:9px 10px;margin-bottom:10px}
+  .ph-stay span{display:block;font:700 5.5px var(--font-primary);letter-spacing:.14em;color:rgba(255,255,255,.62)}
+  .ph-stay b{font:700 13px Georgia,'Times New Roman',serif;color:#fff}
+  .ph-r{text-align:right}
+  .ph-n{font:700 5.5px var(--font-primary);letter-spacing:.12em;color:var(--gd);white-space:nowrap}
+  .ph-sec{font:700 10px var(--font-primary);color:var(--nv);margin-bottom:6px}
+  .ph-card{background:#fff;border:1px solid #ECECF1;border-radius:9px;padding:9px 10px;margin-bottom:8px}
+  .ph-card.tight{margin-bottom:10px}
+  .ph-cardt{font:700 10px var(--font-primary);color:var(--nv)}
+  .ph-cardd{font:400 8.5px var(--font-primary);color:#8A8A98;margin-top:1px}
+  .ph-cta{margin-top:8px;background:var(--gd);color:#fff;border-radius:7px;text-align:center;padding:7px 0;
+    font:700 9.5px var(--font-primary);letter-spacing:.01em}
+  .ph-row{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #ECECF1;border-radius:9px;
+    padding:7px 10px;margin-bottom:6px}
+  .ph-row b{display:block;font:700 9.5px var(--font-primary);color:var(--nv)}
+  .ph-row i{font:400 8.5px var(--font-primary);color:#8A8A98;font-style:normal}
+  .ph-dot{width:15px;height:15px;border-radius:5px;background:var(--nv);flex-shrink:0}
+  .ph-dot.pale{background:#DDDDE4}
+  .ph-lbl{font:700 6.5px var(--font-primary);letter-spacing:.14em;color:var(--gd);margin:0 0 5px 2px}
+  .ph-add{border:1px dashed #C9C9D6;border-radius:8px;text-align:center;padding:8px 0;margin-bottom:9px;
+    font:700 9.5px var(--font-primary);color:var(--nv)}
+  .ph-share{background:#fff;border:1px solid #ECECF1;border-radius:9px;padding:8px 10px;
+    font:400 8.5px/12px var(--font-primary);color:#8A8A98}
+  .ph-share b{color:var(--nv);font-weight:700}
+  @media (max-width:900px){ .bwrap{grid-template-columns:1fr} .bhead{flex-wrap:wrap} }
+
   #protRows .zgrid{grid-template-columns:1fr 1fr}
   .zpreview{margin:0;padding:5px 16px 6px;border-top:1px solid var(--stroke-gray-lighter);background:var(--bg-screen);
     font:400 12px/16px var(--font-primary);color:var(--text-gray-dark)}
@@ -541,13 +613,13 @@
   .plan-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;align-items:start}
   .rail2 .r2.more{color:#AEB7F5;font-style:normal;opacity:.85;padding-left:2px}
   .plan-list{display:flex;flex-direction:column;gap:0}
-  .pl-item{display:flex;gap:13px;padding:11px 4px;border-bottom:1px solid var(--stroke-gray-lighter)}
+  .pl-item{display:flex;gap:13px;padding:8px 4px;border-bottom:1px solid var(--stroke-gray-lighter)}
   .pl-item:last-child{border-bottom:none}
-  .pl-item .no{width:26px;height:26px;border-radius:50%;background:var(--bg-blue-light);color:var(--text-brand);display:grid;place-items:center;font:700 12px var(--font-primary);flex-shrink:0}
-  .pl-item .t{font:600 14px/19px var(--font-primary)}
-  .pl-item .d{font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark);margin-top:2px}
+  .pl-item .no{width:24px;height:24px;border-radius:50%;background:var(--bg-blue-light);color:var(--text-brand);display:grid;place-items:center;font:700 12px var(--font-primary);flex-shrink:0}
+  .pl-item .t{font:600 13.5px/18px var(--font-primary)}
+  .pl-item .d{font:400 12px/16px var(--font-primary);color:var(--text-gray-dark);margin-top:1px}
   .pl-item .eta{margin-left:auto;flex-shrink:0;font:600 11.5px var(--font-primary);color:var(--text-gray-medium);padding-top:4px;white-space:nowrap;font-variant-numeric:tabular-nums}
-  .plan-total{display:flex;align-items:center;gap:10px;margin-top:16px;padding:12px 16px;background:var(--bg-success-light);border-radius:var(--radius-md);font:600 13.5px var(--font-primary);color:var(--success)}
+  .plan-total{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 16px;background:var(--bg-success-light);border-radius:var(--radius-md);font:600 13.5px var(--font-primary);color:var(--success)}
   .plan-total svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 
   /* Mini dashboard preview */
@@ -634,8 +706,9 @@
       <div class="rstep" data-s="2"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">Read from your PMS where we can.</div></div></div>
       <div class="rstep" data-s="3" id="railLegal" hidden><span class="bub">3</span><div class="txt"><div class="t">Legal compliance</div><div class="d">Set per group, ready to change.</div></div></div>
       <div class="rstep" data-s="4"><span class="bub">4</span><div class="txt"><div class="t">Property protection</div><div class="d">Who pays when something breaks.</div></div></div>
-      <div class="rstep" data-s="5"><span class="bub">5</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
-      <div class="rstep" data-s="6"><span class="bub">6</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
+      <div class="rstep" data-s="5"><span class="bub">5</span><div class="txt"><div class="t">Your brand</div><div class="d">Guests see you, not us.</div></div></div>
+      <div class="rstep" data-s="6"><span class="bub">6</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
+      <div class="rstep" data-s="7"><span class="bub">7</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
     </div>
     <div class="plan-so-far">
       <div class="h">Your setup so far</div>
@@ -798,7 +871,81 @@
         </div>
       </section>
 
-      <!-- STEP 5 · Priority -->
+      <!-- STEP 5 · White label -->
+      <section class="panel" data-panel="10">
+        <div class="bhead">
+          <div>
+            <h1>Your guests should see you, not us</h1>
+            <p class="lead" id="brLead">We had a look at your website and took your brand from it.</p>
+          </div>
+          <span class="bplan">Included in your plan</span>
+        </div>
+
+        <div class="bwrap">
+          <div class="bside">
+            <ul class="bwins">
+              <li><b>On-brand from end to end</b> Logo, colours, type and your own domain, all the way through the check-in.</li>
+              <li><b>One template, every property</b> Set it once and it applies everywhere, or keep a different one per group.</li>
+              <li><b>Nothing to design</b> It is built already — you approve it instead of briefing it.</li>
+            </ul>
+            <div class="btook">
+              <div class="btook-h">What we took from your site</div>
+              <div class="btook-r">
+                <span class="bsw"><i style="background:#000029"></i>#000029<em>Primary</em></span>
+                <span class="bsw"><i style="background:#967126"></i>#967126<em>Accent</em></span>
+                <span class="bsw"><b class="bser">Aa</b>Argent CF<em>Headings</em></span>
+                <span class="bsw"><b>Aa</b>Gotham<em>Text</em></span>
+              </div>
+            </div>
+            <label class="bswitch" id="brBox">
+              <span class="sw"><input type="checkbox" id="brOn" checked><i></i></span>
+              <span class="bswitch-t"><b id="brTitle">Use it on all my properties</b><i id="brNote">Guests see your brand from the first screen.</i></span>
+            </label>
+          </div>
+
+          <div class="bphones">
+            <div class="ph">
+              <div class="ph-top"><span class="h10">H10<em>HOTELS</em></span></div>
+              <div class="ph-body">
+                <div class="ph-h">Welcome</div>
+                <div class="ph-sub">Your stay in Barcelona is almost ready — 2 tasks left.</div>
+                <div class="ph-stay">
+                  <div><span>CHECK-IN</span><b>26 Aug</b></div>
+                  <div class="ph-n">3 NIGHTS</div>
+                  <div class="ph-r"><span>CHECK-OUT</span><b>29 Aug</b></div>
+                </div>
+                <div class="ph-sec">Complete your check-in</div>
+                <div class="ph-card">
+                  <div class="ph-cardt">Let’s get you checked in</div>
+                  <div class="ph-cardd">2 steps left · about 8 minutes</div>
+                  <div class="ph-cta">Register your guests</div>
+                </div>
+                <div class="ph-row"><span class="ph-dot"></span><div><b>Guest details</b><i>0 of 2 registered</i></div></div>
+                <div class="ph-row"><span class="ph-dot pale"></span><div><b>Payments</b><i>1 of 2 settled</i></div></div>
+              </div>
+            </div>
+
+            <div class="ph">
+              <div class="ph-top back"><span class="ph-back">‹</span><span class="h10 sm">H10<em>HOTELS</em></span></div>
+              <div class="ph-body">
+                <div class="ph-h">Who are we <u>registering</u>?</div>
+                <div class="ph-sub">Register one guest, or everyone in the same session.</div>
+                <div class="ph-card tight">
+                  <div class="ph-cardt">2 guests to go</div>
+                  <div class="ph-cardd">0 of 2 added</div>
+                </div>
+                <div class="ph-lbl">RESPONSIBLE FOR BOOKING</div>
+                <div class="ph-add">+ Add guest</div>
+                <div class="ph-lbl">OTHER GUESTS</div>
+                <div class="ph-add">+ Add guest</div>
+                <div class="ph-share"><b>Not together right now?</b> Share a link so the others register from their own phone.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 6 · Priority -->
       <section class="panel" data-panel="4">
         <h1 id="prioTitle">What matters most to you right now?</h1>
         <p class="lead" id="prioLead">Pick one or several — we'll build your dashboard around them. You can change this anytime.</p>
@@ -1082,7 +1229,7 @@
   let step = 1;
   const TOTAL = 5;
   const LAST = 5;
-  const RAIL_OF = { 3:1, 6:1, 7:2, 1:2, 8:3, 9:4, 4:5, 5:6 };
+  const RAIL_OF = { 3:1, 6:1, 7:2, 1:2, 8:3, 9:4, 10:5, 4:6, 5:7 };
   /* Bookings first: it is the longest step and the only one that imports
      anything, so getting the PMS authorising early leaves it syncing in the
      background while the shorter questions get answered. */
@@ -1096,9 +1243,9 @@
      question, only comes back if the read is wrong or there was no PMS. */
   function flow(){
     const connectable = state.manage === 'pms' && state.pms && state.pms.kind !== 'catalogue';
-    if (!connectable) return [3,1,9,4,5];
-    if (state.pmsConnected && !state.manualGeo) return [3,6,7,8,9,4,5];
-    return [3,6,1,9,4,5];
+    if (!connectable) return [3,1,9,10,4,5];
+    if (state.pmsConnected && !state.manualGeo) return [3,6,7,8,9,10,4,5];
+    return [3,6,1,9,10,4,5];
   }
 
   const $ = s => document.querySelector(s);
@@ -1681,6 +1828,33 @@
     };
     const pinta = () => montaZonas('#protRows', zonas, tiles, bajoTitulo, null, cabecera, tira);
 
+    pinta();
+  }
+
+  /* Taken from the account's own website rather than asked for: someone who
+     already has a brand does not want to be walked through picking one. The
+     switch decides whether it goes live, not whether it exists. */
+  state.brand = { on:true, site:'h10hotels.com' };
+  function renderBrand(){
+    const n = Number(state.size) || 0;
+    const u = unit();
+    $('#brLead').innerHTML = `Your site at <b>${state.brand.site}</b> gave us the navy, the gold and the type, and your check-in is already built with them. Here is what your guests would open.`;
+    $('#brTitle').textContent = n ? `Use it on all ${n} ${u}` : `Use it on every property`;
+    const box = $('#brOn');
+    box.checked = !!state.brand.on;
+    const pinta = () => {
+      $('#brNote').textContent = state.brand.on
+        ? 'Guests see your brand from the first screen, on your own domain.'
+        : 'Guests see the standard Chekin check-in instead.';
+      $('.bphones').style.opacity = state.brand.on ? '1' : '.45';
+    };
+    if (!box.dataset.wired){
+      box.dataset.wired = '1';
+      box.addEventListener('change', () => {
+        state.brand.on = box.checked;
+        pinta(); renderChips(); saveProgress(); refresh();
+      });
+    }
     pinta();
   }
 
@@ -2548,6 +2722,10 @@
     if (state.prios.includes('revenue')){
       steps.push({ k:'revenue', phase:'Revenue', t:'Open your upselling store', d:'Late check-out, upgrades and experiences — sold automatically via the guest app.', eta:3 });
     }
+    if (state.brand && state.brand.on){
+      steps.push({ k:'brand', phase:'Launch', t:'Put your branding live',
+        d:`Built from ${state.brand.site} \u2014 approve the template and your guests never see a Chekin screen.`, eta:2 });
+    }
     steps.push({ k:'test', phase:'Launch', t:'Send yourself a test check-in link', d:'Experience exactly what your guests will see.', eta:1 });
     return steps;
   }
@@ -2803,6 +2981,7 @@
         && !(state.zones && state.zones.length)){ scanRan = true; runScan(); }
     if (step !== 7 && state.pmsConnected) startImport();
     if (step === 9) renderProtect();
+    if (step === 10) renderBrand();
     if (step === 4) setupPrioStep();
     if (step === LAST) renderPlan();
     refresh();
