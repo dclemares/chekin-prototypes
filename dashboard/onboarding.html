@@ -183,6 +183,34 @@
   .pms.sel .lgimg{filter:none}
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
+  .zone{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:6px;overflow:hidden}
+  .zhead{display:grid;grid-template-columns:30px 1fr 18px;gap:11px;align-items:center;width:100%;padding:11px 14px;background:none;border:0;cursor:pointer;text-align:left}
+  .zshield{width:30px;height:30px;border-radius:9px;background:var(--bg-blue-light);display:grid;place-items:center}
+  .zshield svg{width:15px;height:15px;stroke:var(--text-brand);fill:none;stroke-width:2}
+  .ztitle b{display:block;font:600 13.5px var(--font-primary);color:var(--text-dark)}
+  .ztitle i{font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  .zchev svg{width:14px;height:14px;stroke:var(--text-gray-medium);fill:none;stroke-width:2.4;transition:transform .18s}
+  .zone.open .zchev svg{transform:rotate(180deg)}
+  .zbody{display:none;padding:0 14px 12px 55px}
+  .zone.open .zbody{display:block}
+  .zsets{border-top:1px solid var(--stroke-gray-lighter);padding-top:10px}
+  .zset{display:grid;grid-template-columns:17px auto 1fr;gap:9px;align-items:center;margin-bottom:7px;font:600 12.5px var(--font-primary);color:var(--text-dark);cursor:pointer}
+  .zset i{font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  .zset input{margin:0;accent-color:var(--text-brand);width:15px;height:15px}
+  .zset.locked,.zset.off{cursor:default}
+  .zset .lock{width:15px;height:15px;border-radius:4px;background:var(--success);display:grid;place-items:center}
+  .zset .lock svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3.4}
+  .zset .dash{color:var(--stroke-gray-medium);text-align:center;font-weight:700}
+  .zset.off{color:var(--text-gray-medium)}
+  .zdetail{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:11px;padding-top:10px;border-top:1px solid var(--stroke-gray-lighter)}
+  .zdetail h6{font:600 11px var(--font-primary);color:var(--text-gray-medium);margin:0 0 6px}
+  .zreq ul{margin:0;padding:0;list-style:none}
+  .zreq li{position:relative;padding-left:16px;margin-bottom:4px;font:400 12px/16px var(--font-primary);color:var(--text-gray-dark)}
+  .zreq li::before{content:"";position:absolute;left:0;top:5px;width:9px;height:6px;border-left:1.8px solid var(--success);border-bottom:1.8px solid var(--success);transform:rotate(-45deg)}
+  .zk{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:4px;font:400 12px var(--font-primary);color:var(--text-gray-dark)}
+  .zk b{font:600 11px var(--font-primary);background:var(--bg-neutral-light);border-radius:99px;padding:2px 8px;white-space:nowrap}
+  @media (max-width:640px){ .zdetail{grid-template-columns:1fr} .zbody{padding-left:14px} }
+
   .addons{display:none;margin-top:16px}
   .addons.on{display:block;animation:stepIn .3s ease}
   .ad-h{font:600 12.5px var(--font-primary);color:var(--text-dark);margin-bottom:8px}
@@ -915,6 +943,11 @@
   const $$ = s => Array.from(document.querySelectorAll(s));
 
   const regulated  = () => state.countries.some(c => c.reg);
+  /* True while at least one zone still has its tourist tax on. Without a read
+     there are no zones and the country-level flag stands on its own. */
+  const taxOn = () => !state.zones || !state.zones.length
+    ? true
+    : state.zones.some(z => z.tax && state.zoneTax && state.zoneTax[z.key]);
   const anyTax     = () => state.countries.some(c => c.tax);
   const schemes    = () => state.countries.filter(c => c.reg).map(c => c.scheme);
 
@@ -1185,6 +1218,27 @@
     'Balearic Islands': { amount:'\u20ac1\u2013\u20ac4', note:'By category and season' },
     'Lisbon':    { amount:'\u20ac4.00', note:'Ages 13+, capped at 7 nights' },
   };
+  /* What each scheme actually demands, and how long the data has to be kept.
+     The Spanish figures are the ones the product's own compliance card states
+     (RD 933/2021 is national, so the Mossos zone keeps the same retention).
+     Where we do not hold the retention it is left out rather than guessed —
+     an invented retention period is a worse lie than a missing one. */
+  const COMPLY = {
+    'SES.HOSPEDAJES': {
+      req:['Reporting to SES Hospedajes','Government ID or passport','Official document data retention'],
+      keep:[['Document data','3 years'],['Identity data','Deleted after validation'],['Form data','3 years']] },
+    "Mossos d'Esquadra": {
+      req:["Reporting to the Mossos d'Esquadra",'Government ID or passport','Official document data retention'],
+      keep:[['Document data','3 years'],['Identity data','Deleted after validation'],['Form data','3 years']] },
+    'SIBA / AIMA': {
+      req:['Reporting to SIBA / AIMA','Government ID or passport'], keep:null },
+    'Alloggiati Web': {
+      req:['Reporting to Alloggiati Web','Government ID or passport'], keep:null },
+    'Gästeblatt':   { req:['Reporting to the Gästeblatt','Government ID or passport'], keep:null },
+    'eVisitor':     { req:['Reporting to eVisitor','Government ID or passport'], keep:null },
+    'Meldeschein':  { req:['Reporting to the Meldeschein','Government ID or passport'], keep:null },
+  };
+
   function taxFor(c, region){
     if (!c.tax) return null;
     if (c.taxRegions && !c.taxRegions.includes(REGION_SCHEME[region] || region)) return null;
@@ -1220,25 +1274,64 @@
       ? 'all in ' + byCode(paises[0]).name
       : 'across ' + paises.length + ' countries';
 
-    /* One row per place, each naming the scheme that place actually triggers —
-       Barcelona reports to the Mossos, the rest of Spain to SES.HOSPEDAJES. */
-    $('#foundRows').innerHTML = read.rows.map(r => {
+    /* Grouped by the scheme each place answers to, not by country: Madrid and
+       Valencia share SES.HOSPEDAJES, Barcelona reports to the Mossos instead.
+       That grouping is the unit compliance is actually configured in. */
+    const zonas = [];
+    read.rows.forEach(r => {
       const c = byCode(r.code);
       const sub = (c.subs || []).find(x => x.n === REGION_SCHEME[r.region]);
       const scheme = sub ? sub.s : c.scheme;
-      /* Only where the tax is really charged. Spain lists its regions; the
-         countries that levy it nationally have no taxRegions and keep the
-         country-wide flag. */
       const tax = taxFor(c, r.region);
-      const bits = [];
-      if (scheme) bits.push(`<span class="tag reg">${scheme}</span>`);
-      if (tax) bits.push(`<span class="tag tax">Tourist tax${tax.amount ? ' ' + tax.amount : ''}</span>`);
-      if (!bits.length) bits.push(`<span class="tag none">No registration required</span>`);
-      return `<div class="frow"><span class="fflag">${c.flag}</span>` +
-        `<span class="fplace"><b>${r.region}</b><i>${r.units} ${r.units === 1 ? 'property' : 'properties'}` +
-        `${tax && tax.note ? ` \u00b7 ${tax.note}` : ''}</i></span>` +
-        `<span class="ftags">${bits.join('')}</span></div>`;
+      const key = (scheme || 'none') + '|' + (tax ? tax.amount : '');
+      let z = zonas.find(x => x.key === key);
+      if (!z){
+        z = { key, scheme, tax, flag:c.flag, country:c.name, places:[], units:0 };
+        zonas.push(z);
+      }
+      z.places.push(r.region);
+      z.units += r.units;
+    });
+    state.zones = zonas;
+    if (!state.zoneTax) state.zoneTax = {};
+    zonas.forEach(z => { if (z.tax && state.zoneTax[z.key] === undefined) state.zoneTax[z.key] = true; });
+
+    $('#foundRows').innerHTML = zonas.map((z, i) => {
+      const cm = COMPLY[z.scheme];
+      const req = cm ? cm.req.map(x => `<li>${x}</li>`).join('') : '';
+      const keep = cm && cm.keep
+        ? `<div class="zkeep"><h6>Retention policy</h6>` +
+          cm.keep.map(k => `<div class="zk"><span>${k[0]}</span><b>${k[1]}</b></div>`).join('') + `</div>`
+        : '';
+      const taxRow = z.tax
+        ? `<label class="zset"><input type="checkbox" data-ztax="${z.key}" ${state.zoneTax[z.key] ? 'checked' : ''}>
+             <span>Tourist tax</span><i>${z.tax.amount} per guest, per night${z.tax.note ? ' \u00b7 ' + z.tax.note : ''}</i></label>`
+        : `<div class="zset off"><span class="dash">—</span><span>Tourist tax</span><i>Not charged where these properties are</i></div>`;
+      const policeRow = z.scheme
+        ? `<div class="zset locked"><span class="lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+             <span>Police reporting</span><i>Required by law \u2014 cannot be switched off</i></div>`
+        : `<div class="zset off"><span class="dash">\u2014</span><span>Police reporting</span><i>No guest registration required here</i></div>`;
+      return `<div class="zone${i === 0 ? ' open' : ''}">
+        <button type="button" class="zhead" data-zone="${i}">
+          <span class="zshield"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="ztitle"><b>${z.scheme || 'No registration'}</b><i>${z.flag} ${z.places.join(', ')} \u00b7 ${z.units} ${z.units === 1 ? 'property' : 'properties'}</i></span>
+          <span class="zchev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+        </button>
+        <div class="zbody">
+          <div class="zsets">${policeRow}${taxRow}</div>
+          ${req || keep ? `<div class="zdetail">${req ? `<div class="zreq"><h6>Requirements</h6><ul>${req}</ul></div>` : ''}${keep}</div>` : ''}
+        </div>
+      </div>`;
     }).join('');
+
+    $$('#foundRows .zhead').forEach(h => h.addEventListener('click', () => {
+      h.closest('.zone').classList.toggle('open');
+    }));
+    $$('#foundRows [data-ztax]').forEach(i => i.addEventListener('change', e => {
+      e.stopPropagation();
+      state.zoneTax[e.target.dataset.ztax] = e.target.checked;
+      refresh();
+    }));
 
     renderAddons(read);
     /* The waiver suggestion used to be written out here as well, in almost
@@ -1284,9 +1377,12 @@
     const many = read.units >= 20;
     const pricey = read.avg >= 180;
     return [
+      /* Not a legal requirement anywhere we operate — it is what makes the
+         legal part run without anyone touching it, which is a different and
+         better argument than pretending it is mandatory. */
       { k:'id', t:'Guest ID verification',
-        d:`Every guest checked against their document before they arrive${many ? `, across all ${read.units} properties` : ''}.`,
-        why:'Included in your plan' },
+        d:`Checks the document itself, so what goes to the police is right the first time${many ? ` \u2014 across all ${read.units} properties` : ''}.`,
+        why:'Always recommended' },
       { k:'protect', t:'Deposits and damage waivers',
         d:pricey
           ? `At ${read.avg}\u20ac a night a damaged flat costs more than a deposit covers, so the waiver takes the rest.`
@@ -1770,7 +1866,7 @@
       const extra = mine.length ? ' + ' + mine.join(', ') : '';
       steps.push({ k:'police', phase:'Legal', t:`Police reporting — ${c.scheme}`, d:`${c.name}${extra} — every guest submitted automatically, within the legal deadline.`, eta:4, scheme:c.scheme, country:c.name });
     });
-    if (anyTax()) steps.push({ k:'tax', phase:'Legal', t:'Enable tourist tax auto-calculation', d:'Calculated and collected per stay, per your local rates.', eta:2 });
+    if (anyTax() && taxOn()) steps.push({ k:'tax', phase:'Legal', t:'Enable tourist tax auto-calculation', d:'Calculated and collected per stay, per your local rates.', eta:2 });
     if (state.prios.includes('ops')){
       steps.push({ k:'ops', phase:'Operations', t:'Set up your operations hub', d:'Guest inbox, smart locks, and cleaning turnovers that schedule themselves.', eta:6 });
     }
@@ -1785,7 +1881,8 @@
   function buildMods(){
     const on = ['checkin','id','guestapp'];
     if (regulated()) on.push('police');
-    if (anyTax()) on.push('tax');
+    /* Only if it is charged somewhere the user has not switched off */
+    if (anyTax() && taxOn()) on.push('tax');
     if (state.prios.includes('ops')) on.push('inbox','locks','cleaning');
     if (state.prios.includes('revenue')) on.push('upsell');
     /* Switched on from the read, not from the priority question */
