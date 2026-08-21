@@ -1645,6 +1645,12 @@
         document.getElementById('welcome-title').textContent = 'Hey ' + state.name + ', welcome to Chekin! 👋';
       }
       try {
+        /* A new account has no onboarding behind it. Leaving the previous
+           one's progress meant "Start setup" resumed a stranger's half-done
+           flow — landing on a portfolio read for a PMS this account never
+           connected — and the dashboard opened on their finished plan. */
+        localStorage.removeItem('chekin_onboarding_progress');
+        localStorage.removeItem('chekin_onboarding');
         localStorage.setItem('chekin_account_name', state.name || '');
         localStorage.setItem('chekin_account_ptype', state.ptype || '');
         localStorage.setItem('chekin_account_size', state.size || '');

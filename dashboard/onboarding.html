@@ -2160,6 +2160,11 @@
       show(5);
     }
   } else {
+    /* ?fresh=1 starts from nothing — for walking the flow end to end without
+       yesterday's half-finished run resuming underneath you. */
+    if (new URLSearchParams(location.search).get('fresh')){
+      try { localStorage.removeItem('chekin_onboarding_progress'); localStorage.removeItem('chekin_onboarding'); } catch(e){}
+    }
     const resumed = restoreProgress();
     syncStep1();
     // Debug: ?step=N jumps straight to a step (no validation)
