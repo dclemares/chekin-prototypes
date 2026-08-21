@@ -203,6 +203,9 @@
   .fx-dash{color:var(--stroke-gray-medium);text-align:center;font-weight:700}
   .fx-t{font:600 12.5px var(--font-primary);color:var(--text-dark);white-space:nowrap}
   .fx-n{font:400 12px var(--font-primary);color:var(--text-gray-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fx-n2{white-space:normal;overflow:visible}
+  .fx-n2 b{font:600 12px var(--font-primary);color:var(--text-dark)}
+  .fx-n2 i{display:block;font:400 11px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
   .fx.off .fx-t{color:var(--text-gray-medium)}
   .fx-set{background:none;border:0;padding:2px 4px;cursor:pointer;font:600 12px var(--font-primary);color:var(--text-brand);flex-shrink:0}
   .fx-set.open{text-decoration:underline}
@@ -213,6 +216,28 @@
   .zs select{height:30px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
     font:500 12px var(--font-primary);color:var(--text-dark);padding:0 8px;max-width:60%}
   .zs-note{margin:2px 0 0;font:400 11.5px var(--font-primary);color:var(--text-gray-medium)}
+  .zs-l{display:block;min-width:0}
+  .zs-l em{font-style:normal;font:600 9.5px var(--font-primary);color:var(--text-gray-medium);text-transform:uppercase;
+    letter-spacing:.05em;margin-left:6px}
+  .zs-l i{display:block;font:400 11px/15px var(--font-primary);color:var(--text-gray-medium);font-style:normal;margin-top:1px;max-width:44ch}
+  .zs-col{display:block}
+  .zs-radios{display:grid;gap:6px;margin-top:6px}
+  .zs-r{display:grid;grid-template-columns:15px 1fr;gap:9px;align-items:start;padding:8px 10px;cursor:pointer;
+    border:1px solid var(--stroke-gray-light);border-radius:9px;background:var(--bg-white)}
+  .zs-r input{margin:2px 0 0;accent-color:var(--text-brand);width:14px;height:14px}
+  .zs-r b{display:block;font:600 12px var(--font-primary);color:var(--text-dark)}
+  .zs-r i{display:block;font:400 11px/15px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  .zs-r:has(input:checked){border-color:var(--text-brand);background:var(--bg-white)}
+  .zs-num{display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
+  .zs-num input{width:74px;height:30px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
+    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 8px;text-align:right}
+  .zs-num i{font:500 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  .zs-txt{width:172px;height:30px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
+    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 8px;flex-shrink:0}
+  .zs-tg{margin:0;accent-color:var(--text-brand);width:16px;height:16px;flex-shrink:0}
+  .zs-export{margin:2px 0 8px;background:none;border:0;padding:0;cursor:pointer;
+    font:600 12px var(--font-primary);color:var(--text-brand)}
+  .zs-export:disabled{color:var(--text-gray-medium);cursor:default}
   @media (max-width:640px){ .fx{flex-wrap:wrap} .fx-n{white-space:normal} }
 
   .fx-tag{flex-shrink:0;font:600 10.5px var(--font-primary);color:var(--text-gray-medium);text-transform:uppercase;
@@ -648,23 +673,18 @@
             <div class="found-n"><b id="foundUnits">—</b><span id="foundWhere">—</span></div>
             <button type="button" class="linkish" id="scanManual">Not right? Set it manually</button>
           </div>
-          <p class="grp-why">We put them into groups by where they are, because the rules change from one region to the next. Each group is set up on its own in the next step.</p>
+          <p class="grp-why">We named and grouped them by where they are, because the rules change from one region to the next. <b>Next you set up each group</b> — what gets reported, who gets verified and what is charged.</p>
           <div class="grps" id="groupRows"></div>
         </div>
       </section>
 
       <!-- STEP 3 · What each group has to do -->
       <section class="panel" data-panel="8">
-        <h1 id="cmpTitle">One set of rules per group</h1>
-        <p class="lead">Already switched on the way we would set it up. Change anything that does not fit.</p>
+        <h1 id="cmpTitle">Legal compliance, group by group</h1>
+        <p class="lead">Already switched on the way we would set it up. Check the figures and change anything that does not fit.</p>
         <div class="found">
           <div class="found-rows" id="foundRows"></div>
           <div class="found-tip reveal" id="foundTip"></div>
-
-          <div class="addons reveal" id="addons">
-            <div class="ad-h">Worth switching on for a portfolio like yours</div>
-            <div id="addonList"></div>
-          </div>
         </div>
       </section>
 
@@ -1242,11 +1262,14 @@
      Catalonia Llei 2/2026 in force since 1 April, Lisbon holding at 4 since
      the September 2024 rise. These belong in a table someone maintains — a
      tourist tax changes more often than a product does. */
+  /* The rate is shown, not just charged: someone who runs Barcelona flats
+     knows what 9.50 is made of and will spot it the day the figure moves.
+     price/age/nights are what the settings form edits. */
   const TAX_RATE = {
-    'Barcelona': { amount:'\u20ac9.50', note:'\u20ac4.50 Catalonia + \u20ac5.00 city surcharge' },
-    'Catalonia': { amount:'\u20ac1.75', note:'Outside Barcelona' },
-    'Balearic Islands': { amount:'\u20ac1\u2013\u20ac4', note:'By category and season' },
-    'Lisbon':    { amount:'\u20ac4.00', note:'Ages 13+, capped at 7 nights' },
+    'Barcelona':        { amount:'\u20ac9.50', price:'9,50', age:16, nights:7, note:'\u20ac4.50 Catalonia + \u20ac5.00 city surcharge' },
+    'Catalonia':        { amount:'\u20ac1.75', price:'1,75', age:16, nights:7, note:'Outside Barcelona' },
+    'Balearic Islands': { amount:'\u20ac1\u2013\u20ac4', price:'2,00', age:15, nights:0, note:'By category and season \u2014 check your rate' },
+    'Lisbon':           { amount:'\u20ac4.00', price:'4,00', age:12, nights:7, note:'' },
   };
   /* What each scheme actually demands, and how long the data has to be kept.
      The Spanish figures are the ones the product's own compliance card states
@@ -1267,15 +1290,68 @@
      Two per feature: enough to be a real setting, few enough to stay readable
      inside the card. */
   /* No police entry: reporting is set up once the credentials are filed with
-     the authority, so the row carries a "Set up later" tag and no dropdown. */
+     the authority, so the row carries a "Set up later" tag and no dropdown.
+     The other two mirror the settings the product actually has, so what is
+     agreed here is what gets configured later, not a friendlier summary of
+     it. Fields marked `from` take their default from the zone's own rate. */
   const FEATURE_SETS = {
     id: [
-      { k:'who',  t:'Who is verified',   opts:['Every guest','Lead guest only'] },
-      { k:'docs', t:'Documents accepted', opts:['Passport, ID card and licence','Passport and ID card'] } ],
+      { k:'method', t:'How guests are verified', type:'radio', opts:[
+          { v:'Official document + selfie', d:'We photograph their identification document and compare it with a real-time selfie.' },
+          { v:'Official document only',     d:'We photograph their identification document.' } ] },
+      { k:'who',   t:'Who is verified', opts:['Every guest','The lead guest only'] },
+      { k:'when',  t:'When it is requested', opts:['At online check-in','As soon as the booking is confirmed','The day before arrival'] },
+      { k:'skip',  t:'Booking sources skipped', opt:true, opts:['None','Airbnb','Booking.com','Airbnb and Booking.com'] },
+      { k:'block', t:'Block the form until verified', type:'toggle', on:true,
+        d:'The guest cannot open the form in GuestApp until identity verification has gone through.' },
+      { k:'keep',  t:'Document image retention', opts:[
+          'Delete after verification','Delete after police submission','Delete a set number of days after check-in','Keep forever'],
+        d:'When the captured ID and passport images are deleted from Chekin.' },
+      { k:'days',  t:'Number of days after check-in', type:'num', def:'3',
+        showIf:{ k:'keep', v:'Delete a set number of days after check-in' },
+        d:'Images are deleted that many days after each guest\u2019s check-in date.' },
+    ],
     tax: [
-      { k:'when', t:'Charged',   opts:['With the check-in payment','On arrival, at the property'] },
-      { k:'kids', t:'Exemptions', opts:['Apply local age exemptions','Charge every guest'] } ],
+      { k:'price',  t:'Price per night', type:'num', suffix:'\u20ac', from:'price' },
+      { k:'exname', t:'Name of the exemption', type:'text', ph:'Children' },
+      { k:'exrule', t:'Rule', opts:['Less than or equal to','Less than','Equal to'] },
+      { k:'exage',  t:'Age', type:'num', from:'age' },
+      { k:'nights', t:'Maximum nights taxed', type:'num', from:'nights' },
+      { k:'skip',   t:'Booking sources excluded', opt:true, opts:['None','Airbnb','Booking.com','Airbnb and Booking.com'] },
+      { k:'fees',   t:'The guest pays the payment fees', type:'toggle', on:false },
+    ],
   };
+
+  /* A field the user has not touched falls back to the zone's own rate, so
+     Barcelona opens on 9,50 and Lisbon on 4,00 rather than on a blank form. */
+  function fieldDefault(sp, z){
+    if (sp.def !== undefined) return sp.def;
+    if (sp.from) return z.tax ? z.tax[sp.from] : '';
+    if (sp.type === 'toggle') return !!sp.on;
+    if (sp.type === 'text') return '';
+    if (sp.type === 'radio') return sp.opts[0].v;
+    return sp.opts[0];
+  }
+  function fieldValue(sp, z, sets){
+    const v = sets && sets[sp.k];
+    return v === undefined ? fieldDefault(sp, z) : v;
+  }
+
+  /* The rate on the face of the card, in the same numbers the settings form
+     edits — someone who runs Barcelona flats can tell at a glance whether
+     9,50 and the 7-night cap are still right. */
+  function taxLine(z, sets){
+    if (!z.tax) return '';
+    const price  = fieldValue(FEATURE_SETS.tax[0], z, sets);
+    const age    = fieldValue(FEATURE_SETS.tax[3], z, sets);
+    const nights = fieldValue(FEATURE_SETS.tax[4], z, sets);
+    const bits = [];
+    if (+age) bits.push(`Exempt: ${age} y/o or under`);
+    if (+nights) bits.push(`Taxed up to ${nights} nights`);
+    /* What the figure is made of belongs in the form, not on the row: three
+       lines of small print here buried the number itself. */
+    return `<b>${price} \u20ac per guest / night</b><i>${bits.join(' \u00b7 ')}</i>`;
+  }
 
 
   function taxFor(c, region){
@@ -1326,11 +1402,19 @@
       const key = (scheme || 'none') + '|' + (tax ? tax.amount : '');
       let z = zonas.find(x => x.key === key);
       if (!z){
-        z = { key, scheme, tax, flag:c.flag, country:c.name, places:[], units:0, regional: !!sub };
+        z = { key, scheme, tax, flag:c.flag, country:c.name, places:[], units:0, regional: !!sub, name:'' };
         zonas.push(z);
       }
       z.places.push(r.region);
       z.units += r.units;
+    });
+    /* The group is named after the places in it, not after the authority it
+       answers to: "Madrid & Valencia" is what the user recognises, and the
+       scheme belongs on the reporting row where it says who receives it. */
+    zonas.forEach(z => {
+      z.name = z.places.length === 1
+        ? z.places[0]
+        : z.places.slice(0, -1).join(', ') + ' & ' + z.places[z.places.length - 1];
     });
     state.zones = zonas;
     if (!state.zoneTax) state.zoneTax = {};
@@ -1350,7 +1434,7 @@
     $('#groupRows').innerHTML = zonas.map(z => `
       <div class="grp">
         <span class="grp-flag">${z.flag}</span>
-        <span class="grp-t"><b>${z.places.join(', ')}</b><i>${z.regional ? z.country + ' \u2014 this region has rules of its own' : z.country}</i></span>
+        <span class="grp-t"><b>${z.name}</b><i>${z.regional ? z.country + ' \u2014 this region has rules of its own' : z.country}</i></span>
         <span class="grp-n">${z.units} ${z.units === 1 ? 'property' : 'properties'}</span>
       </div>`).join('');
 
@@ -1369,7 +1453,7 @@
         ? `<span class="fx-tag">${tag}</span>`
         : FEATURE_SETS[kind] ? `<button type="button" class="fx-set" data-zi="${zi}" data-kind="${kind}">Settings</button>` : '';
       return `<div class="fx${on ? ' on' : ''}">
-        <label class="fx-main">${box}<span class="fx-t">${label}</span><span class="fx-n">${note}</span></label>
+        <label class="fx-main">${box}<span class="fx-t">${label}</span><span class="fx-n${/<b>/.test(note) ? ' fx-n2' : ''}">${note}</span></label>
         ${right}
       </div>`;
     };
@@ -1378,15 +1462,16 @@
       const cm = COMPLY[z.scheme];
       const F = state.zoneFeat[z.key];
       const filas = [];
-      if (z.scheme) filas.push(featRow(z, zi, 'police', true, true, 'Police reporting', 'Required by law', 'Set up later'));
-      filas.push(featRow(z, zi, 'id', F.id, false, 'Guest ID verification', 'We recommend it — not required here'));
+      if (z.scheme) filas.push(featRow(z, zi, 'police', true, true, 'Police reporting',
+        `Reported to ${z.scheme} \u00b7 required by law`, 'Set up later'));
+      filas.push(featRow(z, zi, 'id', F.id, false, 'Guest ID verification', 'We recommend it'));
       if (z.tax) filas.push(featRow(z, zi, 'tax', state.zoneTax[z.key], false, 'Tourist tax',
-        `${z.tax.amount} per guest, per night`));
+        taxLine(z, F.sets && F.sets.tax)));
       else filas.push(`<div class="fx off"><span class="fx-main"><span class="fx-dash">\u2014</span><span class="fx-t">Tourist tax</span><span class="fx-n">Not charged where these properties are</span></span></div>`);
       return `<div class="zone" data-zk="${z.key}">
         <div class="zhead2">
           <span class="zshield"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg></span>
-          <span class="ztitle"><b>${z.scheme || 'No registration required'}</b><i>${z.flag} ${z.places.join(', ')} \u00b7 ${z.units} ${z.units === 1 ? 'property' : 'properties'}</i></span>
+          <span class="ztitle"><b>${z.name}</b><i>${z.flag} ${z.country} \u00b7 ${z.units} ${z.units === 1 ? 'property' : 'properties'}</i></span>
         </div>
         ${cm ? `<p class="zreqline"><b>Required here</b> ${cm.req}</p>` : ''}
         <div class="fxs">${filas.join('')}</div>
@@ -1414,19 +1499,74 @@
       box.dataset.kind = kind;
       box.hidden = false;
       b.classList.add('open');
-      box.innerHTML = FEATURE_SETS[kind].map(sp => {
-        const cur = (F.sets[kind] && F.sets[kind][sp.k]) || sp.opts[0];
-        return `<div class="zs"><span>${sp.t}</span><select data-zi="${b.dataset.zi}" data-kind="${kind}" data-field="${sp.k}">` +
-          sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select></div>`;
-      }).join('') + `<p class="zs-note">Applies to the ${zonas[+b.dataset.zi].units} properties in this group only.</p>`;
-      box.querySelectorAll('select[data-field]').forEach(sel => sel.addEventListener('change', e => {
-        const k = zonas[+e.target.dataset.zi].key, kd = e.target.dataset.kind, field = e.target.dataset.field;
-        state.zoneFeat[k].sets[kd] = state.zoneFeat[k].sets[kd] || {};
-        state.zoneFeat[k].sets[kd][field] = e.target.value;
-      }));
+      const zn = zonas[+b.dataset.zi];
+      pintaCajon(box, zona, zn, zk, kind, b.dataset.zi);
     }));
 
-    renderAddons(read);
+    /* Its own function because one field can reveal another — choosing to keep
+       images for a number of days has to produce the field that says how
+       many — and that means drawing the form again, not patching it. */
+    function pintaCajon(box, zona, zn, zk, kind, zi){
+      const F = state.zoneFeat[zk];
+      const sets = F.sets[kind] || {};
+      const visibles = FEATURE_SETS[kind].filter(sp =>
+        !sp.showIf || fieldValue(FEATURE_SETS[kind].find(x => x.k === sp.showIf.k), zn, sets) === sp.showIf.v);
+      const dset = `data-zi="${zi}" data-kind="${kind}"`;
+      box.innerHTML = visibles.map(sp => {
+        const cur = fieldValue(sp, zn, sets);
+        const id  = `${dset} data-field="${sp.k}"`;
+        const desc = sp.k === 'price' && zn.tax && zn.tax.note ? zn.tax.note : sp.d;
+        const eti = `<span class="zs-l">${sp.t}${sp.opt ? '<em>Optional</em>' : ''}${desc ? `<i>${desc}</i>` : ''}</span>`;
+        if (sp.type === 'radio'){
+          return `<div class="zs zs-col">${eti}<div class="zs-radios">` + sp.opts.map(o => `
+            <label class="zs-r"><input type="radio" name="r${zi}${sp.k}" ${id} value="${o.v}" ${o.v === cur ? 'checked' : ''}>
+              <span><b>${o.v}</b><i>${o.d}</i></span></label>`).join('') + `</div></div>`;
+        }
+        const ctl = sp.type === 'toggle'
+            ? `<input type="checkbox" class="zs-tg" ${id} ${cur ? 'checked' : ''}>`
+          : sp.type === 'num'
+            ? `<span class="zs-num"><input type="text" inputmode="decimal" ${id} value="${cur}">${sp.suffix ? `<i>${sp.suffix}</i>` : ''}</span>`
+          : sp.type === 'text'
+            ? `<input type="text" class="zs-txt" ${id} value="${cur}" placeholder="${sp.ph || ''}">`
+          : `<select ${id}>` + sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select>`;
+        return `<div class="zs">${eti}${ctl}</div>`;
+      }).join('')
+        + (kind === 'tax' ? `<button type="button" class="zs-export">Export these settings to the other groups</button>` : '')
+        + `<p class="zs-note">Applies to the ${zn.units} ${zn.units === 1 ? 'property' : 'properties'} in ${zn.name} only.</p>`;
+
+      box.querySelectorAll('[data-field]').forEach(el => {
+        const evt = (el.tagName === 'INPUT' && el.type === 'text') ? 'input' : 'change';
+        el.addEventListener(evt, e => {
+          const t = e.target, field = t.dataset.field;
+          F.sets[kind] = F.sets[kind] || {};
+          F.sets[kind][field] = t.type === 'checkbox' ? t.checked : t.value;
+          /* The rate on the card is the same number this form edits, so it
+             follows the edit instead of waiting for a re-render. */
+          if (kind === 'tax'){
+            const fila = zona.querySelector('.fx-n2');
+            if (fila) fila.innerHTML = taxLine(zn, F.sets.tax);
+          }
+          if (FEATURE_SETS[kind].some(sp => sp.showIf && sp.showIf.k === field)){
+            pintaCajon(box, zona, zn, zk, kind, zi);
+          }
+        });
+      });
+
+      const exp = box.querySelector('.zs-export');
+      if (exp) exp.addEventListener('click', () => {
+        /* Same rate everywhere is rarely right — the amount is local — so this
+           copies how it is charged and leaves each group's own figures alone. */
+        const src = F.sets.tax || {};
+        zonas.forEach(o => {
+          if (o.key === zk || !o.tax) return;
+          const dst = state.zoneFeat[o.key].sets.tax = state.zoneFeat[o.key].sets.tax || {};
+          ['exname','exrule','skip','fees'].forEach(f => { if (src[f] !== undefined) dst[f] = src[f]; });
+        });
+        exp.textContent = 'Copied to the other groups';
+        exp.disabled = true;
+      });
+    }
+
     /* The waiver suggestion used to be written out here as well, in almost
        the same words as the switch below it. One of them had to go, and a
        banner you cannot act on is the weaker half. */
@@ -1458,52 +1598,10 @@
     importTimer = setInterval(tick, 900);
   }
 
-  /* Recommendations, each tied to something the read actually found — volume,
-     nightly rate, markets. One of them is a question rather than a suggestion,
-     because whether the doors have smart locks is not in any PMS. Everything
-     here defaults on except that question: these are worth having, and the
-     honest way to sell them is to let someone switch them off. */
-  /* protect starts undefined on purpose: false would mean the user turned it
-     off, and we would never dare recommend it. */
-  state.addons = { id:true, locks:false };
-  function addonSpec(read){
-    const many = read.units >= 20;
-    const pricey = read.avg >= 180;
-    return [
-      /* ID verification now lives inside each zone, where it can be set per
-         group — repeating it here would be the same switch in two places. */
-      { k:'protect', t:'Deposits and damage waivers',
-        d:pricey
-          ? `At ${read.avg}\u20ac a night a damaged flat costs more than a deposit covers, so the waiver takes the rest.`
-          : 'Take a deposit at check-in, or let guests pay a small waiver instead.',
-        why:pricey ? `Suggested \u2014 ${read.avg}\u20ac average` : 'Optional' },
-      { k:'locks', t:'Remote access',
-        d:'Send the door code or key with the check-in link, once the guest is verified.',
-        why:'Do your properties have smart locks?', ask:true },
-    ];
-  }
-  function renderAddons(read){
-    /* What we recommend arrives switched on. Suggesting something and leaving
-       it off asks the user to do the work of agreeing with us; leaving it on
-       and easy to undo is the honest version of selling it. The one we cannot
-       know stays off — it is a question, not a recommendation. */
-    if (read.avg >= 180 && state.addons.protect === undefined) state.addons.protect = true;
-    const box = $('#addonList');
-    box.innerHTML = addonSpec(read).map(a => `
-      <label class="ad" data-k="${a.k}">
-        <input type="checkbox" ${state.addons[a.k] ? 'checked' : ''}>
-        <span class="ad-b"><b>${a.t}</b><i>${a.d}</i></span>
-        <span class="ad-why${a.ask ? ' ask' : ''}">${a.why}</span>
-      </label>`).join('');
-    box.querySelectorAll('.ad input').forEach(i => {
-      i.addEventListener('change', e => {
-        const k = e.target.closest('.ad').dataset.k;
-        state.addons[k] = e.target.checked;
-        refresh();
-      });
-    });
-    $('#addons').classList.add('on');
-  }
+  /* The upsell block that used to sit under the groups is out of this page:
+     it is the legal-compliance step, and deposits or door codes are not
+     compliance. state.addons stays so the plan keeps reading it. */
+  state.addons = {};
 
   function scanResultCopy(){
     $('#scanTitle').textContent = `Here is what ${state.pms ? state.pms.name : 'your PMS'} told us`;
