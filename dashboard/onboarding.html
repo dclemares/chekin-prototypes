@@ -377,10 +377,13 @@
   .prio .apps span{font:600 11px var(--font-primary);color:var(--text-gray-dark);background:var(--bg-neutral-light);border:1px solid var(--stroke-gray-lighter);padding:3px 9px;border-radius:999px}
 
   /* Step 5 — plan */
-  .plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+  /* An even split left the steps 338px wide, so every description wrapped to
+     two lines and the plan ran past the button that finishes it. The list is
+     the substance here; the preview is the reward, and it does not need half. */
+  .plan-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;align-items:start}
   .rail2 .r2.more{color:#AEB7F5;font-style:normal;opacity:.85;padding-left:2px}
   .plan-list{display:flex;flex-direction:column;gap:0}
-  .pl-item{display:flex;gap:14px;padding:14px 4px;border-bottom:1px solid var(--stroke-gray-lighter)}
+  .pl-item{display:flex;gap:13px;padding:11px 4px;border-bottom:1px solid var(--stroke-gray-lighter)}
   .pl-item:last-child{border-bottom:none}
   .pl-item .no{width:26px;height:26px;border-radius:50%;background:var(--bg-blue-light);color:var(--text-brand);display:grid;place-items:center;font:700 12px var(--font-primary);flex-shrink:0}
   .pl-item .t{font:600 14px/19px var(--font-primary)}
@@ -1744,7 +1747,7 @@
     }
     const ad = state.addons || {};
     if (ad.protect) steps.push({ k:'protect', phase:'Protect', t:'Turn on deposits and damage waivers',
-      d:`Charged at check-in, released after checkout — or a waiver instead, so the guest pays a few euros and you carry no risk.`, eta:2 });
+      d:`Charged at check-in and released after checkout, or a small waiver instead.`, eta:2 });
     if (ad.locks) steps.push({ k:'locks', phase:'Protect', t:'Connect your smart locks',
       d:'The code goes out with the check-in link, only once the guest is verified.', eta:3 });
 
@@ -1811,9 +1814,17 @@
       list.appendChild(el);
     });
     $('#planTotal span').textContent = `You can be live in about ${total} minutes.`;
+    /* "Based on your answers" stopped being true once the portfolio came from
+       the PMS: the countries, the count and the obligations were read, not
+       answered. Saying so is also the better line. */
+    const leido = state.geoFromRead;
     $('#planLead').textContent = regulated()
-      ? 'Based on your answers — compliance handled automatically, plus the tools you picked.'
-      : 'Based on your answers — no legal paperwork in your markets, so we go straight to revenue and time savings.';
+      ? (leido
+          ? `Built from what ${state.pms ? state.pms.name : 'your PMS'} told us — compliance handled automatically, plus the tools you picked.`
+          : 'Based on your answers — compliance handled automatically, plus the tools you picked.')
+      : (leido
+          ? `Built from what ${state.pms ? state.pms.name : 'your PMS'} told us — no legal paperwork in your markets, so we go straight to revenue and time savings.`
+          : 'Based on your answers — no legal paperwork in your markets, so we go straight to revenue and time savings.');
 
     // Mini hero rail (first 4 steps)
     const rail = $('#pvRail');
