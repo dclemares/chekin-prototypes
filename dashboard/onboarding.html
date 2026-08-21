@@ -223,6 +223,9 @@
   .scan-list li.done{color:var(--text-dark)}
   .scan-list li.done::before{border-color:var(--success);background:var(--success)}
 
+  .backtoread{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-6px 0 16px;padding:10px 14px;
+    border-radius:var(--radius-lg);background:var(--bg-blue-light);font:400 13px var(--font-primary);color:var(--text-dark)}
+  .backtoread[hidden]{display:none}
   .found{max-width:704px}
   .found-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px}
   .found-n b{font:700 22px var(--font-primary);color:var(--text-dark)}
@@ -490,6 +493,14 @@
         <div class="multihint">
           <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           Select every country where you operate — you can pick more than one.
+        </div>
+
+        <!-- Only when there is a read to go back to. "Set it manually" used to
+             be a one-way door: press it by accident and the only way back to
+             the diagnosis was changing your PMS. -->
+        <div class="backtoread" id="backToRead" hidden>
+          <span>You chose to fill this in yourself.</span>
+          <button type="button" class="linkish" id="useRead">Use what we read from <b id="useReadPms">your PMS</b> instead</button>
         </div>
 
         <div class="csearch">
@@ -1342,6 +1353,12 @@
     }, 2100);
   }
 
+  $('#useRead').addEventListener('click', () => {
+    /* The read is still there — it was never thrown away, only stepped over. */
+    state.manualGeo = false;
+    show(7);
+  });
+
   $('#scanManual').addEventListener('click', () => {
     /* The read can be wrong — a property with no address, a market we do not
        cover. Falling back to the question has to stay one click away. */
@@ -1970,6 +1987,11 @@
     $('#cbar').style.width = ((i + 1) / f.length * 100) + '%';
     $('#btnBack').style.visibility = i > 0 ? 'visible' : 'hidden';
     $('#btnSkip').style.display = step === LAST ? 'none' : '';
+    if (step === 1){
+      const puede = state.pmsConnected && state.manualGeo && state.pms;
+      $('#backToRead').hidden = !puede;
+      if (puede) $('#useReadPms').textContent = state.pms.name;
+    }
     if (step === 7) runScan();
     if (step !== 7 && state.pmsConnected) startImport();
     if (step === 4) setupPrioStep();
