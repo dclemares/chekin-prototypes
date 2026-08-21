@@ -283,6 +283,14 @@
      Two options instead of three, so the grid splits in half rather than
      leaving a gap where a third feature would be. */
   #protRows .zgrid{grid-template-columns:1fr 1fr}
+  .pflag{display:inline-flex;border:1px solid var(--stroke-gray-light);border-radius:20px;background:var(--bg-white);
+    padding:2px;gap:2px;flex-shrink:0}
+  .pflag button{border:0;background:none;cursor:pointer;border-radius:20px;padding:4px 11px;
+    font:600 11px var(--font-primary);color:var(--text-gray-dark);white-space:nowrap}
+  .pflag button:hover{color:var(--text-dark)}
+  .pflag button.on{background:var(--text-brand);color:#fff}
+  .sw.dis{opacity:.4;pointer-events:none}
+  .zs-foot{margin:-4px 0 9px;font:400 11px var(--font-primary);color:var(--text-gray-medium);text-align:right}
   .grp-foot.warn{color:var(--text-warn)}
   .grp-foot.warn::before{border-color:var(--text-warn)}
 
@@ -1363,23 +1371,19 @@
   /* The settings someone might want to change for one group and not another.
      Two per feature: enough to be a real setting, few enough to stay readable
      inside the card. */
-  /* The plans as they are sold: the standard three sit under Chekin's own
-     Program Policy and are named by what they cover, because a coverage limit
-     is the thing a host actually compares. Stellar is the separate policy.
-     Every figure excludes VAT. */
+  /* The three plans as they are sold, all under Chekin's own Program Policy
+     and named by what they cover, because a coverage limit is the thing a
+     host actually compares. Every figure excludes VAT. */
   const PLANS = [
-    { k:'p1500', lim:'Up to 1.500 \u20ac', pol:'Chekin Program Policy',
+    { k:'p1500', lim:'Up to 1.500 \u20ac',
       d:'Instant, essential damage coverage that ensures peace of mind for everyone.',
-      flat:'28,00 \u20ac', day:'1,00 \u20ac' },
-    { k:'p2500', lim:'Up to 2.500 \u20ac', pol:'Chekin Program Policy',
+      flat:'20.50$', day:'3.00$' },
+    { k:'p2500', lim:'Up to 2.500 \u20ac',
       d:'Designed for properties seeking robust protection with seamless claims processing for both parties.',
-      flat:'42,00 \u20ac', day:'4,00 \u20ac' },
-    { k:'p5000', lim:'Up to 5.000 \u20ac', pol:'Chekin Program Policy',
-      d:'Full coverage with extra benefits, ideal for high-value properties.',
-      flat:'60,00 \u20ac', day:'8,00 \u20ac', details:true },
-    { k:'stellar', lim:'Stellar', pol:'Stellar Program Policy',
+      flat:'27.20$', day:'4.05$' },
+    { k:'p5000', lim:'Up to 5.000 \u20ac',
       d:'Premium properties need advanced protection with comprehensive coverage and quicker claim support.',
-      flat:'65,00 \u20ac', day:'7,00 \u20ac' },
+      flat:'32.99$', day:'4.63$', details:true },
   ];
   /* Recommended off the nightly rate the read came back with, because that is
      the only thing we know about what a stay is worth. */
@@ -1407,23 +1411,23 @@
     ],
     program: [
       { k:'plan',   t:'Coverage', type:'radio', calc:'plan',
-        d:'The three standard limits are covered by Chekin\u2019s Program Policy; Stellar has its own. All prices exclude VAT.',
+        d:'The 1.500 \u20ac, 2.500 \u20ac and 5.000 \u20ac limits are covered by Chekin\u2019s Program Policy. All prices exclude VAT.',
         opts:PLANS.map(pl => ({ v:pl.lim,
           d:`<b>${pl.flat}</b> a stay, or ${pl.day} a day, or the nightly price \u00f7 150<u>${pl.d}</u>${
               pl.details ? '<a>View coverage details</a>' : ''}` })) },
-      { k:'fee',    t:'Charge the fee to the guest', type:'toggle', on:true,
+      { k:'fee',    t:'Enter damage protection fee to guests', type:'toggle', on:true,
         d:'Off means you absorb it and protection stays invisible to them.' },
-      { k:'must',   t:'Can the guest skip it?', opts:['Always required','The guest can skip it'],
-        d:'Whether a property protection option always has to be paid before check-in.' },
+      { k:'addfee', t:'Additional fee amount', type:'num', suffix:'$', def:'0', foot:'Per booking',
+        showIf:{ k:'fee', v:true },
+        d:'Charged on top of the plan price, on every booking.' },
       { k:'skip',   t:'Booking sources excluded', opt:true, opts:['None','Airbnb','Booking.com','Airbnb and Booking.com'] },
     ],
     deposit: [
-      { k:'amount', t:'Deposit amount', type:'num', suffix:'\u20ac', def:'250,00',
+      { k:'amount', t:'Deposit amount', type:'num', suffix:'\u20ac', def:'200,00',
         d:'Held on the card, released after checkout.' },
       { k:'dtype',  t:'Type of deposit', opts:['Pre-authorisation','Retention'],
         d:'A pre-authorisation reserves the amount; a retention takes it and gives it back.' },
       { k:'dfees',  t:'The guest pays the payment fees', type:'toggle', on:false },
-      { k:'must',   t:'Can the guest skip it?', opts:['Always required','The guest can skip it'] },
       { k:'skip',   t:'Booking sources excluded', opt:true, opts:['None','Airbnb','Booking.com','Airbnb and Booking.com'] },
     ],
     tax: [
@@ -1512,7 +1516,7 @@
 
   function planSugerido(avg){
     const a = avg || state.readAvg || 140;
-    return a < 110 ? 'p1500' : a < 160 ? 'p2500' : a < 220 ? 'p5000' : 'stellar';
+    return a < 110 ? 'p1500' : a < 160 ? 'p2500' : 'p5000';
   }
   /* What the card face says about the choice, in the numbers that were set. */
   function protLine(z, kind){
@@ -1536,46 +1540,76 @@
     const z = { key:'all', name:'All your properties', flag:'', country:'',
                 units:Number(state.size) || 0, avg:state.readAvg || 0, tax:null };
     if (!state.zoneFeat) state.zoneFeat = {};
-    if (!state.zoneFeat.all) state.zoneFeat.all = { id:true, program:true, deposit:false, sets:{} };
+    if (!state.zoneFeat.all) state.zoneFeat.all = { id:true, program:true, deposit:true, prot:'mandatory', sets:{} };
     return [z];
   }
+
+  const PROT_FLAG = [
+    { v:'off',       t:'Off',       d:'Guests are not asked for anything.' },
+    { v:'optional',  t:'Optional',  d:'Guests are offered it and can skip it.' },
+    { v:'mandatory', t:'Mandatory', d:'Guests must pay one of the active options before check-in.' },
+  ];
 
   function renderProtect(){
     const zonas = protZonas();
     const avg = state.readAvg || null;
     $('#prLead').innerHTML = avg
-      ? `At <b>\u20ac${avg} a night</b>, one broken TV or one stained sofa costs more than a week of good stays \u2014 and it comes out of your revenue unless the guest covers it. Every group starts on the cover that fits what it charges.`
-      : 'A broken TV or a stained sofa comes out of your revenue unless the guest covers it. Pick how they carry it.';
+      ? `At <b>\u20ac${avg} a night</b>, one broken TV or one stained sofa costs more than a week of good stays. Turn on the protection program, the traditional deposit, or both and let the guest choose \u2014 either way they pay it during online check-in, not you.`
+      : 'Turn on the protection program, the traditional deposit, or both and let the guest choose. Either way they pay it during online check-in, not you.';
 
     montaZonas('#protRows', zonas, (z, zi) => {
       const F = state.zoneFeat[z.key];
+      const apagado = F.prot === 'off';
       return [
         tile({ badge:'We recommend it', tone:'rec', title:'Damage protection', help:'program',
-          ctl:swi(zi, 'program', F.program), off:!F.program,
+          ctl:swi(zi, 'program', F.program && !apagado, apagado), off:!F.program || apagado,
           body:protLine(z, 'program'), live:'program', foot:setBtn(zi, 'program') }),
-        tile({ badge:'Or instead', tone:'na', title:'Security deposit', help:'deposit',
-          ctl:swi(zi, 'deposit', F.deposit), off:!F.deposit,
+        tile({ badge:'Traditional option', title:'Security deposit', help:'deposit',
+          ctl:swi(zi, 'deposit', F.deposit && !apagado, apagado), off:!F.deposit || apagado,
           body:protLine(z, 'deposit'), live:'deposit', foot:setBtn(zi, 'deposit') }),
       ];
-    }, z => z.country
-        ? `${z.flag} ${z.country} \u00b7 \u20ac${z.avg} a night`
-        : 'Everything you add, until you split them into groups',
-       pintaPie);
+    },
+    z => z.country
+      ? `${z.flag} ${z.country} \u00b7 \u20ac${z.avg} a night \u00b7 ${z.units} ${z.units === 1 ? 'property' : 'properties'}`
+      : 'Everything you add, until you split them into groups',
+    pintaPie,
+    (z, zi) => {
+      const cur = state.zoneFeat[z.key].prot || 'mandatory';
+      const sel = PROT_FLAG.find(f => f.v === cur);
+      return `<span class="pflag" title="${sel ? sel.d : ''}">${PROT_FLAG.map(f =>
+        `<button type="button" data-zi="${zi}" data-v="${f.v}" class="${f.v === cur ? 'on' : ''}"${
+          f.v === cur ? ` aria-current="true"` : ''}>${f.t}</button>`).join('')}</span>`;
+    });
 
-    /* Turning a group off has to be said out loud. A switch going grey is easy
-       to miss; "damage there comes out of your own pocket" is not. */
+    /* What each state means, said once under the cards rather than repeated
+       three times inside them. */
     function pintaPie(){
-      const sin = zonas.filter(z => {
-        const F = state.zoneFeat[z.key];
-        return !F.program && !F.deposit;
-      });
+      const off  = zonas.filter(z => state.zoneFeat[z.key].prot === 'off');
+      const opt  = zonas.filter(z => state.zoneFeat[z.key].prot === 'optional');
+      const dos  = zonas.filter(z => { const F = state.zoneFeat[z.key];
+                                       return F.prot !== 'off' && F.program && F.deposit; });
+      const nada = zonas.filter(z => { const F = state.zoneFeat[z.key];
+                                       return F.prot !== 'off' && !F.program && !F.deposit; });
       const pie = $('#prFoot');
-      pie.innerHTML = !sin.length
-        ? 'Nothing is charged to you. Whichever you pick, the guest pays it as part of their check-in.'
-        : sin.length === zonas.length
-          ? 'Nothing is protected \u2014 damage comes out of your own pocket. Switch one on above to change that.'
-          : `${sin.map(z => z.name).join(' and ')} ${sin.length === 1 ? 'has' : 'have'} no protection: damage there comes out of your own pocket.`;
-      pie.classList.toggle('warn', sin.length > 0);
+      const malo = off.concat(nada);
+      /* Optional is a real setting, not a footnote to the "both are on"
+         message — it is the one that decides whether anybody pays at all. */
+      const partes = [];
+      if (malo.length){
+        partes.push(malo.length === zonas.length
+          ? 'Nothing is protected \u2014 damage comes out of your own pocket. Switch something on above to change that.'
+          : `${malo.map(z => z.name).join(' and ')} ${malo.length === 1 ? 'is' : 'are'} unprotected: damage there comes out of your own pocket.`);
+      }
+      if (opt.length){
+        partes.push(`In ${opt.map(z => z.name).join(' and ')} the guest is offered it and can skip paying.`);
+      }
+      if (!partes.length){
+        partes.push(dos.length === zonas.length
+          ? 'Both options are on everywhere, so the guest decides which suits them at check-in.'
+          : 'Nothing is charged to you. Whichever they pick, the guest pays it during online check-in.');
+      }
+      pie.innerHTML = partes.join(' ');
+      pie.classList.toggle('warn', malo.length > 0);
     }
     pintaPie();
   }
@@ -1613,33 +1647,28 @@
       <div class="ft-b" ${bits.live ? `data-live="${bits.live}"` : ''}>${bits.body}</div>
       ${bits.foot ? `<div class="ft-foot">${bits.foot}</div>` : ''}
     </div>`;
-  const swi = (zi, kind, on) => `<span class="ft-sw"><label class="sw">
-    <input type="checkbox" data-zi="${zi}" data-kind="${kind}" ${on ? 'checked' : ''}><i></i></label></span>`;
+  const swi = (zi, kind, on, dis) => `<span class="ft-sw"><label class="sw${dis ? ' dis' : ''}">
+    <input type="checkbox" data-zi="${zi}" data-kind="${kind}" ${on ? 'checked' : ''} ${dis ? 'disabled' : ''}><i></i></label></span>`;
   const lock = `<span class="ft-lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`;
   const setBtn = (zi, kind) => `<button type="button" class="ft-set" data-zi="${zi}" data-kind="${kind}">Settings</button>`;
 
-  /* Program and deposit are two answers to one question, so switching one on
-     switches the other off rather than letting a guest be charged twice. */
+  /* Both can be on: that is the point of offering them. With the two live the
+     guest picks one at check-in. */
   function toggleZona(z, kind, on){
     const k = z.key;
     if (kind === 'tax'){ state.zoneTax[k] = on; return false; }
-    const F = state.zoneFeat[k];
-    F[kind] = on;
-    if (on && (kind === 'program' || kind === 'deposit')){
-      F[kind === 'program' ? 'deposit' : 'program'] = false;
-      return true;   // the other tile changed too, so redraw
-    }
+    state.zoneFeat[k][kind] = on;
     return false;
   }
 
-  function montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar){
+  function montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn){
     const root = $(rootSel);
     root.innerHTML = zonas.map((z, zi) => `
       <div class="zone" data-zk="${z.key}">
         <div class="zhead3">
           <span class="zshield"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg></span>
           <span class="ztitle"><b>${z.name}</b><i>${subFn ? subFn(z) : `${z.flag} ${z.country}`}</i></span>
-          <span class="zcount">${z.units ? `${z.units} ${z.units === 1 ? 'property' : 'properties'}` : ''}</span>
+          ${headFn ? headFn(z, zi) : `<span class="zcount">${z.units ? `${z.units} ${z.units === 1 ? 'property' : 'properties'}` : ''}</span>`}
         </div>
         <div class="zgrid">${tilesFn(z, zi).join('')}</div>
         <div class="zsettings" hidden></div>
@@ -1648,7 +1677,7 @@
     $$(`${rootSel} .sw input`).forEach(i => i.addEventListener('change', e => {
       const z = zonas[+e.target.dataset.zi];
       const redibuja = toggleZona(z, e.target.dataset.kind, e.target.checked);
-      if (redibuja){ montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar); }
+      if (redibuja){ montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn); }
       else e.target.closest('.ft').classList.toggle('off', !e.target.checked);
       if (alCambiar) alCambiar();
       renderChips();
@@ -1664,6 +1693,17 @@
       abreAyuda(q, q.dataset.help);
     }));
 
+    /* Three states rather than a switch: off, the guest may skip it, the
+       guest must pay one. A switch could not say the middle one. */
+    $$(`${rootSel} .pflag button`).forEach(b => b.addEventListener('click', () => {
+      state.zoneFeat[zonas[+b.dataset.zi].key].prot = b.dataset.v;
+      montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn);
+      if (alCambiar) alCambiar();
+      renderChips();
+      guardaZonas();
+      refresh();
+    }));
+
     $$(`${rootSel} .ft-set`).forEach(b => b.addEventListener('click', () => {
       const zn = zonas[+b.dataset.zi], zk = zn.key, kind = b.dataset.kind;
       const zona = b.closest('.zone');
@@ -1674,7 +1714,7 @@
       box.dataset.kind = kind;
       box.hidden = false;
       b.classList.add('open');
-      pintaCajon(box, zona, zn, zk, kind, b.dataset.zi, () => montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar));
+      pintaCajon(box, zona, zn, zk, kind, b.dataset.zi, () => montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn));
       /* Opening a form the user cannot see is the same as not opening it. */
       box.scrollIntoView({ block:'nearest', behavior:'smooth' });
     }));
@@ -1687,7 +1727,7 @@
     const F = state.zoneFeat[zk];
     const sets = F.sets[kind] || {};
     const visibles = FEATURE_SETS[kind].filter(sp =>
-      !sp.showIf || fieldValue(FEATURE_SETS[kind].find(x => x.k === sp.showIf.k), zn, sets) === sp.showIf.v);
+      !sp.showIf || fieldValue(FEATURE_SETS[kind].find(x => x.k === sp.showIf.k), zn, sets) == sp.showIf.v);
     const dset = `data-zi="${zi}" data-kind="${kind}"`;
     box.innerHTML = visibles.map(sp => {
       const cur = fieldValue(sp, zn, sets);
@@ -1706,7 +1746,7 @@
         : sp.type === 'text'
           ? `<input type="text" class="zs-txt" ${id} value="${cur}" placeholder="${sp.ph || ''}">`
         : `<select ${id}>` + sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select>`;
-      return `<div class="zs">${eti}${ctl}</div>`;
+      return `<div class="zs">${eti}${ctl}</div>${sp.foot ? `<p class="zs-foot">${sp.foot}</p>` : ''}`;
     }).join('')
       + (kind === 'tax' ? `<button type="button" class="zs-export">Export these settings to the other groups</button>` : '')
       + `<p class="zs-note">${zn.units
@@ -1798,7 +1838,7 @@
        one group and not another, which is why they live here. */
     if (!state.zoneFeat) state.zoneFeat = {};
     zonas.forEach(z => {
-      if (!state.zoneFeat[z.key]) state.zoneFeat[z.key] = { id:true, program:true, deposit:false, sets:{} };
+      if (!state.zoneFeat[z.key]) state.zoneFeat[z.key] = { id:true, program:true, deposit:true, prot:'mandatory', sets:{} };
     });
 
     /* The first screen shows the grouping and nothing else: which places we
@@ -2337,8 +2377,9 @@
        plan matches the screen without listing a step per group. */
     const pz = (state.zones && state.zones.length) ? state.zones
              : (state.zoneFeat && state.zoneFeat.all ? [{ key:'all', name:'your properties' }] : []);
-    const conPrograma = pz.filter(z => state.zoneFeat[z.key] && state.zoneFeat[z.key].program);
-    const conDeposito = pz.filter(z => state.zoneFeat[z.key] && state.zoneFeat[z.key].deposit);
+    const activo = z => state.zoneFeat[z.key] && state.zoneFeat[z.key].prot !== 'off';
+    const conPrograma = pz.filter(z => activo(z) && state.zoneFeat[z.key].program);
+    const conDeposito = pz.filter(z => activo(z) && state.zoneFeat[z.key].deposit);
     const nombres = zs => zs.map(z => z.name).join(', ');
     if (conPrograma.length){
       const lims = [...new Set(conPrograma.map(z =>
@@ -2347,8 +2388,10 @@
         d:`${nombres(conPrograma)} \u2014 ${lims.join(' and ')}. The guest pays it with their check-in and we handle any claim.`, eta:2 });
     }
     if (conDeposito.length){
+      const imp = [...new Set(conDeposito.map(z =>
+        fieldValue(FEATURE_SETS.deposit[0], z, (state.zoneFeat[z.key].sets.deposit) || {})))];
       steps.push({ k:'protect', phase:'Protect', t:'Turn on security deposits',
-        d:`${nombres(conDeposito)} \u2014 held on the card before arrival, released after checkout.`, eta:2 });
+        d:`${nombres(conDeposito)} \u2014 ${imp.join(' and ')} \u20ac held on the card before arrival, released after checkout.`, eta:2 });
     }
     const ad = state.addons || {};
     if (ad.locks) steps.push({ k:'locks', phase:'Protect', t:'Connect your smart locks',
