@@ -188,7 +188,7 @@
      room for its own status, the fact that matters (who receives the report,
      the rate being charged) and its own switch. */
   .zone{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);
-    box-shadow:var(--shadow-card);margin-bottom:8px;overflow:hidden}
+    box-shadow:var(--shadow-card);margin-bottom:7px;overflow:hidden}
 
   .zhead3{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;
     padding:10px 16px;border-bottom:1px solid var(--stroke-gray-lighter);background:var(--bg-blue-light)}
@@ -199,7 +199,7 @@
   .zcount{font:600 12.5px var(--font-primary);color:var(--text-gray-dark);white-space:nowrap}
 
   .zgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
-  .ft{padding:10px 16px 11px;border-left:1px solid var(--stroke-gray-lighter);display:flex;flex-direction:column;min-width:0}
+  .ft{padding:10px 16px 10px;border-left:1px solid var(--stroke-gray-lighter);display:flex;flex-direction:column;min-width:0}
   .ft:first-child{border-left:0}
   .ft-badge{font:700 9.5px var(--font-primary);letter-spacing:.06em;text-transform:uppercase;color:var(--text-brand);
     background:var(--bg-blue-light);border-radius:20px;padding:3px 8px;align-self:flex-start;margin-bottom:7px}
@@ -299,25 +299,6 @@
   .psell-w b{color:var(--text-dark);font-weight:700;margin-right:4px}
   .psell .pc-video{border-radius:12px}
   @media (max-width:760px){ .psell{grid-template-columns:1fr} }
-
-  .psum{display:flex;align-items:center;gap:10px;padding:8px 14px;margin-bottom:9px;border-radius:11px;
-    border:1px solid var(--stroke-gray-lighter);background:var(--bg-white);
-    font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark)}
-  .psum b{color:var(--text-dark);font-weight:700}
-  .psum-t{flex:1;min-width:0}
-  .psum-i{width:16px;height:16px;border-radius:50%;flex-shrink:0;background:var(--success);
-    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.2' d='M20 6 9 17l-5-5'/></svg>") center/11px no-repeat;
-    mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.2' d='M20 6 9 17l-5-5'/></svg>") center/11px no-repeat}
-  .psum.warn{border-color:#F3D9AE;background:var(--warn-bg);color:var(--text-warn)}
-  .psum.warn b{color:var(--text-warn)}
-  .psum.warn .psum-i{background:var(--text-warn);
-    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='2.6' d='M12 8v5M12 17h.01'/><path fill='none' stroke='black' stroke-width='2' d='M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z'/></svg>") center/15px no-repeat;
-    mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='2.6' d='M12 8v5M12 17h.01'/><path fill='none' stroke='black' stroke-width='2' d='M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z'/></svg>") center/15px no-repeat}
-  .psum-a{flex-shrink:0;border:1px solid var(--text-brand);background:var(--bg-white);color:var(--text-brand);
-    border-radius:20px;padding:5px 13px;cursor:pointer;font:600 12px var(--font-primary)}
-  .psum-a:hover{background:var(--bg-blue-light)}
-  .psum.warn .psum-a{border-color:var(--text-warn);color:var(--text-warn)}
-  .psum.warn .psum-a:hover{background:#FBEBD4}
 
   #protRows .zgrid{grid-template-columns:1fr 1fr}
   .zpreview{margin:0;padding:5px 16px 6px;border-top:1px solid var(--stroke-gray-lighter);background:var(--bg-screen);
@@ -813,7 +794,6 @@
               <span class="pc-vcap">How damage protection works</span>
             </button>
           </div>
-          <div class="psum" id="prSum"></div>
           <div id="protRows"></div>
         </div>
       </section>
@@ -1480,7 +1460,7 @@
       { k:'amount', t:'Deposit amount', type:'num', suffix:'\u20ac', def:'200,00',
         d:'Held on the card, released after checkout.' },
       { k:'dtype',  t:'Type of deposit', opts:['Retention','Pre-authorisation'],
-        d:'A retention takes the money and gives it back; a pre-authorisation only reserves it.' },
+        d:'A retention charges the money and gives it back later. A pre-authorisation only holds it and is never charged unless you make a claim.' },
       { k:'drel',   t:'Days to release after check-out', type:'num', def:'7',
         showIf:{ k:'dtype', v:'Retention' },
         d:'When the money goes back, counting from check-out. A retention can be held for at most 30 days after it was taken.' },
@@ -1589,9 +1569,12 @@
     const amt = fieldValue(FEATURE_SETS.deposit[0], z, sets);
     const tip = fieldValue(FEATURE_SETS.deposit[1], z, sets);
     const rel = fieldValue(FEATURE_SETS.deposit[2], z, sets);
-    return `${amt} \u20ac held on the card<div class="ft-d">${tip === 'Retention'
-      ? `Returned ${rel} ${+rel === 1 ? 'day' : 'days'} after check-out`
-      : 'Reserved on the card, released after check-out'}</div>`;
+    /* The two are not the same promise to the guest: a retention takes the
+       money and gives it back, a pre-authorisation only holds it and is never
+       charged unless you claim. The card has to say which. */
+    return tip === 'Retention'
+      ? `${amt} \u20ac charged, then returned<div class="ft-d">Back in their account ${rel} ${+rel === 1 ? 'day' : 'days'} after check-out</div>`
+      : `${amt} \u20ac held on the card<div class="ft-d">Never charged unless you make a claim</div>`;
   }
 
   /* Same shape as compliance: a card per group, a switch per option and the
@@ -1614,9 +1597,14 @@
     if (F.prot === 'off') return { txt:'Nothing is asked at check-in.', mal:true };
     const pl  = PLANS.find(x => x.lim === fieldValue(FEATURE_SETS.program[0], z, F.sets.program || {})) || PLANS[1];
     const amt = fieldValue(FEATURE_SETS.deposit[0], z, F.sets.deposit || {});
+    const sd = F.sets.deposit || {};
+    const ret = fieldValue(FEATURE_SETS.deposit[1], z, sd) === 'Retention';
+    const rel = fieldValue(FEATURE_SETS.deposit[2], z, sd);
     const op = [];
     if (F.program) op.push(`a <b>${pl.flat}</b> protection fee`);
-    if (F.deposit) op.push(`a <b>${amt} \u20ac</b> deposit`);
+    if (F.deposit) op.push(ret
+      ? `a <b>${amt} \u20ac</b> deposit, back ${rel} ${+rel === 1 ? 'day' : 'days'} after check-out`
+      : `a <b>${amt} \u20ac</b> hold on their card`);
     if (!op.length) return { txt:'Nothing is asked at check-in \u2014 this group is unprotected.', mal:true };
     const cola = F.prot === 'optional' ? ', and they can skip it' : '';
     return { txt: op.length === 2
@@ -1668,11 +1656,11 @@
       return [
         tile({ title:'Damage protection', help:'program',
           ctl:swi(zi, 'program', F.program && !apagado, apagado), off:!F.program || apagado,
-          body:caraDe(z, 'program', true), live:'program', corto:true,
+          body:caraDe(z, 'program'), live:'program',
           foot: apagado ? '' : setBtn(zi, 'program') }),
         tile({ title:'Security deposit', help:'deposit',
           ctl:swi(zi, 'deposit', F.deposit && !apagado, apagado), off:!F.deposit || apagado,
-          body:caraDe(z, 'deposit', true), live:'deposit', corto:true,
+          body:caraDe(z, 'deposit'), live:'deposit',
           foot: apagado ? '' : setBtn(zi, 'deposit') }),
       ];
     };
@@ -1691,95 +1679,9 @@
       const pv = protPreview(z);
       return `<p class="zpreview${pv.mal ? ' mal' : ''}">${pv.txt}</p>`;
     };
-    const pinta = () => montaZonas('#protRows', zonas, tiles, bajoTitulo, resumen, cabecera, tira);
-
-    /* Deciding the same thing three times is the real cost of splitting into
-       groups, so the common case — the same setup everywhere — is one click
-       rather than six. The bar always offers the single most useful move:
-       protect what is exposed, or level the groups up. */
-    function firma(z){
-      const F = state.zoneFeat[z.key];
-      return [F.prot, F.program, F.deposit,
-        ...EXPORTABLE.program.f.map(k => fieldValue(FEATURE_SETS.program.find(x => x.k === k), z, F.sets.program || {})),
-        ...EXPORTABLE.deposit.f.map(k => fieldValue(FEATURE_SETS.deposit.find(x => x.k === k), z, F.sets.deposit || {})),
-      ].join('|');
-    }
-    function copiaTodo(src){
-      const F = state.zoneFeat[src.key];
-      zonas.forEach(o => {
-        if (o.key === src.key) return;
-        const D = state.zoneFeat[o.key];
-        D.prot = F.prot; D.program = F.program; D.deposit = F.deposit;
-        ['program','deposit'].forEach(kind => {
-          const dst = D.sets[kind] = D.sets[kind] || {};
-          EXPORTABLE[kind].f.forEach(k => {
-            const spec = FEATURE_SETS[kind].find(x => x.k === k);
-            if (spec) dst[k] = fieldValue(spec, src, F.sets[kind] || {});
-          });
-        });
-      });
-    }
-    function enciendeTodo(){
-      zonas.forEach(o => {
-        const D = state.zoneFeat[o.key];
-        if (D.prot === 'off') D.prot = 'mandatory';
-        if (!D.program && !D.deposit){ D.program = true; D.deposit = true; }
-      });
-    }
-
-    function resumen(){
-      const sin = zonas.filter(z => {
-        const F = state.zoneFeat[z.key];
-        return F.prot === 'off' || (!F.program && !F.deposit);
-      });
-      const opt = zonas.filter(z => state.zoneFeat[z.key].prot === 'optional');
-      const iguales = new Set(zonas.map(firma)).size === 1;
-      /* Groups start out differing on purpose — each opens on the cover that
-         fits what it charges. Offering to flatten that on arrival would be
-         telling the user to undo our own recommendation. */
-      const intacto = zonas.every(z => {
-        const F = state.zoneFeat[z.key];
-        return F.prot === 'mandatory' && F.program && F.deposit
-          && !Object.keys(F.sets.program || {}).length
-          && !Object.keys(F.sets.deposit || {}).length;
-      });
-      const bar = $('#prSum');
-      let tono = 'ok', txt = '', accion = '';
-
-      if (sin.length){
-        tono = 'warn';
-        txt = sin.length === zonas.length
-          ? 'Nothing is protected \u2014 every repair comes out of your own pocket.'
-          : `<b>${sin.map(z => z.name).join(' and ')}</b> ${sin.length === 1 ? 'is' : 'are'} unprotected \u2014 damage there comes out of your own pocket.`;
-        accion = `<button type="button" class="psum-a" data-do="on">Protect ${
-          sin.length === zonas.length ? 'every group' : sin.length === 1 ? 'it too' : 'them too'}</button>`;
-      } else if (intacto && zonas.length > 1){
-        txt = `All ${zonas.length} groups covered, each on the plan that fits what it charges \u2014 and none of it costs you anything.`;
-      } else if (zonas.length > 1 && !iguales){
-        txt = `All ${zonas.length} groups are covered, each set up its own way.`;
-        accion = `<button type="button" class="psum-a" data-do="copy">Use ${zonas[0].name}\u2019s setup everywhere</button>`;
-      } else {
-        txt = zonas.length > 1
-          ? `All ${zonas.length} groups covered the same way \u2014 and none of it costs you anything.`
-          : 'Covered \u2014 and none of it costs you anything.';
-      }
-      if (opt.length && !sin.length) txt += ` Guests in ${opt.map(z => z.name).join(' and ')} can skip paying.`;
-
-      bar.className = 'psum ' + tono;
-      bar.innerHTML = `<span class="psum-i"></span><span class="psum-t">${txt}</span>${accion}`;
-      const btn = bar.querySelector('.psum-a');
-      if (btn) btn.addEventListener('click', () => {
-        if (btn.dataset.do === 'on') enciendeTodo(); else copiaTodo(zonas[0]);
-        pinta();
-        resumen();
-        renderChips();
-        guardaZonas();
-        refresh();
-      });
-    }
+    const pinta = () => montaZonas('#protRows', zonas, tiles, bajoTitulo, null, cabecera, tira);
 
     pinta();
-    resumen();
   }
 
   function readPortfolio(){
