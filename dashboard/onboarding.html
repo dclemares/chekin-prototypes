@@ -284,10 +284,10 @@
      leaving a gap where a third feature would be. */
   /* The sell, once, above the groups: what it is for, why it pays, and
      someone explaining it in a minute for the people who would rather watch. */
-  .psell{display:grid;grid-template-columns:1fr 228px;gap:22px;align-items:start;margin-bottom:12px}
+  .psell{display:grid;grid-template-columns:1fr 228px;gap:22px;align-items:start;margin-bottom:10px}
   .psell-t h1{margin:0 0 6px;font:700 27px/1.15 var(--font-primary);color:var(--text-dark);letter-spacing:-.025em}
   .psell-t p{margin:0 0 9px;font:400 13.5px/20px var(--font-primary);color:var(--text-gray-dark)}
-  .psell-w{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+  .psell-w{list-style:none;margin:0;padding:0;display:grid;gap:5px}
   .psell-w li{position:relative;padding-left:22px;font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark)}
   .psell-w li::before{content:"";position:absolute;left:0;top:2px;width:14px;height:14px;border-radius:50%;
     background:var(--bg-success-light);
@@ -299,6 +299,25 @@
   .psell-w b{color:var(--text-dark);font-weight:700;margin-right:4px}
   .psell .pc-video{border-radius:12px}
   @media (max-width:760px){ .psell{grid-template-columns:1fr} }
+
+  .psum{display:flex;align-items:center;gap:10px;padding:8px 14px;margin-bottom:9px;border-radius:11px;
+    border:1px solid var(--stroke-gray-lighter);background:var(--bg-white);
+    font:400 12.5px/17px var(--font-primary);color:var(--text-gray-dark)}
+  .psum b{color:var(--text-dark);font-weight:700}
+  .psum-t{flex:1;min-width:0}
+  .psum-i{width:16px;height:16px;border-radius:50%;flex-shrink:0;background:var(--success);
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.2' d='M20 6 9 17l-5-5'/></svg>") center/11px no-repeat;
+    mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='3.2' d='M20 6 9 17l-5-5'/></svg>") center/11px no-repeat}
+  .psum.warn{border-color:#F3D9AE;background:var(--warn-bg);color:var(--text-warn)}
+  .psum.warn b{color:var(--text-warn)}
+  .psum.warn .psum-i{background:var(--text-warn);
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='2.6' d='M12 8v5M12 17h.01'/><path fill='none' stroke='black' stroke-width='2' d='M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z'/></svg>") center/15px no-repeat;
+    mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='black' stroke-width='2.6' d='M12 8v5M12 17h.01'/><path fill='none' stroke='black' stroke-width='2' d='M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z'/></svg>") center/15px no-repeat}
+  .psum-a{flex-shrink:0;border:1px solid var(--text-brand);background:var(--bg-white);color:var(--text-brand);
+    border-radius:20px;padding:5px 13px;cursor:pointer;font:600 12px var(--font-primary)}
+  .psum-a:hover{background:var(--bg-blue-light)}
+  .psum.warn .psum-a{border-color:var(--text-warn);color:var(--text-warn)}
+  .psum.warn .psum-a:hover{background:#FBEBD4}
 
   #protRows .zgrid{grid-template-columns:1fr 1fr}
   .zpreview{margin:0;padding:5px 16px 6px;border-top:1px solid var(--stroke-gray-lighter);background:var(--bg-screen);
@@ -785,7 +804,7 @@
               <p id="prLead">Things break, and the bill turns up whether you planned for it or not.</p>
               <ul class="psell-w">
                 <li><b>Financial backup</b> Your properties are covered against what nobody saw coming.</li>
-                <li><b>Immediate charges</b> The money arrives online the moment they check in, not after you have chased it.</li>
+                <li><b>Immediate charges</b> The money arrives online the moment they check in, not after you chase it.</li>
               </ul>
             </div>
             <button type="button" class="pc-video" id="prVideo" data-yt="WHgS5t5Qc6s" aria-label="Play: how damage protection works">
@@ -794,8 +813,8 @@
               <span class="pc-vcap">How damage protection works</span>
             </button>
           </div>
+          <div class="psum" id="prSum"></div>
           <div id="protRows"></div>
-          <p class="grp-foot" id="prFoot"></p>
         </div>
       </section>
 
@@ -1616,10 +1635,12 @@
     id:      { t:'Apply these settings to the other groups',    f:['method','who','when','skip','block','keep','days'] },
   };
 
+  /* Mandatory first: it is the default and the one worth reading first. Off
+     leading the row made the way out the most prominent thing in the card. */
   const PROT_FLAG = [
-    { v:'off',       t:'Off',       d:'Guests are not asked for anything.' },
-    { v:'optional',  t:'Optional',  d:'Guests are offered it and can skip it.' },
-    { v:'mandatory', t:'Mandatory', d:'Guests must pay one of the active options before check-in.' },
+    { v:'mandatory', t:'Mandatory' },
+    { v:'optional',  t:'Optional' },
+    { v:'off',       t:'Off' },
   ];
 
   function renderProtect(){
@@ -1638,65 +1659,127 @@
     }
     const avg = state.readAvg || null;
     $('#prLead').innerHTML = avg
-      ? `At <b>\u20ac${avg} a night</b>, one bad stay costs more than a week of good ones \u2014 and the guest can carry it, not you.`
-      : 'A broken TV or a stained sofa can be carried by the guest, not by you.';
+      ? `At <b>\u20ac${avg} a night</b>, one bad stay costs more than a week of good ones \u2014 and the bill turns up whether you planned for it or not. The guest covers it during check-in, and we handle the claim.`
+      : 'Things break, and the bill turns up whether you planned for it or not.';
 
-    montaZonas('#protRows', zonas, (z, zi) => {
+    const tiles = (z, zi) => {
       const F = state.zoneFeat[z.key];
       const apagado = F.prot === 'off';
       return [
         tile({ title:'Damage protection', help:'program',
           ctl:swi(zi, 'program', F.program && !apagado, apagado), off:!F.program || apagado,
-          body:caraDe(z, 'program'), live:'program',
+          body:caraDe(z, 'program', true), live:'program', corto:true,
           foot: apagado ? '' : setBtn(zi, 'program') }),
         tile({ title:'Security deposit', help:'deposit',
           ctl:swi(zi, 'deposit', F.deposit && !apagado, apagado), off:!F.deposit || apagado,
-          body:caraDe(z, 'deposit'), live:'deposit',
+          body:caraDe(z, 'deposit', true), live:'deposit', corto:true,
           foot: apagado ? '' : setBtn(zi, 'deposit') }),
       ];
-    },
-    z => z.country
+    };
+    const bajoTitulo = z => z.country
       ? `${z.flag} ${z.country} \u00b7 \u20ac${z.avg} a night \u00b7 ${z.units} ${z.units === 1 ? 'property' : 'properties'}`
-      : 'Everything you add, until you split them into groups',
-    pintaPie,
-    (z, zi) => {
+      : 'Everything you add, until you split them into groups';
+    const cabecera = (z, zi) => {
       const cur = state.zoneFeat[z.key].prot || 'mandatory';
       return `<span class="phead">
         <button type="button" class="ft-q" data-help="flag" aria-label="What is this?">?</button>
         <span class="pflag">${PROT_FLAG.map(f =>
           `<button type="button" data-zi="${zi}" data-v="${f.v}" class="${f.v === cur ? 'on' : ''}"${
             f.v === cur ? ' aria-current="true"' : ''}>${f.t}</button>`).join('')}</span></span>`;
-    },
-    (z) => {
+    };
+    const tira = z => {
       const pv = protPreview(z);
       return `<p class="zpreview${pv.mal ? ' mal' : ''}">${pv.txt}</p>`;
-    });
+    };
+    const pinta = () => montaZonas('#protRows', zonas, tiles, bajoTitulo, resumen, cabecera, tira);
 
-    /* What each state means, said once under the cards rather than repeated
-       three times inside them. */
-    function pintaPie(){
-      const off  = zonas.filter(z => state.zoneFeat[z.key].prot === 'off');
-      const opt  = zonas.filter(z => state.zoneFeat[z.key].prot === 'optional');
-      const dos  = zonas.filter(z => { const F = state.zoneFeat[z.key];
-                                       return F.prot !== 'off' && F.program && F.deposit; });
-      const nada = zonas.filter(z => { const F = state.zoneFeat[z.key];
-                                       return F.prot !== 'off' && !F.program && !F.deposit; });
-      const pie = $('#prFoot');
-      const malo = off.concat(nada);
-      /* Optional is a real setting, not a footnote to the "both are on"
-         message — it is the one that decides whether anybody pays at all. */
-      /* Each card already states its own outcome, so the footer is only for
-         the thing the cards cannot say: money you would be leaving on the
-         table. Silence when everything is covered. */
-      pie.innerHTML = malo.length
-        ? (malo.length === zonas.length
-            ? 'Nothing is protected \u2014 damage comes out of your own pocket. Switch something on above to change that.'
-            : `${malo.map(z => z.name).join(' and ')} ${malo.length === 1 ? 'is' : 'are'} unprotected: damage there comes out of your own pocket.`)
-        : '';
-      pie.hidden = !malo.length;
-      pie.classList.toggle('warn', malo.length > 0);
+    /* Deciding the same thing three times is the real cost of splitting into
+       groups, so the common case — the same setup everywhere — is one click
+       rather than six. The bar always offers the single most useful move:
+       protect what is exposed, or level the groups up. */
+    function firma(z){
+      const F = state.zoneFeat[z.key];
+      return [F.prot, F.program, F.deposit,
+        ...EXPORTABLE.program.f.map(k => fieldValue(FEATURE_SETS.program.find(x => x.k === k), z, F.sets.program || {})),
+        ...EXPORTABLE.deposit.f.map(k => fieldValue(FEATURE_SETS.deposit.find(x => x.k === k), z, F.sets.deposit || {})),
+      ].join('|');
     }
-    pintaPie();
+    function copiaTodo(src){
+      const F = state.zoneFeat[src.key];
+      zonas.forEach(o => {
+        if (o.key === src.key) return;
+        const D = state.zoneFeat[o.key];
+        D.prot = F.prot; D.program = F.program; D.deposit = F.deposit;
+        ['program','deposit'].forEach(kind => {
+          const dst = D.sets[kind] = D.sets[kind] || {};
+          EXPORTABLE[kind].f.forEach(k => {
+            const spec = FEATURE_SETS[kind].find(x => x.k === k);
+            if (spec) dst[k] = fieldValue(spec, src, F.sets[kind] || {});
+          });
+        });
+      });
+    }
+    function enciendeTodo(){
+      zonas.forEach(o => {
+        const D = state.zoneFeat[o.key];
+        if (D.prot === 'off') D.prot = 'mandatory';
+        if (!D.program && !D.deposit){ D.program = true; D.deposit = true; }
+      });
+    }
+
+    function resumen(){
+      const sin = zonas.filter(z => {
+        const F = state.zoneFeat[z.key];
+        return F.prot === 'off' || (!F.program && !F.deposit);
+      });
+      const opt = zonas.filter(z => state.zoneFeat[z.key].prot === 'optional');
+      const iguales = new Set(zonas.map(firma)).size === 1;
+      /* Groups start out differing on purpose — each opens on the cover that
+         fits what it charges. Offering to flatten that on arrival would be
+         telling the user to undo our own recommendation. */
+      const intacto = zonas.every(z => {
+        const F = state.zoneFeat[z.key];
+        return F.prot === 'mandatory' && F.program && F.deposit
+          && !Object.keys(F.sets.program || {}).length
+          && !Object.keys(F.sets.deposit || {}).length;
+      });
+      const bar = $('#prSum');
+      let tono = 'ok', txt = '', accion = '';
+
+      if (sin.length){
+        tono = 'warn';
+        txt = sin.length === zonas.length
+          ? 'Nothing is protected \u2014 every repair comes out of your own pocket.'
+          : `<b>${sin.map(z => z.name).join(' and ')}</b> ${sin.length === 1 ? 'is' : 'are'} unprotected \u2014 damage there comes out of your own pocket.`;
+        accion = `<button type="button" class="psum-a" data-do="on">Protect ${
+          sin.length === zonas.length ? 'every group' : sin.length === 1 ? 'it too' : 'them too'}</button>`;
+      } else if (intacto && zonas.length > 1){
+        txt = `All ${zonas.length} groups covered, each on the plan that fits what it charges \u2014 and none of it costs you anything.`;
+      } else if (zonas.length > 1 && !iguales){
+        txt = `All ${zonas.length} groups are covered, each set up its own way.`;
+        accion = `<button type="button" class="psum-a" data-do="copy">Use ${zonas[0].name}\u2019s setup everywhere</button>`;
+      } else {
+        txt = zonas.length > 1
+          ? `All ${zonas.length} groups covered the same way \u2014 and none of it costs you anything.`
+          : 'Covered \u2014 and none of it costs you anything.';
+      }
+      if (opt.length && !sin.length) txt += ` Guests in ${opt.map(z => z.name).join(' and ')} can skip paying.`;
+
+      bar.className = 'psum ' + tono;
+      bar.innerHTML = `<span class="psum-i"></span><span class="psum-t">${txt}</span>${accion}`;
+      const btn = bar.querySelector('.psum-a');
+      if (btn) btn.addEventListener('click', () => {
+        if (btn.dataset.do === 'on') enciendeTodo(); else copiaTodo(zonas[0]);
+        pinta();
+        resumen();
+        renderChips();
+        guardaZonas();
+        refresh();
+      });
+    }
+
+    pinta();
+    resumen();
   }
 
   function readPortfolio(){
@@ -1729,7 +1812,7 @@
       ${bits.badge ? `<span class="ft-badge${bits.tone ? ' ' + bits.tone : ''}">${bits.badge}</span>` : ''}
       <div class="ft-h"><span class="ft-t">${bits.title}</span>${bits.help
         ? `<button type="button" class="ft-q" data-help="${bits.help}" aria-label="What is this?">?</button>` : ''}${bits.ctl || ''}</div>
-      <div class="ft-b" ${bits.live ? `data-live="${bits.live}"` : ''}>${bits.body}</div>
+      <div class="ft-b" ${bits.live ? `data-live="${bits.live}"` : ''}${bits.corto ? ' data-short="1"' : ''}>${bits.body}</div>
       ${bits.foot ? `<div class="ft-foot">${bits.foot}</div>` : ''}
     </div>`;
   const swi = (zi, kind, on, dis) => `<span class="ft-sw"><label class="sw${dis ? ' dis' : ''}">
@@ -1741,14 +1824,18 @@
      now. One function so a card face can never disagree with its own form —
      "Who is verified" used to change in the drawer and stay wrong on the
      card. */
-  function caraDe(z, kind){
+  function caraDe(z, kind, corto){
     const F = state.zoneFeat[z.key];
     if (kind === 'tax') return taxLine(z, F.sets.tax || {});
     if (kind === 'id'){
       const sets = F.sets.id || {};
       return `${fieldValue(FEATURE_SETS.id[0], z, sets)}<div class="ft-d">${fieldValue(FEATURE_SETS.id[1], z, sets)}</div>`;
     }
-    return protLine(z, kind);
+    /* On the protection cards the second line said what the strip underneath
+       already says, so the tile keeps the headline and the strip keeps the
+       consequence. */
+    const html = protLine(z, kind);
+    return corto ? html.replace(/<div class="ft-d">[\s\S]*$/, '') : html;
   }
 
   /* Both can be on: that is the point of offering them. With the two live the
@@ -1814,7 +1901,7 @@
     function refrescaCaras(){
       $$(`${rootSel} .zone`).forEach((el, i) => {
         const z = zonas[i];
-        el.querySelectorAll('[data-live]').forEach(n => { n.innerHTML = caraDe(z, n.dataset.live); });
+        el.querySelectorAll('[data-live]').forEach(n => { n.innerHTML = caraDe(z, n.dataset.live, n.dataset.short === '1'); });
         const pv = el.querySelector('.zpreview');
         if (pv && pieFn){
           const tmp = document.createElement('div');
@@ -1886,7 +1973,7 @@
         /* The card states the same values this form edits, so it follows the
            edit instead of waiting for a re-render. */
         const cara = zona.querySelector(`[data-live="${kind}"]`);
-        if (cara) cara.innerHTML = caraDe(zn, kind);
+        if (cara) cara.innerHTML = caraDe(zn, kind, cara.dataset.short === '1');
         const pv = zona.querySelector('.zpreview');
         if (pv && typeof protPreview === 'function' && state.zoneFeat[zk].prot){
           const r = protPreview(zn);
@@ -1895,6 +1982,9 @@
         }
         renderChips();
         guardaZonas();
+        /* The summary above the cards counts what every group is set to, so an
+           edit inside one of these forms has to reach it too. */
+        if (alCambiar) alCambiar();
         if (FEATURE_SETS[kind].some(sp => sp.showIf && sp.showIf.k === field)){
           pintaCajon(box, zona, zn, zk, kind, zi, alCambiar);
         }
