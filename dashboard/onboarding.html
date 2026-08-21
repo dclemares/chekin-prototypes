@@ -255,6 +255,9 @@
   .zs-r input{margin:2px 0 0;accent-color:var(--text-brand);width:14px;height:14px}
   .zs-r b{display:block;font:600 12px var(--font-primary);color:var(--text-dark)}
   .zs-r i{display:block;font:400 11px/15px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  .zs-r i b{font:700 12px var(--font-primary);color:var(--text-dark)}
+  .zs-r i u{display:block;text-decoration:none;margin-top:2px}
+  .zs-r i a{display:block;margin-top:3px;font-weight:600;color:var(--text-brand);cursor:pointer}
   .zs-r:has(input:checked){border-color:var(--text-brand);box-shadow:inset 0 0 0 1px var(--text-brand)}
   .zs-num{display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
   .zs-num input{width:80px;height:31px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
@@ -276,39 +279,12 @@
      the next screen's job — saying it twice made the first one redundant. */
   .grp-why{margin:0 0 14px;font:400 13.5px/21px var(--font-primary);color:var(--text-gray-dark);max-width:68ch}
   .grp-why b{color:var(--text-dark)}
-  /* ───────── Property protection ───────── */
-  .pmodes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-  .pmode{position:relative;text-align:left;padding:14px 16px 15px;cursor:pointer;background:var(--bg-white);
-    border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);
-    transition:border-color .12s,box-shadow .12s}
-  .pmode:hover{border-color:var(--stroke-gray-medium)}
-  .pmode.on{border-color:var(--text-brand);box-shadow:inset 0 0 0 1px var(--text-brand)}
-  .pmode-b{position:absolute;top:13px;right:14px;font:700 9.5px var(--font-primary);letter-spacing:.06em;
-    text-transform:uppercase;color:var(--success);background:var(--bg-success-light);border-radius:20px;padding:3px 8px}
-  .pmode-t{display:block;font:700 14px var(--font-primary);color:var(--text-dark);margin-bottom:5px;padding-right:84px}
-  .pmode-d{display:block;font:400 12px/17px var(--font-primary);color:var(--text-gray-dark)}
-
-  .pnone{grid-column:1/-1;background:none;border:0;padding:2px 0 0;cursor:pointer;text-align:left;
-    font:500 12px var(--font-primary);color:var(--text-gray-medium);text-decoration:underline}
-  .pnone.on{color:var(--text-warn);text-decoration:none;font-weight:600}
-
-  .plans{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-  .plan{position:relative;text-align:left;padding:12px 14px 13px;cursor:pointer;background:var(--bg-white);
-    border:1px solid var(--stroke-gray-lighter);border-radius:12px;transition:border-color .12s}
-  .plan:hover{border-color:var(--stroke-gray-medium)}
-  .plan.on{border-color:var(--text-brand);box-shadow:inset 0 0 0 1px var(--text-brand)}
-  .plan-h{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-  .plan-h b{font:700 13.5px var(--font-primary);color:var(--text-dark)}
-  .plan-h em{font-style:normal;font:700 9px var(--font-primary);letter-spacing:.05em;text-transform:uppercase;
-    color:var(--text-brand);background:var(--bg-blue-light);border-radius:20px;padding:3px 7px;white-space:nowrap}
-  .plan-d{display:block;font:400 11.5px/16px var(--font-primary);color:var(--text-gray-medium);margin-bottom:7px;min-height:32px}
-  .plan-p{display:block;font:400 11.5px var(--font-primary);color:var(--text-gray-dark)}
-  .plan-p b{font:700 14px var(--font-primary);color:var(--text-dark);margin-right:3px}
-  .plan-p i{display:block;font:400 11px var(--font-primary);color:var(--text-gray-medium);font-style:normal;margin-top:1px}
-  .plan-l{display:block;margin-top:6px;font:600 11.5px var(--font-primary);color:var(--text-brand)}
-  .plan-note{margin:9px 0 12px;font:400 11.5px/16px var(--font-primary);color:var(--text-gray-medium)}
-  .prset{margin-top:14px;padding-top:13px;border-top:1px solid var(--stroke-gray-lighter)}
-  @media (max-width:760px){ .pmodes,.plans{grid-template-columns:1fr} }
+  /* ───────── Property protection ─────────
+     Two options instead of three, so the grid splits in half rather than
+     leaving a gap where a third feature would be. */
+  #protRows .zgrid{grid-template-columns:1fr 1fr}
+  .grp-foot.warn{color:var(--text-warn)}
+  .grp-foot.warn::before{border-color:var(--text-warn)}
 
   .stats{display:flex;gap:30px;flex-wrap:wrap}
   .stat b{font:700 24px var(--font-primary);color:var(--text-dark);letter-spacing:-.025em;margin-right:6px}
@@ -775,22 +751,8 @@
         <p class="lead" id="prLead">One bad stay costs more than a month of good ones.</p>
 
         <div class="found">
-          <div class="pmodes" id="prModes"></div>
-          <div id="prBody"></div>
-
-          <div class="prset">
-            <div class="ad-h">Property protection settings</div>
-            <div class="zs">
-              <span class="zs-l">Can the guest skip it?<i>Whether a property protection option always has to be paid before check-in.</i></span>
-              <select id="prMust"><option>Always required</option><option>The guest can skip it</option></select>
-            </div>
-            <div class="zs">
-              <span class="zs-l">Booking sources excluded<em>Optional</em><i>Bookings from these sources are never charged for protection.</i></span>
-              <select id="prSkip"><option>None</option><option>Airbnb</option><option>Booking.com</option><option>Airbnb and Booking.com</option></select>
-            </div>
-          </div>
-
-          <p class="grp-foot" id="prFoot">Nothing is charged to you. Whichever you pick, the guest pays it as part of their check-in.</p>
+          <div id="protRows"></div>
+          <p class="grp-foot" id="prFoot"></p>
         </div>
       </section>
 
@@ -1401,6 +1363,26 @@
   /* The settings someone might want to change for one group and not another.
      Two per feature: enough to be a real setting, few enough to stay readable
      inside the card. */
+  /* The plans as they are sold: the standard three sit under Chekin's own
+     Program Policy and are named by what they cover, because a coverage limit
+     is the thing a host actually compares. Stellar is the separate policy.
+     Every figure excludes VAT. */
+  const PLANS = [
+    { k:'p1500', lim:'Up to 1.500 \u20ac', pol:'Chekin Program Policy',
+      d:'Instant, essential damage coverage that ensures peace of mind for everyone.',
+      flat:'28,00 \u20ac', day:'1,00 \u20ac' },
+    { k:'p2500', lim:'Up to 2.500 \u20ac', pol:'Chekin Program Policy',
+      d:'Designed for properties seeking robust protection with seamless claims processing for both parties.',
+      flat:'42,00 \u20ac', day:'4,00 \u20ac' },
+    { k:'p5000', lim:'Up to 5.000 \u20ac', pol:'Chekin Program Policy',
+      d:'Full coverage with extra benefits, ideal for high-value properties.',
+      flat:'60,00 \u20ac', day:'8,00 \u20ac', details:true },
+    { k:'stellar', lim:'Stellar', pol:'Stellar Program Policy',
+      d:'Premium properties need advanced protection with comprehensive coverage and quicker claim support.',
+      flat:'65,00 \u20ac', day:'7,00 \u20ac' },
+  ];
+  /* Recommended off the nightly rate the read came back with, because that is
+     the only thing we know about what a stay is worth. */
   /* No police entry: reporting is set up once the credentials are filed with
      the authority, so the row carries a "Set up later" tag and no dropdown.
      The other two mirror the settings the product actually has, so what is
@@ -1423,6 +1405,27 @@
         showIf:{ k:'keep', v:'Delete a set number of days after check-in' },
         d:'Images are deleted that many days after each guest\u2019s check-in date.' },
     ],
+    program: [
+      { k:'plan',   t:'Coverage', type:'radio', calc:'plan',
+        d:'The three standard limits are covered by Chekin\u2019s Program Policy; Stellar has its own. All prices exclude VAT.',
+        opts:PLANS.map(pl => ({ v:pl.lim,
+          d:`<b>${pl.flat}</b> a stay, or ${pl.day} a day, or the nightly price \u00f7 150<u>${pl.d}</u>${
+              pl.details ? '<a>View coverage details</a>' : ''}` })) },
+      { k:'fee',    t:'Charge the fee to the guest', type:'toggle', on:true,
+        d:'Off means you absorb it and protection stays invisible to them.' },
+      { k:'must',   t:'Can the guest skip it?', opts:['Always required','The guest can skip it'],
+        d:'Whether a property protection option always has to be paid before check-in.' },
+      { k:'skip',   t:'Booking sources excluded', opt:true, opts:['None','Airbnb','Booking.com','Airbnb and Booking.com'] },
+    ],
+    deposit: [
+      { k:'amount', t:'Deposit amount', type:'num', suffix:'\u20ac', def:'250,00',
+        d:'Held on the card, released after checkout.' },
+      { k:'dtype',  t:'Type of deposit', opts:['Pre-authorisation','Retention'],
+        d:'A pre-authorisation reserves the amount; a retention takes it and gives it back.' },
+      { k:'dfees',  t:'The guest pays the payment fees', type:'toggle', on:false },
+      { k:'must',   t:'Can the guest skip it?', opts:['Always required','The guest can skip it'] },
+      { k:'skip',   t:'Booking sources excluded', opt:true, opts:['None','Airbnb','Booking.com','Airbnb and Booking.com'] },
+    ],
     tax: [
       { k:'price',  t:'Price per night', type:'num', suffix:'\u20ac', from:'price' },
       { k:'exname', t:'Name of the exemption', type:'text', ph:'Children' },
@@ -1439,6 +1442,10 @@
   const QHELP = {
     id: { t:'Guest ID verification',
       d:'Each guest photographs their ID or passport before arrival, and — if you leave the selfie on — takes a photo of themselves that we compare with it. You know the person arriving is the person who booked, and the details the police report needs are already filled in, so nobody types them twice.' },
+    program: { t:'Damage protection program',
+      d:'The guest pays a small fee with their check-in payment, and damage up to the limit you pick is covered. We handle the claim, so you are not the one chasing anybody \u2014 and nothing is blocked on their card, which is why more guests finish check-in.' },
+    deposit: { t:'Security deposit',
+      d:'You hold an amount on the guest\u2019s card before they arrive and release it after they leave. There is no fee for them, but the money is blocked for the whole stay, and if something breaks the claim is yours to make.' },
     tax: { t:'Tourist tax',
       d:'The nightly tax your city or region charges each guest. We work out what every booking owes from how many nights they stay and how old they are, collect it with the check-in payment, and keep the record you would have to show if anyone asks.' },
   };
@@ -1467,6 +1474,7 @@
   /* A field the user has not touched falls back to the zone's own rate, so
      Barcelona opens on 9,50 and Lisbon on 4,00 rather than on a blank form. */
   function fieldDefault(sp, z){
+    if (sp.calc === 'plan') return (PLANS.find(x => x.k === planSugerido(z.avg)) || PLANS[1]).lim;
     if (sp.def !== undefined) return sp.def;
     if (sp.from) return z.tax ? z.tax[sp.from] : '';
     if (sp.type === 'toggle') return !!sp.on;
@@ -1502,112 +1510,74 @@
     return TAX_RATE[region] || TAX_RATE[REGION_SCHEME[region]] || { amount:'', note:'' };
   }
 
-  /* The plans as they are sold: the standard three sit under Chekin's own
-     Program Policy and are named by what they cover, because a coverage limit
-     is the thing a host actually compares. Stellar is the separate policy.
-     Every figure excludes VAT. */
-  const PLANS = [
-    { k:'p1500', lim:'Up to 1.500 \u20ac', pol:'Chekin Program Policy',
-      d:'Instant, essential damage coverage that ensures peace of mind for everyone.',
-      flat:'28,00 \u20ac', day:'1,00 \u20ac' },
-    { k:'p2500', lim:'Up to 2.500 \u20ac', pol:'Chekin Program Policy',
-      d:'Designed for properties seeking robust protection with seamless claims processing for both parties.',
-      flat:'42,00 \u20ac', day:'4,00 \u20ac' },
-    { k:'p5000', lim:'Up to 5.000 \u20ac', pol:'Chekin Program Policy',
-      d:'Full coverage with extra benefits, ideal for high-value properties.',
-      flat:'60,00 \u20ac', day:'8,00 \u20ac', details:true },
-    { k:'stellar', lim:'Stellar', pol:'Stellar Program Policy',
-      d:'Premium properties need advanced protection with comprehensive coverage and quicker claim support.',
-      flat:'65,00 \u20ac', day:'7,00 \u20ac' },
-  ];
-  /* Recommended off the nightly rate the read came back with, because that is
-     the only thing we know about what a stay is worth. */
-  function planSugerido(){
-    const a = state.readAvg || 140;
-    return a < 120 ? 'p1500' : a < 200 ? 'p2500' : a < 300 ? 'p5000' : 'stellar';
+  function planSugerido(avg){
+    const a = avg || state.readAvg || 140;
+    return a < 110 ? 'p1500' : a < 160 ? 'p2500' : a < 220 ? 'p5000' : 'stellar';
+  }
+  /* What the card face says about the choice, in the numbers that were set. */
+  function protLine(z, kind){
+    const sets = (state.zoneFeat[z.key] && state.zoneFeat[z.key].sets[kind]) || {};
+    if (kind === 'program'){
+      const lim = fieldValue(FEATURE_SETS.program[0], z, sets);
+      const pl  = PLANS.find(x => x.lim === lim) || PLANS[1];
+      const fee = fieldValue(FEATURE_SETS.program[1], z, sets);
+      return `${pl.lim}<div class="ft-d">${pl.flat} a stay, ${fee ? 'paid by the guest' : 'absorbed by you'}</div>`;
+    }
+    const amt = fieldValue(FEATURE_SETS.deposit[0], z, sets);
+    const tip = fieldValue(FEATURE_SETS.deposit[1], z, sets);
+    return `${amt} \u20ac held on the card<div class="ft-d">${tip}, released after checkout</div>`;
   }
 
-  state.prot = { mode:'program', plan:null, fee:true,
-                 amount:'250,00', dtype:'Pre-authorisation', dfees:false };
+  /* Same shape as compliance: a card per group, a switch per option and the
+     settings behind it. Without a read there are no groups, so the whole
+     portfolio becomes one. */
+  function protZonas(){
+    if (state.zones && state.zones.length) return state.zones;
+    const z = { key:'all', name:'All your properties', flag:'', country:'',
+                units:Number(state.size) || 0, avg:state.readAvg || 0, tax:null };
+    if (!state.zoneFeat) state.zoneFeat = {};
+    if (!state.zoneFeat.all) state.zoneFeat.all = { id:true, program:true, deposit:false, sets:{} };
+    return [z];
+  }
 
   function renderProtect(){
-    if (!state.prot.plan) state.prot.plan = planSugerido();
-    const P = state.prot;
+    const zonas = protZonas();
     const avg = state.readAvg || null;
-
     $('#prLead').innerHTML = avg
-      ? `At <b>\u20ac${avg} a night</b>, one broken TV or one stained sofa costs more than a week of good stays \u2014 and it comes out of your revenue unless the guest covers it. Pick how they do that.`
-      : 'A broken TV or a stained sofa comes out of your revenue unless the guest covers it. Pick how they do that.';
+      ? `At <b>\u20ac${avg} a night</b>, one broken TV or one stained sofa costs more than a week of good stays \u2014 and it comes out of your revenue unless the guest covers it. Every group starts on the cover that fits what it charges.`
+      : 'A broken TV or a stained sofa comes out of your revenue unless the guest covers it. Pick how they carry it.';
 
-    const modo = (k, t, d, badge) => `
-      <button type="button" class="pmode${P.mode === k ? ' on' : ''}" data-mode="${k}">
-        ${badge ? `<span class="pmode-b">${badge}</span>` : ''}
-        <span class="pmode-t">${t}</span>
-        <span class="pmode-d">${d}</span>
-      </button>`;
+    montaZonas('#protRows', zonas, (z, zi) => {
+      const F = state.zoneFeat[z.key];
+      return [
+        tile({ badge:'We recommend it', tone:'rec', title:'Damage protection', help:'program',
+          ctl:swi(zi, 'program', F.program), off:!F.program,
+          body:protLine(z, 'program'), live:'program', foot:setBtn(zi, 'program') }),
+        tile({ badge:'Or instead', tone:'na', title:'Security deposit', help:'deposit',
+          ctl:swi(zi, 'deposit', F.deposit), off:!F.deposit,
+          body:protLine(z, 'deposit'), live:'deposit', foot:setBtn(zi, 'deposit') }),
+      ];
+    }, z => z.country
+        ? `${z.flag} ${z.country} \u00b7 \u20ac${z.avg} a night`
+        : 'Everything you add, until you split them into groups',
+       pintaPie);
 
-    $('#prModes').innerHTML =
-      modo('program', 'Damage protection program',
-        'The guest pays a small fee with their check-in payment and damage is covered up to the limit you choose. We handle the claim, so you are not the one chasing anybody \u2014 and nothing is blocked on their card.',
-        'Recommended') +
-      modo('deposit', 'Security deposit',
-        'You hold an amount on the guest\u2019s card before arrival and release it after checkout. No fee for them, but the money is blocked for the whole stay and any claim is yours to handle.')
-      + `<button type="button" class="pnone${P.mode === 'none' ? ' on' : ''}" data-mode="none">${
-          P.mode === 'none' ? 'No protection \u2014 damage comes out of your own pocket. Pick one above to change that.'
-                            : 'Neither for now \u2014 I will cover damage myself'}</button>`;
-
-    if (P.mode === 'none'){
-      $('#prBody').innerHTML = '';
-    } else if (P.mode === 'program'){
-      $('#prBody').innerHTML = `
-        <div class="plans">${PLANS.map(pl => `
-          <button type="button" class="plan${P.plan === pl.k ? ' on' : ''}" data-plan="${pl.k}">
-            <span class="plan-h"><b>${pl.lim}</b>${pl.k === planSugerido() ? '<em>Best fit for your rate</em>' : ''}</span>
-            <span class="plan-d">${pl.d}</span>
-            <span class="plan-p"><b>${pl.flat}</b> per stay <i>or ${pl.day} a day, or the nightly price \u00f7 150</i></span>
-            ${pl.details ? '<span class="plan-l">View coverage details</span>' : ''}
-          </button>`).join('')}</div>
-        <p class="plan-note">The three standard limits are covered by Chekin\u2019s Program Policy; Stellar has its own. All prices exclude VAT.</p>
-        <div class="zs">
-          <span class="zs-l">Charge the fee to the guest<i>Off means you absorb it and keep protection invisible to them.</i></span>
-          <label class="sw"><input type="checkbox" id="prFee" ${P.fee ? 'checked' : ''}><i></i></label>
-        </div>`;
-    } else {
-      $('#prBody').innerHTML = `
-        <div class="zs">
-          <span class="zs-l">Deposit amount<i>Held on the card, released after checkout.</i></span>
-          <span class="zs-num"><input type="text" inputmode="decimal" id="prAmt" value="${P.amount}"><i>\u20ac</i></span>
-        </div>
-        <div class="zs">
-          <span class="zs-l">Type of deposit<i>A pre-authorisation reserves the amount; a retention takes it and gives it back.</i></span>
-          <select id="prType">
-            <option ${P.dtype === 'Pre-authorisation' ? 'selected' : ''}>Pre-authorisation</option>
-            <option ${P.dtype === 'Retention' ? 'selected' : ''}>Retention</option>
-          </select>
-        </div>
-        <div class="zs">
-          <span class="zs-l">The guest pays the payment fees</span>
-          <label class="sw"><input type="checkbox" id="prDFees" ${P.dfees ? 'checked' : ''}><i></i></label>
-        </div>`;
-    }
-
-    $$('#prModes .pmode, #prModes .pnone').forEach(b => b.addEventListener('click', () => {
-      state.prot.mode = b.dataset.mode; renderProtect(); renderChips(); refresh();
-    }));
-    $$('#prBody .plan').forEach(b => b.addEventListener('click', () => {
-      state.prot.plan = b.dataset.plan; renderProtect(); refresh();
-    }));
-    const wire = (id, prop, prop2) => {
-      const el = $(id); if (!el) return;
-      el.addEventListener(el.type === 'text' ? 'input' : 'change', e => {
-        state.prot[prop] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-        if (prop2) renderChips();
+    /* Turning a group off has to be said out loud. A switch going grey is easy
+       to miss; "damage there comes out of your own pocket" is not. */
+    function pintaPie(){
+      const sin = zonas.filter(z => {
+        const F = state.zoneFeat[z.key];
+        return !F.program && !F.deposit;
       });
-    };
-    wire('#prFee', 'fee'); wire('#prAmt', 'amount');
-    wire('#prType', 'dtype'); wire('#prDFees', 'dfees');
-    $('.prset').hidden = P.mode === 'none';
-    $('#prFoot').hidden = P.mode === 'none';
+      const pie = $('#prFoot');
+      pie.innerHTML = !sin.length
+        ? 'Nothing is charged to you. Whichever you pick, the guest pays it as part of their check-in.'
+        : sin.length === zonas.length
+          ? 'Nothing is protected \u2014 damage comes out of your own pocket. Switch one on above to change that.'
+          : `${sin.map(z => z.name).join(' and ')} ${sin.length === 1 ? 'has' : 'have'} no protection: damage there comes out of your own pocket.`;
+      pie.classList.toggle('warn', sin.length > 0);
+    }
+    pintaPie();
   }
 
   function readPortfolio(){
@@ -1630,6 +1600,156 @@
     state.size = String(read.units);
     state.readAvg = read.avg;
     state.geoFromRead = true;
+  }
+
+  /* ───────── One card per group, wherever they are shown ─────────
+     Compliance and property protection are the same decision shape: a group
+     of properties, a feature, a switch, and settings behind it. They share
+     the components so they cannot drift apart. */
+  const tile = (bits) => `<div class="ft${bits.off ? ' off' : ''}">
+      <span class="ft-badge${bits.tone ? ' ' + bits.tone : ''}">${bits.badge}</span>
+      <div class="ft-h"><span class="ft-t">${bits.title}</span>${bits.help
+        ? `<button type="button" class="ft-q" data-help="${bits.help}" aria-label="What is this?">?</button>` : ''}${bits.ctl || ''}</div>
+      <div class="ft-b" ${bits.live ? `data-live="${bits.live}"` : ''}>${bits.body}</div>
+      ${bits.foot ? `<div class="ft-foot">${bits.foot}</div>` : ''}
+    </div>`;
+  const swi = (zi, kind, on) => `<span class="ft-sw"><label class="sw">
+    <input type="checkbox" data-zi="${zi}" data-kind="${kind}" ${on ? 'checked' : ''}><i></i></label></span>`;
+  const lock = `<span class="ft-lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`;
+  const setBtn = (zi, kind) => `<button type="button" class="ft-set" data-zi="${zi}" data-kind="${kind}">Settings</button>`;
+
+  /* Program and deposit are two answers to one question, so switching one on
+     switches the other off rather than letting a guest be charged twice. */
+  function toggleZona(z, kind, on){
+    const k = z.key;
+    if (kind === 'tax'){ state.zoneTax[k] = on; return false; }
+    const F = state.zoneFeat[k];
+    F[kind] = on;
+    if (on && (kind === 'program' || kind === 'deposit')){
+      F[kind === 'program' ? 'deposit' : 'program'] = false;
+      return true;   // the other tile changed too, so redraw
+    }
+    return false;
+  }
+
+  function montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar){
+    const root = $(rootSel);
+    root.innerHTML = zonas.map((z, zi) => `
+      <div class="zone" data-zk="${z.key}">
+        <div class="zhead3">
+          <span class="zshield"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="ztitle"><b>${z.name}</b><i>${subFn ? subFn(z) : `${z.flag} ${z.country}`}</i></span>
+          <span class="zcount">${z.units ? `${z.units} ${z.units === 1 ? 'property' : 'properties'}` : ''}</span>
+        </div>
+        <div class="zgrid">${tilesFn(z, zi).join('')}</div>
+        <div class="zsettings" hidden></div>
+      </div>`).join('');
+
+    $$(`${rootSel} .sw input`).forEach(i => i.addEventListener('change', e => {
+      const z = zonas[+e.target.dataset.zi];
+      const redibuja = toggleZona(z, e.target.dataset.kind, e.target.checked);
+      if (redibuja){ montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar); }
+      else e.target.closest('.ft').classList.toggle('off', !e.target.checked);
+      if (alCambiar) alCambiar();
+      renderChips();
+      guardaZonas();
+      refresh();
+    }));
+
+    /* Plain words for the features nobody has to take on trust. Anchored to
+       the button rather than living in the card, because the card is already
+       carrying everything that has to be read at a glance. */
+    $$(`${rootSel} .ft-q`).forEach(q => q.addEventListener('click', e => {
+      e.stopPropagation();
+      abreAyuda(q, q.dataset.help);
+    }));
+
+    $$(`${rootSel} .ft-set`).forEach(b => b.addEventListener('click', () => {
+      const zn = zonas[+b.dataset.zi], zk = zn.key, kind = b.dataset.kind;
+      const zona = b.closest('.zone');
+      const box = zona.querySelector('.zsettings');
+      const abierto = box.dataset.kind === kind && !box.hidden;
+      $$(`${rootSel} .ft-set`).forEach(x => x.classList.remove('open'));
+      if (abierto){ box.hidden = true; box.dataset.kind = ''; return; }
+      box.dataset.kind = kind;
+      box.hidden = false;
+      b.classList.add('open');
+      pintaCajon(box, zona, zn, zk, kind, b.dataset.zi, () => montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar));
+      /* Opening a form the user cannot see is the same as not opening it. */
+      box.scrollIntoView({ block:'nearest', behavior:'smooth' });
+    }));
+  }
+
+  /* Its own function because one field can reveal another — choosing to keep
+     images for a number of days has to produce the field that says how many —
+     and that means drawing the form again, not patching it. */
+  function pintaCajon(box, zona, zn, zk, kind, zi, alCambiar){
+    const F = state.zoneFeat[zk];
+    const sets = F.sets[kind] || {};
+    const visibles = FEATURE_SETS[kind].filter(sp =>
+      !sp.showIf || fieldValue(FEATURE_SETS[kind].find(x => x.k === sp.showIf.k), zn, sets) === sp.showIf.v);
+    const dset = `data-zi="${zi}" data-kind="${kind}"`;
+    box.innerHTML = visibles.map(sp => {
+      const cur = fieldValue(sp, zn, sets);
+      const id  = `${dset} data-field="${sp.k}"`;
+      const desc = sp.k === 'price' && zn.tax && zn.tax.note ? zn.tax.note : sp.d;
+      const eti = `<span class="zs-l">${sp.t}${sp.opt ? '<em>Optional</em>' : ''}${desc ? `<i>${desc}</i>` : ''}</span>`;
+      if (sp.type === 'radio'){
+        return `<div class="zs zs-col">${eti}<div class="zs-radios">` + sp.opts.map(o => `
+          <label class="zs-r"><input type="radio" name="r${zi}${sp.k}" ${id} value="${o.v}" ${o.v === cur ? 'checked' : ''}>
+            <span><b>${o.v}</b><i>${o.d}</i></span></label>`).join('') + `</div></div>`;
+      }
+      const ctl = sp.type === 'toggle'
+          ? `<label class="sw"><input type="checkbox" ${id} ${cur ? 'checked' : ''}><i></i></label>`
+        : sp.type === 'num'
+          ? `<span class="zs-num"><input type="text" inputmode="decimal" ${id} value="${cur}">${sp.suffix ? `<i>${sp.suffix}</i>` : ''}</span>`
+        : sp.type === 'text'
+          ? `<input type="text" class="zs-txt" ${id} value="${cur}" placeholder="${sp.ph || ''}">`
+        : `<select ${id}>` + sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select>`;
+      return `<div class="zs">${eti}${ctl}</div>`;
+    }).join('')
+      + (kind === 'tax' ? `<button type="button" class="zs-export">Export these settings to the other groups</button>` : '')
+      + `<p class="zs-note">${zn.units
+            ? `Applies to the ${zn.units} ${zn.units === 1 ? 'property' : 'properties'} in ${zn.name} only.`
+            : 'Applies to every property in this account.'}</p>`;
+
+    box.querySelectorAll('[data-field]').forEach(el => {
+      const evt = (el.tagName === 'INPUT' && el.type === 'text') ? 'input' : 'change';
+      el.addEventListener(evt, e => {
+        const t = e.target, field = t.dataset.field;
+        F.sets[kind] = F.sets[kind] || {};
+        F.sets[kind][field] = t.type === 'checkbox' ? t.checked : t.value;
+        /* The figure on the card is the same number this form edits, so it
+           follows the edit instead of waiting for a re-render. */
+        if (kind === 'tax'){
+          const fila = zona.querySelector('[data-live="tax"]');
+          if (fila) fila.innerHTML = taxLine(zn, F.sets.tax);
+        }
+        if (kind === 'program' || kind === 'deposit'){
+          const fila = zona.querySelector(`[data-live="${kind}"]`);
+          if (fila) fila.innerHTML = protLine(zn, kind);
+        }
+        renderChips();
+        guardaZonas();
+        if (FEATURE_SETS[kind].some(sp => sp.showIf && sp.showIf.k === field)){
+          pintaCajon(box, zona, zn, zk, kind, zi, alCambiar);
+        }
+      });
+    });
+
+    const exp = box.querySelector('.zs-export');
+    if (exp) exp.addEventListener('click', () => {
+      /* Same rate everywhere is rarely right — the amount is local — so this
+         copies how it is charged and leaves each group's own figures alone. */
+      const src = F.sets.tax || {};
+      (state.zones || []).forEach(o => {
+        if (o.key === zk || !o.tax) return;
+        const dst = state.zoneFeat[o.key].sets.tax = state.zoneFeat[o.key].sets.tax || {};
+        ['exname','exrule','skip','fees'].forEach(f => { if (src[f] !== undefined) dst[f] = src[f]; });
+      });
+      exp.textContent = 'Copied to the other groups';
+      exp.disabled = true;
+    });
   }
 
   function renderFound(read){
@@ -1678,7 +1798,7 @@
        one group and not another, which is why they live here. */
     if (!state.zoneFeat) state.zoneFeat = {};
     zonas.forEach(z => {
-      if (!state.zoneFeat[z.key]) state.zoneFeat[z.key] = { id:true, sets:{} };
+      if (!state.zoneFeat[z.key]) state.zoneFeat[z.key] = { id:true, program:true, deposit:false, sets:{} };
     });
 
     /* The first screen shows the grouping and nothing else: which places we
@@ -1717,26 +1837,10 @@
     /* Wire the DOM by index, not by key: the key is "scheme|amount", so using
        it with a pipe separator split "Mossos d'Esquadra|\u20ac9.50|tax" into the
        wrong three pieces and the settings drawer opened empty. */
-    const tile = (bits) => `<div class="ft${bits.off ? ' off' : ''}">
-        <span class="ft-badge${bits.tone ? ' ' + bits.tone : ''}">${bits.badge}</span>
-        <div class="ft-h"><span class="ft-t">${bits.title}</span>${bits.help
-          ? `<button type="button" class="ft-q" data-help="${bits.help}" aria-label="What is this?">?</button>` : ''}${bits.ctl || ''}</div>
-        <div class="ft-b" ${bits.live ? `data-live="${bits.live}"` : ''}>${bits.body}</div>
-        ${bits.foot ? `<div class="ft-foot">${bits.foot}</div>` : ''}
-      </div>`;
-
-    const swi = (zi, kind, on) => `<span class="ft-sw"><label class="sw">
-      <input type="checkbox" data-zi="${zi}" data-kind="${kind}" ${on ? 'checked' : ''}><i></i></label></span>`;
-    const lock = `<span class="ft-lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`;
-    const setBtn = (zi, kind) => `<button type="button" class="ft-set" data-zi="${zi}" data-kind="${kind}">Settings</button>`;
-
-    $('#foundRows').innerHTML = zonas.map((z, zi) => {
+    montaZonas('#foundRows', zonas, (z, zi) => {
       const cm = COMPLY[z.scheme];
       const F = state.zoneFeat[z.key];
       const idSets = F.sets.id || {};
-      const modo = fieldValue(FEATURE_SETS.id[0], z, idSets);
-      const quien = fieldValue(FEATURE_SETS.id[1], z, idSets);
-
       const cajas = [];
       if (z.scheme) cajas.push(tile({
         badge:'Required by law', title:'Police reporting', ctl:lock,
@@ -1746,7 +1850,7 @@
       cajas.push(tile({
         badge:'We recommend it', tone:'rec', title:'Guest ID verification', help:'id',
         ctl:swi(zi, 'id', F.id), off:!F.id,
-        body:`${modo}<div class="ft-d">${quien}</div>`,
+        body:`${fieldValue(FEATURE_SETS.id[0], z, idSets)}<div class="ft-d">${fieldValue(FEATURE_SETS.id[1], z, idSets)}</div>`,
         foot:setBtn(zi, 'id') }));
 
       cajas.push(z.tax
@@ -1755,114 +1859,8 @@
             body:taxLine(z, F.sets.tax), live:'tax', foot:setBtn(zi, 'tax') })
         : tile({ badge:'Not charged here', tone:'na', title:'Tourist tax', help:'tax', off:true,
             body:`Nothing to collect<div class="ft-d">No nightly tax applies where these properties are.</div>` }));
-
-      return `<div class="zone" data-zk="${z.key}">
-        <div class="zhead3">
-          <span class="zshield"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg></span>
-          <span class="ztitle"><b>${z.name}</b><i>${z.flag} ${z.country}</i></span>
-          <span class="zcount">${z.units} ${z.units === 1 ? 'property' : 'properties'}</span>
-        </div>
-        <div class="zgrid">${cajas.join('')}</div>
-        <div class="zsettings" hidden></div>
-      </div>`;
-    }).join('');
-
-    $$('#foundRows .sw input').forEach(i => i.addEventListener('change', e => {
-      const k = zonas[+e.target.dataset.zi].key, kind = e.target.dataset.kind;
-      if (kind === 'tax') state.zoneTax[k] = e.target.checked;
-      else state.zoneFeat[k][kind] = e.target.checked;
-      e.target.closest('.ft').classList.toggle('off', !e.target.checked);
-      refresh();
-    }));
-
-    /* Plain words for the two features nobody has to take on trust. Anchored
-       to the button rather than living in the card, because the card is
-       already carrying everything that has to be read at a glance. */
-    $$('#foundRows .ft-q').forEach(q => q.addEventListener('click', e => {
-      e.stopPropagation();
-      abreAyuda(q, q.dataset.help);
-    }));
-
-    $$('#foundRows .ft-set').forEach(b => b.addEventListener('click', () => {
-      const zk = zonas[+b.dataset.zi].key, kind = b.dataset.kind;
-      const zona = b.closest('.zone');
-      const box = zona.querySelector('.zsettings');
-      const abierto = box.dataset.kind === kind && !box.hidden;
-      $$('#foundRows .ft-set').forEach(x => x.classList.remove('open'));
-      if (abierto){ box.hidden = true; box.dataset.kind = ''; return; }
-      const F = state.zoneFeat[zk];
-      box.dataset.kind = kind;
-      box.hidden = false;
-      b.classList.add('open');
-      const zn = zonas[+b.dataset.zi];
-      pintaCajon(box, zona, zn, zk, kind, b.dataset.zi);
-      /* Opening a form the user cannot see is the same as not opening it. */
-      box.scrollIntoView({ block:'nearest', behavior:'smooth' });
-    }));
-
-    /* Its own function because one field can reveal another — choosing to keep
-       images for a number of days has to produce the field that says how
-       many — and that means drawing the form again, not patching it. */
-    function pintaCajon(box, zona, zn, zk, kind, zi){
-      const F = state.zoneFeat[zk];
-      const sets = F.sets[kind] || {};
-      const visibles = FEATURE_SETS[kind].filter(sp =>
-        !sp.showIf || fieldValue(FEATURE_SETS[kind].find(x => x.k === sp.showIf.k), zn, sets) === sp.showIf.v);
-      const dset = `data-zi="${zi}" data-kind="${kind}"`;
-      box.innerHTML = visibles.map(sp => {
-        const cur = fieldValue(sp, zn, sets);
-        const id  = `${dset} data-field="${sp.k}"`;
-        const desc = sp.k === 'price' && zn.tax && zn.tax.note ? zn.tax.note : sp.d;
-        const eti = `<span class="zs-l">${sp.t}${sp.opt ? '<em>Optional</em>' : ''}${desc ? `<i>${desc}</i>` : ''}</span>`;
-        if (sp.type === 'radio'){
-          return `<div class="zs zs-col">${eti}<div class="zs-radios">` + sp.opts.map(o => `
-            <label class="zs-r"><input type="radio" name="r${zi}${sp.k}" ${id} value="${o.v}" ${o.v === cur ? 'checked' : ''}>
-              <span><b>${o.v}</b><i>${o.d}</i></span></label>`).join('') + `</div></div>`;
-        }
-        const ctl = sp.type === 'toggle'
-            ? `<label class="sw"><input type="checkbox" ${id} ${cur ? 'checked' : ''}><i></i></label>`
-          : sp.type === 'num'
-            ? `<span class="zs-num"><input type="text" inputmode="decimal" ${id} value="${cur}">${sp.suffix ? `<i>${sp.suffix}</i>` : ''}</span>`
-          : sp.type === 'text'
-            ? `<input type="text" class="zs-txt" ${id} value="${cur}" placeholder="${sp.ph || ''}">`
-          : `<select ${id}>` + sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select>`;
-        return `<div class="zs">${eti}${ctl}</div>`;
-      }).join('')
-        + (kind === 'tax' ? `<button type="button" class="zs-export">Export these settings to the other groups</button>` : '')
-        + `<p class="zs-note">Applies to the ${zn.units} ${zn.units === 1 ? 'property' : 'properties'} in ${zn.name} only.</p>`;
-
-      box.querySelectorAll('[data-field]').forEach(el => {
-        const evt = (el.tagName === 'INPUT' && el.type === 'text') ? 'input' : 'change';
-        el.addEventListener(evt, e => {
-          const t = e.target, field = t.dataset.field;
-          F.sets[kind] = F.sets[kind] || {};
-          F.sets[kind][field] = t.type === 'checkbox' ? t.checked : t.value;
-          /* The rate on the card is the same number this form edits, so it
-             follows the edit instead of waiting for a re-render. */
-          if (kind === 'tax'){
-            const fila = zona.querySelector('[data-live="tax"]');
-            if (fila) fila.innerHTML = taxLine(zn, F.sets.tax);
-          }
-          if (FEATURE_SETS[kind].some(sp => sp.showIf && sp.showIf.k === field)){
-            pintaCajon(box, zona, zn, zk, kind, zi);
-          }
-        });
-      });
-
-      const exp = box.querySelector('.zs-export');
-      if (exp) exp.addEventListener('click', () => {
-        /* Same rate everywhere is rarely right — the amount is local — so this
-           copies how it is charged and leaves each group's own figures alone. */
-        const src = F.sets.tax || {};
-        zonas.forEach(o => {
-          if (o.key === zk || !o.tax) return;
-          const dst = state.zoneFeat[o.key].sets.tax = state.zoneFeat[o.key].sets.tax || {};
-          ['exname','exrule','skip','fees'].forEach(f => { if (src[f] !== undefined) dst[f] = src[f]; });
-        });
-        exp.textContent = 'Copied to the other groups';
-        exp.disabled = true;
-      });
-    }
+      return cajas;
+    });
 
     /* The waiver suggestion used to be written out here as well, in almost
        the same words as the switch below it. One of them had to go, and a
@@ -2335,14 +2333,22 @@
     if ((state.sizeTier ?? 0) >= 2){
       steps.push({ k:'team', phase:'Import', t:'Invite your team', d:'Owners, managers and front desk — each with the right permissions.', eta:3 });
     }
-    const pr = state.prot || {};
-    if (pr.mode === 'program'){
-      const pl = PLANS.find(x => x.k === pr.plan) || PLANS[1];
-      steps.push({ k:'protect', phase:'Protect', t:`Turn on damage protection \u2014 ${pl.lim}`,
-        d:`${pl.flat} a stay, ${pr.fee ? 'paid by the guest with their check-in' : 'absorbed by you'}. We handle any claim.`, eta:2 });
-    } else if (pr.mode === 'deposit'){
+    /* One step per kind of protection, naming the groups it covers, so the
+       plan matches the screen without listing a step per group. */
+    const pz = (state.zones && state.zones.length) ? state.zones
+             : (state.zoneFeat && state.zoneFeat.all ? [{ key:'all', name:'your properties' }] : []);
+    const conPrograma = pz.filter(z => state.zoneFeat[z.key] && state.zoneFeat[z.key].program);
+    const conDeposito = pz.filter(z => state.zoneFeat[z.key] && state.zoneFeat[z.key].deposit);
+    const nombres = zs => zs.map(z => z.name).join(', ');
+    if (conPrograma.length){
+      const lims = [...new Set(conPrograma.map(z =>
+        fieldValue(FEATURE_SETS.program[0], z, (state.zoneFeat[z.key].sets.program) || {})))];
+      steps.push({ k:'protect', phase:'Protect', t:'Turn on damage protection',
+        d:`${nombres(conPrograma)} \u2014 ${lims.join(' and ')}. The guest pays it with their check-in and we handle any claim.`, eta:2 });
+    }
+    if (conDeposito.length){
       steps.push({ k:'protect', phase:'Protect', t:'Turn on security deposits',
-        d:`${pr.amount} \u20ac held on the card as a ${String(pr.dtype).toLowerCase()}, released after checkout.`, eta:2 });
+        d:`${nombres(conDeposito)} \u2014 held on the card before arrival, released after checkout.`, eta:2 });
     }
     const ad = state.addons || {};
     if (ad.locks) steps.push({ k:'locks', phase:'Protect', t:'Connect your smart locks',
@@ -2625,10 +2631,11 @@
       if (puede) $('#useReadPms').textContent = state.pms.name;
     }
     if (step === 7) runScan();
-    /* Resumed straight into the compliance step: the read ran in an earlier
-       session, not in this page load, so the groups it configures would not
+    /* Resumed straight into a step that configures the groups: the read ran
+       in an earlier session, not in this page load, so the groups would not
        exist. Replay the result, not the animation. */
-    if (step === 8 && !$('#foundRows').children.length){ scanRan = true; runScan(); }
+    if ((step === 8 || step === 9) && state.pmsConnected && state.geoFromRead
+        && !(state.zones && state.zones.length)){ scanRan = true; runScan(); }
     if (step !== 7 && state.pmsConnected) startImport();
     if (step === 9) renderProtect();
     if (step === 4) setupPrioStep();
@@ -2673,6 +2680,18 @@
      written until the final step, so a skip on step 3 threw away the countries
      and the portfolio. Progress is kept, and re-entering resumes where it
      stopped rather than starting the questions over. */
+  /* Per-group decisions are written as they are made. Waiting for the next
+     click on Continue meant a reload on the last screen lost them. */
+  function guardaZonas(){
+    try {
+      const raw = localStorage.getItem('chekin_onboarding_progress');
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      p.zoneFeat = state.zoneFeat || {};
+      p.zoneTax = state.zoneTax || {};
+      localStorage.setItem('chekin_onboarding_progress', JSON.stringify(p));
+    } catch(e){}
+  }
   function saveProgress(){
     try {
       localStorage.setItem('chekin_onboarding_progress', JSON.stringify({
@@ -2690,7 +2709,10 @@
         geoFromRead: !!state.geoFromRead,
         manualGeo: !!state.manualGeo,
         imported: !!state.imported,
-        prot: state.prot,
+        /* Everything decided per group lives here now — which features are
+           on and every field behind their Settings. */
+        zoneFeat: state.zoneFeat || {},
+        zoneTax: state.zoneTax || {},
         prios: state.prios
       }));
     } catch(e){}
@@ -2708,7 +2730,10 @@
       const card = groupsBox.querySelector(`.card.country[data-code="${code}"]`);
       if (card && !card.classList.contains('sel')) card.click();
     });
-    if (p.prot && typeof p.prot === 'object') state.prot = { ...state.prot, ...p.prot };
+    /* Restored before the read rebuilds the zones: renderFound only seeds a
+       group it does not already have, so what was set survives. */
+    if (p.zoneFeat && typeof p.zoneFeat === 'object') state.zoneFeat = p.zoneFeat;
+    if (p.zoneTax && typeof p.zoneTax === 'object') state.zoneTax = p.zoneTax;
     state.regions = Array.isArray(p.regions) ? p.regions : [];
     if (p.primary) state.primary = p.primary;
 
