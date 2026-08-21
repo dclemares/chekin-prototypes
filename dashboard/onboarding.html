@@ -354,6 +354,18 @@
   .bfile{display:flex;align-items:center;gap:9px;flex-shrink:0}
   .bfile b{font:600 12px var(--font-primary);color:var(--text-dark)}
   .bfile em{font-style:normal;font:600 11.5px var(--font-primary);color:var(--text-brand);cursor:pointer}
+  .bacc{border-top:1px solid var(--stroke-gray-lighter)}
+  .bacc:first-of-type{border-top:0}
+  .bacc-h{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;background:none;
+    border:0;padding:11px 0;cursor:pointer;text-align:left;
+    font:700 12.5px var(--font-primary);color:var(--text-dark)}
+  .bacc-h span{font:400 16px/1 var(--font-primary);color:var(--text-gray-medium)}
+  .bacc.on .bacc-h{color:var(--text-brand)}
+  .bacc-b{padding:2px 0 10px}
+  .bacc-b .zs:last-of-type{margin-bottom:0}
+  .bupload{border:1px dashed var(--stroke-gray-medium);background:none;border-radius:9px;padding:8px 14px;
+    cursor:pointer;font:600 12px var(--font-primary);color:var(--text-brand)}
+  #brDrawer .zs-r i{margin-top:1px}
 
   /* The account's own palette, read off its website: navy, gold, white. */
   .bphones{display:grid;grid-template-columns:1fr 1fr;gap:16px;--nv:#000029;--gd:#967126;
@@ -1872,73 +1884,136 @@
   /* Taken from the account's own website rather than asked for: someone who
      already has a brand does not want to be walked through picking one. The
      switch decides whether it goes live, not whether it exists. */
-  /* The fields the branding editor actually has, in its own two groups and
-     its own words — General and Style — so what is agreed in onboarding is
-     the template someone opens later, not a friendlier summary of it. */
+  /* The template builder as it stands: two tabs, four accordions each, and
+     the product's own labels and helper text. Values are pre-filled from the
+     read so the template arrives built rather than blank. */
   const BRAND_SETS = {
     General: [
-      { k:'name',   t:'Template name', type:'text', def:'H10 Hotels' },
-      { k:'props',  t:'Properties', opts:['All 14 properties','Selected properties only'],
-        d:'A template can cover the whole portfolio or only the properties you pick.' },
-      { k:'site',   t:'Web title', type:'text', def:'H10 Hotels' },
-      { k:'domain', t:'Domain', type:'text', def:'book.h10hotels.com',
-        d:'Your own domain or a subdomain. We handle the certificate.' },
-      { k:'fav',    t:'Favicon', type:'file', def:'h10-mark.svg' },
-      { k:'logo',   t:'Logo', type:'file', def:'h10-hotels.svg', d:'Taken from your website.' },
-      { k:'splash', t:'Splash screen', type:'toggle', on:true,
-        d:'Your logo on your background while the check-in loads.' },
+      { s:'Template Name & Properties Selection', f:[
+        { k:'name',  t:'Template name', type:'text', def:'H10 Hotels' },
+        { k:'props', t:'Select properties', type:'props', def:'14 selected',
+          d:'The properties where this template applies on the online check-in.' },
+      ]},
+      { s:'Site Settings: Site Title, Favicon & Domain', f:[
+        { k:'title', t:'Site title', type:'text', def:'H10 Hotels',
+          d:'The name of the page in the browser tab when the check-in opens.' },
+        { k:'fav',   t:'Favicon', type:'file', def:'h10-mark.png',
+          d:'Next to the title in the browser tab. 32 × 32 px, ratio 1:1, 500KB max, JPG or PNG.' },
+        { k:'domain', t:'Domain', type:'radio', def:'Custom domain',
+          opts:[
+            { v:'Base domain',      d:'Chekin’s default — guest.chekin.com' },
+            { v:'Chekin subdomain', d:'A customised Chekin subdomain' },
+            { v:'Custom domain',    d:'Your own domain through your DNS — book.h10hotels.com' } ] },
+      ]},
+      { s:'Navigation Title', f:[
+        { k:'nav', t:'What the top bar shows', type:'radio', def:'Logo',
+          opts:[
+            { v:'Property name only', d:'' },
+            { v:'Logo',               d:'Your company logo' },
+            { v:'Logo + property name', d:'Both together' } ] },
+      ]},
+      { s:'Splash Screen', f:[
+        { k:'splash', t:'Loading screen', type:'radio', def:'Splash screen',
+          d:'What a guest sees while the check-in link loads — the first impression.',
+          opts:[ { v:'No splash screen', d:'' }, { v:'Splash screen', d:'Your company logo' } ] },
+      ]},
     ],
     Style: [
-      { k:'primary', t:'Brand colour \u00b7 Primary', type:'colour', def:'#000029' },
-      { k:'icons',   t:'Brand colour \u00b7 Icons', type:'colour', def:'#967126' },
-      { k:'nav',     t:'Navigation menu', opts:['Light','Dark'] },
-      { k:'buttons', t:'Buttons', opts:['Solid','Outlined'] },
-      { k:'font',    t:'Font', opts:['Argent CF and Gotham','Gotham only','System font'],
-        d:'Read from your site. We fall back to the closest web-safe pair.' },
+      { s:'Branding Color Palette', f:[
+        { k:'primary', t:'Brand colour · Primary', type:'colour', def:'#000029',
+          d:'The accent across the app: buttons, links, highlights, progress and the selected menu item.' },
+        { k:'icons',   t:'Brand colour · Icons', type:'colour', def:'#967126' },
+        { k:'fontPri', t:'Font colour · Primary', type:'colour', def:'#152946' },
+        { k:'fontSec', t:'Font colour · Secondary', type:'colour', def:'#777E91' },
+        { k:'bgMain',  t:'Main background', type:'colour', def:'#F4F6F9' },
+        { k:'bgSec',   t:'Secondary background', type:'colour', def:'#EAECEF' },
+        { k:'bgBox',   t:'Boxes & modals', type:'colour', def:'#FFFFFF' },
+      ]},
+      { s:'Navigation Menu', f:[
+        { k:'navBg',  t:'Background', type:'colour', def:'#FFFFFF' },
+        { k:'navTxt', t:'Menu items text', type:'colour', def:'#152946' },
+      ]},
+      { s:'Buttons', f:[
+        { k:'btnBg', t:'Brand colour · Background', type:'colour', def:'#000029' },
+        { k:'btn2',  t:'Secondary button · Text & border', type:'colour', def:'#000029' },
+        { k:'btn3',  t:'Text button · Text', type:'colour', def:'#967126' },
+      ]},
+      { s:'Font', f:[
+        { k:'font', t:'Body', def:'Gotham',
+          d:'Used across the whole app — titles, descriptions, menu items, labels and buttons.',
+          opts:['Gotham','Proxima Nova Regular','Nippo Regular','Ranade Regular','General Sans Regular'] },
+        { k:'upload', t:'', type:'upload' },
+      ]},
     ],
   };
 
-  state.brand = { on:true, site:'h10hotels.com', tab:'General', sets:{} };
+  state.brand = { on:true, site:'h10hotels.com', tab:'General',
+                  open:'Template Name & Properties Selection', sets:{} };
 
+  const brandSpec = k => {
+    for (const tab of Object.values(BRAND_SETS))
+      for (const sec of tab) { const f = sec.f.find(x => x.k === k); if (f) return f; }
+    return null;
+  };
   function brandValue(sp){
+    if (typeof sp === 'string') sp = brandSpec(sp);
+    if (!sp) return '';
     const v = state.brand.sets[sp.k];
     if (v !== undefined) return v;
     if (sp.def !== undefined) return sp.def;
-    if (sp.type === 'toggle') return !!sp.on;
+    if (sp.type === 'radio') return sp.opts[0].v;
     return sp.opts ? sp.opts[0] : '';
   }
 
   function pintaBrandCajon(){
     const box = $('#brDrawer');
-    const grupo = state.brand.tab;
+    const tab = state.brand.tab;
+    const campo = (sp) => {
+      const cur = brandValue(sp);
+      const eti = `<span class="zs-l">${sp.t}${sp.d ? `<i>${sp.d}</i>` : ''}</span>`;
+      if (sp.type === 'radio'){
+        return `<div class="zs zs-col">${eti}<div class="zs-radios">` + sp.opts.map(o => `
+          <label class="zs-r"><input type="radio" name="b${sp.k}" data-bf="${sp.k}" value="${o.v}" ${o.v === cur ? 'checked' : ''}>
+            <span><b>${o.v}</b>${o.d ? `<i>${o.d}</i>` : ''}</span></label>`).join('') + `</div></div>`;
+      }
+      if (sp.type === 'upload') return `<button type="button" class="bupload">+ Upload custom font</button>`;
+      const ctl = sp.type === 'colour'
+          ? `<span class="zs-num"><input type="text" data-bf="${sp.k}" value="${cur}"><b class="bdot" data-dot="${sp.k}" style="background:${cur}"></b></span>`
+        : sp.type === 'file'
+          ? `<span class="bfile"><b>${cur}</b><em>Replace</em></span>`
+        : sp.type === 'props'
+          ? `<span class="bfile"><b>${cur}</b><em>Select properties</em></span>`
+        : sp.type === 'text'
+          ? `<input type="text" class="zs-txt" data-bf="${sp.k}" value="${cur}">`
+        : `<select data-bf="${sp.k}">` + sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select>`;
+      return `<div class="zs">${eti}${ctl}</div>`;
+    };
+
     box.innerHTML = `<div class="btabs">${Object.keys(BRAND_SETS).map(g =>
-        `<button type="button" data-g="${g}" class="${g === grupo ? 'on' : ''}">${g}</button>`).join('')}</div>`
-      + BRAND_SETS[grupo].map(sp => {
-        const cur = brandValue(sp);
-        const eti = `<span class="zs-l">${sp.t}${sp.d ? `<i>${sp.d}</i>` : ''}</span>`;
-        const ctl = sp.type === 'toggle'
-            ? `<label class="sw"><input type="checkbox" data-bf="${sp.k}" ${cur ? 'checked' : ''}><i></i></label>`
-          : sp.type === 'colour'
-            ? `<span class="zs-num"><input type="text" data-bf="${sp.k}" value="${cur}"><b class="bdot" style="background:${cur}"></b></span>`
-          : sp.type === 'file'
-            ? `<span class="bfile"><b>${cur}</b><em>Replace</em></span>`
-          : sp.type === 'text'
-            ? `<input type="text" class="zs-txt" data-bf="${sp.k}" value="${cur}">`
-          : `<select data-bf="${sp.k}">` + sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select>`;
-        return `<div class="zs">${eti}${ctl}</div>`;
-      }).join('')
-      + `<p class="zs-note">Saved as a template. You can duplicate it, rename it or point it at other properties later.</p>`;
+        `<button type="button" data-g="${g}" class="${g === tab ? 'on' : ''}">${g}</button>`).join('')}</div>`
+      + BRAND_SETS[tab].map(sec => {
+          const abierto = state.brand.open === sec.s;
+          return `<div class="bacc${abierto ? ' on' : ''}">
+            <button type="button" class="bacc-h" data-sec="${sec.s}">${sec.s}<span>${abierto ? '−' : '+'}</span></button>
+            ${abierto ? `<div class="bacc-b">${sec.f.map(campo).join('')}</div>` : ''}
+          </div>`;
+        }).join('')
+      + `<p class="zs-note">Saved as a template you can rename, duplicate or point at other properties later.</p>`;
 
     box.querySelectorAll('.btabs button').forEach(b => b.addEventListener('click', () => {
-      state.brand.tab = b.dataset.g; pintaBrandCajon();
+      state.brand.tab = b.dataset.g;
+      state.brand.open = BRAND_SETS[b.dataset.g][0].s;
+      pintaBrandCajon();
+    }));
+    box.querySelectorAll('.bacc-h').forEach(b => b.addEventListener('click', () => {
+      state.brand.open = state.brand.open === b.dataset.sec ? '' : b.dataset.sec;
+      pintaBrandCajon();
     }));
     box.querySelectorAll('[data-bf]').forEach(el => {
       const evt = (el.tagName === 'INPUT' && el.type === 'text') ? 'input' : 'change';
       el.addEventListener(evt, e => {
-        const t = e.target, k = t.dataset.bf;
-        state.brand.sets[k] = t.type === 'checkbox' ? t.checked : t.value;
-        /* The mockups are painted from these values, so an edit lands on them
-           straight away rather than after a reload. */
+        const t = e.target;
+        state.brand.sets[t.dataset.bf] = t.value;
         aplicaMarca();
         pintaCabeceraMarca();
         saveProgress();
@@ -1946,32 +2021,30 @@
     });
   }
 
-  /* The mockups take their colours from the template, not from a hard-coded
-     palette: change the primary here and the two screens follow. */
+  /* The mockups take their colours from the template, so an edit here lands on
+     the two screens rather than waiting for a reload. */
   function aplicaMarca(){
     const caja = $('.bphones');
     if (!caja) return;
-    caja.style.setProperty('--nv', brandValue(BRAND_SETS.Style[0]));
-    caja.style.setProperty('--gd', brandValue(BRAND_SETS.Style[1]));
-    const dot = $$('#brDrawer .bdot');
-    dot.forEach((d, i) => { d.style.background = brandValue(BRAND_SETS.Style[i]); });
+    caja.style.setProperty('--nv', brandValue('primary'));
+    caja.style.setProperty('--gd', brandValue('icons'));
+    $$('#brDrawer .bdot').forEach(d => { d.style.background = brandValue(d.dataset.dot); });
   }
   function pintaCabeceraMarca(){
-    $('#brTitle').textContent = brandValue(BRAND_SETS.General[0]) || 'Your template';
+    $('#brTitle').textContent = brandValue('name') || 'Your template';
+    const dom = brandValue('domain');
+    const dir = dom === 'Base domain' ? 'guest.chekin.com'
+              : dom === 'Chekin subdomain' ? 'h10.guest.chekin.com'
+              : `book.${state.brand.site}`;
     $('#brNote').textContent = state.brand.on
-      ? brandValue(BRAND_SETS.General[1])
-      : 'Not applied \u2014 guests see the standard check-in';
-    /* The domain is set in the form and stated over the preview, so it has to
-       follow the field rather than wait for the switch to be touched. */
-    $('#brWhere').textContent = state.brand.on
-      ? `on ${brandValue(BRAND_SETS.General[3])}`
-      : 'on a Chekin address';
+      ? `${brandValue('props').replace('selected', 'properties')} · ${dir}`
+      : 'Not applied — guests see the standard check-in';
+    $('#brWhere').textContent = state.brand.on ? `on ${dir}` : 'on a Chekin address';
   }
 
   function renderBrand(){
     const n = Number(state.size) || 0;
-    const u = unit();
-    if (n && !state.brand.sets.props) BRAND_SETS.General[1].opts[0] = `All ${n} ${u}`;
+    if (n) BRAND_SETS.General[0].f[1].def = `${n} selected`;
     $('#brLead').innerHTML = `Your site at <b>${state.brand.site}</b> gave us the navy, the gold and the type, and we have saved them as your first template. Here is what your guests would open.`;
 
     const box = $('#brOn');
@@ -1982,9 +2055,10 @@
       $('.bphones').classList.toggle('plain', !on);
       $$('.wl-mark').forEach(m => { m.innerHTML = on ? 'H10<em>HOTELS</em>' : 'Chekin'; });
       $('#brSet').style.visibility = on ? 'visible' : 'hidden';
-      if (!on) $('#brDrawer').hidden = true;
+      if (!on){ $('#brDrawer').hidden = true; $('#brSet').classList.remove('open'); }
       pintaCabeceraMarca();
-      if (on) aplicaMarca(); else { const c = $('.bphones'); c.style.removeProperty('--nv'); c.style.removeProperty('--gd'); }
+      if (on) aplicaMarca();
+      else { const c = $('.bphones'); c.style.removeProperty('--nv'); c.style.removeProperty('--gd'); }
     };
     if (!box.dataset.wired){
       box.dataset.wired = '1';
