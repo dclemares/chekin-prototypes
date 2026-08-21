@@ -183,62 +183,91 @@
   .pms.sel .lgimg{filter:none}
   .pms .lg{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font:800 12px var(--font-primary);flex-shrink:0}
 
-  .zone{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:5px;overflow:hidden}
-  .zshield{width:30px;height:30px;border-radius:9px;background:var(--bg-blue-light);display:grid;place-items:center}
-  .zshield svg{width:15px;height:15px;stroke:var(--text-brand);fill:none;stroke-width:2}
-  .ztitle b{display:block;font:600 13.5px var(--font-primary);color:var(--text-dark)}
-  .ztitle i{font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
+  /* ───────── Compliance, one card per group ─────────
+     Three features side by side rather than three cramped rows: each one gets
+     room for its own status, the fact that matters (who receives the report,
+     the rate being charged) and its own switch. */
+  .zone{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);
+    box-shadow:var(--shadow-card);margin-bottom:10px;overflow:hidden}
 
-  .zhead2{display:grid;grid-template-columns:30px 1fr;gap:11px;align-items:center;padding:10px 14px 0}
-  .zreqline{margin:5px 14px 0 55px;padding:0;font:400 11.5px/16px var(--font-primary);color:var(--text-gray-dark)}
-  .zreqline b{font:700 10px var(--font-primary);color:var(--text-gray-medium);text-transform:uppercase;letter-spacing:.05em;margin-right:5px}
-  .fxs{padding:4px 14px 9px}
-  .fx{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:3px 0;border-top:1px solid var(--stroke-gray-lighter)}
-  .fx:first-child{border-top:0}
-  .fx-main{display:grid;grid-template-columns:16px auto 1fr;gap:9px;align-items:center;cursor:pointer;min-width:0}
-  .fx.off .fx-main{cursor:default}
-  .fx input{margin:0;accent-color:var(--text-brand);width:15px;height:15px}
-  .fx-lock{width:15px;height:15px;border-radius:4px;background:var(--success);display:grid;place-items:center}
-  .fx-lock svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3.4}
-  .fx-dash{color:var(--stroke-gray-medium);text-align:center;font-weight:700}
-  .fx-t{font:600 12.5px var(--font-primary);color:var(--text-dark);white-space:nowrap}
-  .fx-n{font:400 12px var(--font-primary);color:var(--text-gray-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .fx-n2{white-space:normal;overflow:visible}
-  .fx-n2 b{font:600 12px var(--font-primary);color:var(--text-dark)}
-  .fx-n2 i{display:block;font:400 11px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
-  .fx.off .fx-t{color:var(--text-gray-medium)}
-  .fx-set{background:none;border:0;padding:2px 4px;cursor:pointer;font:600 12px var(--font-primary);color:var(--text-brand);flex-shrink:0}
-  .fx-set.open{text-decoration:underline}
-  .zsettings{margin:0 14px 12px;padding:11px 13px;border-radius:10px;background:var(--bg-blue-light)}
+  .zhead3{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;
+    padding:12px 16px;border-bottom:1px solid var(--stroke-gray-lighter);background:var(--bg-blue-light)}
+  .zshield{width:34px;height:34px;border-radius:10px;background:var(--bg-white);display:grid;place-items:center}
+  .zshield svg{width:17px;height:17px;stroke:var(--text-brand);fill:none;stroke-width:2}
+  .ztitle b{display:block;font:700 15px var(--font-primary);color:var(--text-dark);letter-spacing:-.01em}
+  .ztitle i{display:block;font:400 12px var(--font-primary);color:var(--text-gray-dark);font-style:normal;margin-top:1px}
+  .zcount{font:600 12.5px var(--font-primary);color:var(--text-gray-dark);white-space:nowrap}
+
+  .zgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .ft{padding:11px 16px 13px;border-left:1px solid var(--stroke-gray-lighter);display:flex;flex-direction:column;min-width:0}
+  .ft:first-child{border-left:0}
+  .ft-badge{font:700 9.5px var(--font-primary);letter-spacing:.06em;text-transform:uppercase;color:var(--text-brand);
+    background:var(--bg-blue-light);border-radius:20px;padding:3px 8px;align-self:flex-start;margin-bottom:7px}
+  .ft-badge.rec{color:var(--success);background:var(--bg-success-light)}
+  .ft-badge.na{color:var(--text-gray-medium);background:var(--bg-neutral-light)}
+  .ft-h{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .ft-t{font:600 13px var(--font-primary);color:var(--text-dark);min-width:0}
+  .ft-q{width:15px;height:15px;flex-shrink:0;border-radius:50%;border:1px solid var(--stroke-gray-medium);background:none;
+    cursor:pointer;padding:0;font:700 10px var(--font-primary);color:var(--text-gray-dark);line-height:1;display:grid;place-items:center}
+  .ft-q:hover{border-color:var(--text-brand);color:var(--text-brand)}
+  .ft-sw{margin-left:auto}
+  .ft-lock{margin-left:auto;width:17px;height:17px;border-radius:5px;background:var(--success);display:grid;place-items:center;flex-shrink:0}
+  .ft-lock svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3.4}
+  .ft-b{font:600 12.5px/17px var(--font-primary);color:var(--text-dark);word-break:break-word}
+  .ft-d{font:400 11.5px/16px var(--font-primary);color:var(--text-gray-medium);margin-top:1px}
+  .ft-foot{margin-top:auto;padding-top:8px}
+  .ft-set{background:none;border:0;padding:0;cursor:pointer;font:600 12px var(--font-primary);color:var(--text-brand)}
+  .ft-set.open{text-decoration:underline}
+  .ft-tag{font:600 10px var(--font-primary);letter-spacing:.04em;text-transform:uppercase;color:var(--text-gray-medium)}
+  .ft.off .ft-b,.ft.off .ft-t{color:var(--text-gray-medium)}
+
+  .sw{position:relative;display:block;width:34px;height:19px;flex-shrink:0}
+  .sw input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer;z-index:2}
+  .sw i{position:absolute;inset:0;border-radius:20px;background:var(--stroke-gray-medium);transition:background .15s}
+  .sw i::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 2px rgba(22,22,67,.2);transition:transform .15s}
+  .sw input:checked + i{background:var(--text-brand)}
+  .sw input:checked + i::after{transform:translateX(15px)}
+  .sw input:focus-visible + i{outline:2px solid var(--text-brand);outline-offset:2px}
+
+  /* Plain-language explainer, opened from the ? next to a feature. */
+  .qpop{position:fixed;z-index:60;width:310px;background:var(--bg-white);border:1px solid var(--stroke-gray-light);
+    border-radius:12px;box-shadow:var(--shadow-hover);padding:13px 15px}
+  .qpop[hidden]{display:none}
+  .qpop b{display:block;font:700 13px var(--font-primary);color:var(--text-dark);margin-bottom:5px}
+  .qpop p{margin:0;font:400 12.5px/18px var(--font-primary);color:var(--text-gray-dark)}
+
+  .zsettings{margin:0;padding:13px 16px 14px;border-top:1px solid var(--stroke-gray-lighter);background:var(--bg-screen)}
   .zsettings[hidden]{display:none}
-  .zs{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .zs{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:9px}
   .zs span{font:600 12px var(--font-primary);color:var(--text-dark)}
-  .zs select{height:30px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
-    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 8px;max-width:60%}
+  .zs select{height:31px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
+    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 9px;min-width:200px;max-width:58%}
   .zs-note{margin:2px 0 0;font:400 11.5px var(--font-primary);color:var(--text-gray-medium)}
   .zs-l{display:block;min-width:0}
   .zs-l em{font-style:normal;font:600 9.5px var(--font-primary);color:var(--text-gray-medium);text-transform:uppercase;
     letter-spacing:.05em;margin-left:6px}
-  .zs-l i{display:block;font:400 11px/15px var(--font-primary);color:var(--text-gray-medium);font-style:normal;margin-top:1px;max-width:44ch}
+  .zs-l i{display:block;font:400 11px/15px var(--font-primary);color:var(--text-gray-medium);font-style:normal;margin-top:1px;max-width:46ch}
   .zs-col{display:block}
-  .zs-radios{display:grid;gap:6px;margin-top:6px}
-  .zs-r{display:grid;grid-template-columns:15px 1fr;gap:9px;align-items:start;padding:8px 10px;cursor:pointer;
-    border:1px solid var(--stroke-gray-light);border-radius:9px;background:var(--bg-white)}
+  .zs-radios{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}
+  .zs-r{display:grid;grid-template-columns:15px 1fr;gap:9px;align-items:start;padding:9px 11px;cursor:pointer;
+    border:1px solid var(--stroke-gray-light);border-radius:10px;background:var(--bg-white)}
   .zs-r input{margin:2px 0 0;accent-color:var(--text-brand);width:14px;height:14px}
   .zs-r b{display:block;font:600 12px var(--font-primary);color:var(--text-dark)}
   .zs-r i{display:block;font:400 11px/15px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
-  .zs-r:has(input:checked){border-color:var(--text-brand);background:var(--bg-white)}
+  .zs-r:has(input:checked){border-color:var(--text-brand);box-shadow:inset 0 0 0 1px var(--text-brand)}
   .zs-num{display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
-  .zs-num input{width:74px;height:30px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
-    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 8px;text-align:right}
+  .zs-num input{width:80px;height:31px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
+    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 9px;text-align:right}
   .zs-num i{font:500 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
-  .zs-txt{width:172px;height:30px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
-    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 8px;flex-shrink:0}
-  .zs-tg{margin:0;accent-color:var(--text-brand);width:16px;height:16px;flex-shrink:0}
-  .zs-export{margin:2px 0 8px;background:none;border:0;padding:0;cursor:pointer;
+  .zs-txt{width:190px;height:31px;border:1px solid var(--stroke-gray-light);border-radius:8px;background:var(--bg-white);
+    font:500 12px var(--font-primary);color:var(--text-dark);padding:0 9px;flex-shrink:0}
+  .zs > .sw{flex-shrink:0}
+  .zs-export{margin:2px 0 9px;background:none;border:0;padding:0;cursor:pointer;
     font:600 12px var(--font-primary);color:var(--text-brand)}
   .zs-export:disabled{color:var(--text-gray-medium);cursor:default}
-  @media (max-width:640px){ .fx{flex-wrap:wrap} .fx-n{white-space:normal} }
+  @media (max-width:900px){ .zgrid{grid-template-columns:1fr} .ft{border-left:0;border-top:1px solid var(--stroke-gray-lighter)}
+    .ft:first-child{border-top:0} .zs-radios{grid-template-columns:1fr} }
 
   .fx-tag{flex-shrink:0;font:600 10.5px var(--font-primary);color:var(--text-gray-medium);text-transform:uppercase;
     letter-spacing:.04em;background:var(--bg-gray-light);border-radius:20px;padding:3px 9px;white-space:nowrap}
@@ -246,12 +275,13 @@
   /* The grouping screen: places and counts only. What each group has to do is
      the next screen's job — saying it twice made the first one redundant. */
   .grp-why{margin:0 0 10px;font:400 13px/19px var(--font-primary);color:var(--text-gray-dark);max-width:60ch}
-  .grp{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:center;padding:11px 14px;
-    border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:7px}
-  .grp-flag{font-size:19px;line-height:1}
-  .grp-t b{display:block;font:600 13.5px var(--font-primary);color:var(--text-dark)}
-  .grp-t i{font:400 12px var(--font-primary);color:var(--text-gray-medium);font-style:normal}
-  .grp-n{font:600 13px var(--font-primary);color:var(--text-dark);white-space:nowrap}
+  .grp{display:grid;grid-template-columns:28px 1fr auto;gap:13px;align-items:center;padding:13px 16px;
+    border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);
+    box-shadow:var(--shadow-card);margin-bottom:8px}
+  .grp-flag{font-size:21px;line-height:1}
+  .grp-t b{display:block;font:700 14.5px var(--font-primary);color:var(--text-dark);letter-spacing:-.01em}
+  .grp-t i{font:400 12px var(--font-primary);color:var(--text-gray-dark);font-style:normal}
+  .grp-n{font:600 12.5px var(--font-primary);color:var(--text-gray-dark);white-space:nowrap}
 
   #railSteps .rstep[hidden]{display:none}
 
@@ -751,6 +781,8 @@
           </div>
         </div>
       </section>
+
+      <div class="qpop" id="qpop" role="dialog" hidden></div>
 
       <!-- Footer nav -->
       <div class="cfoot">
@@ -1322,6 +1354,36 @@
     ],
   };
 
+  /* Written for someone who has never had to think about either of these.
+     No "KYC", no "compliance obligations" — what we do and what they get. */
+  const QHELP = {
+    id: { t:'Guest ID verification',
+      d:'Each guest photographs their ID or passport before arrival, and — if you leave the selfie on — takes a photo of themselves that we compare with it. You know the person arriving is the person who booked, and the details the police report needs are already filled in, so nobody types them twice.' },
+    tax: { t:'Tourist tax',
+      d:'The nightly tax your city or region charges each guest. We work out what every booking owes from how many nights they stay and how old they are, collect it with the check-in payment, and keep the record you would have to show if anyone asks.' },
+  };
+  function abreAyuda(btn, kind){
+    const pop = $('#qpop');
+    if (!pop || !QHELP[kind]) return;
+    if (pop.dataset.for === kind && pop.dataset.at === btn.dataset.zi && !pop.hidden){ cierraAyuda(); return; }
+    pop.innerHTML = `<b>${QHELP[kind].t}</b><p>${QHELP[kind].d}</p>`;
+    pop.dataset.for = kind;
+    pop.dataset.at = btn.dataset.zi || '';
+    pop.hidden = false;
+    const r = btn.getBoundingClientRect();
+    const w = pop.offsetWidth;
+    /* Clamped to the viewport so the third column's popover does not open off
+       the right edge. */
+    pop.style.left = Math.max(12, Math.min(r.left - 8, window.innerWidth - w - 12)) + 'px';
+    const alto = pop.offsetHeight;
+    pop.style.top = (r.bottom + 8 + alto > window.innerHeight ? r.top - alto - 8 : r.bottom + 8) + 'px';
+  }
+  function cierraAyuda(){ const p = $('#qpop'); if (p) p.hidden = true; }
+  document.addEventListener('click', e => { if (!e.target.closest('#qpop')) cierraAyuda(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') cierraAyuda(); });
+  window.addEventListener('scroll', cierraAyuda, true);
+  window.addEventListener('resize', cierraAyuda);
+
   /* A field the user has not touched falls back to the zone's own rate, so
      Barcelona opens on 9,50 and Lisbon on 4,00 rather than on a blank form. */
   function fieldDefault(sp, z){
@@ -1348,9 +1410,9 @@
     const bits = [];
     if (+age) bits.push(`Exempt: ${age} y/o or under`);
     if (+nights) bits.push(`Taxed up to ${nights} nights`);
-    /* What the figure is made of belongs in the form, not on the row: three
+    /* What the figure is made of belongs in the form, not on the card: three
        lines of small print here buried the number itself. */
-    return `<b>${price} \u20ac per guest / night</b><i>${bits.join(' \u00b7 ')}</i>`;
+    return `${price} \u20ac per guest / night<div class="ft-d">${bits.join(' \u00b7 ')}</div>`;
   }
 
 
@@ -1441,59 +1503,78 @@
     /* Wire the DOM by index, not by key: the key is "scheme|amount", so using
        it with a pipe separator split "Mossos d'Esquadra|\u20ac9.50|tax" into the
        wrong three pieces and the settings drawer opened empty. */
-    const featRow = (z, zi, kind, on, locked, label, note, tag) => {
-      const dis = locked ? 'disabled' : '';
-      const box = locked
-        ? `<span class="fx-lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`
-        : `<input type="checkbox" data-zi="${zi}" data-kind="${kind}" ${on ? 'checked' : ''} ${dis}>`;
-      /* A tag instead of a link where there is nothing to set yet: reporting
-         needs credentials filed with the authority, which is the plan step
-         further down, not a dropdown here. */
-      const right = tag
-        ? `<span class="fx-tag">${tag}</span>`
-        : FEATURE_SETS[kind] ? `<button type="button" class="fx-set" data-zi="${zi}" data-kind="${kind}">Settings</button>` : '';
-      return `<div class="fx${on ? ' on' : ''}">
-        <label class="fx-main">${box}<span class="fx-t">${label}</span><span class="fx-n${/<b>/.test(note) ? ' fx-n2' : ''}">${note}</span></label>
-        ${right}
+    const tile = (bits) => `<div class="ft${bits.off ? ' off' : ''}">
+        <span class="ft-badge${bits.tone ? ' ' + bits.tone : ''}">${bits.badge}</span>
+        <div class="ft-h"><span class="ft-t">${bits.title}</span>${bits.help
+          ? `<button type="button" class="ft-q" data-help="${bits.help}" aria-label="What is this?">?</button>` : ''}${bits.ctl || ''}</div>
+        <div class="ft-b" ${bits.live ? `data-live="${bits.live}"` : ''}>${bits.body}</div>
+        ${bits.foot ? `<div class="ft-foot">${bits.foot}</div>` : ''}
       </div>`;
-    };
+
+    const swi = (zi, kind, on) => `<span class="ft-sw"><label class="sw">
+      <input type="checkbox" data-zi="${zi}" data-kind="${kind}" ${on ? 'checked' : ''}><i></i></label></span>`;
+    const lock = `<span class="ft-lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`;
+    const setBtn = (zi, kind) => `<button type="button" class="ft-set" data-zi="${zi}" data-kind="${kind}">Settings</button>`;
 
     $('#foundRows').innerHTML = zonas.map((z, zi) => {
       const cm = COMPLY[z.scheme];
       const F = state.zoneFeat[z.key];
-      const filas = [];
-      if (z.scheme) filas.push(featRow(z, zi, 'police', true, true, 'Police reporting',
-        `Reported to ${z.scheme} \u00b7 required by law`, 'Set up later'));
-      filas.push(featRow(z, zi, 'id', F.id, false, 'Guest ID verification', 'We recommend it'));
-      if (z.tax) filas.push(featRow(z, zi, 'tax', state.zoneTax[z.key], false, 'Tourist tax',
-        taxLine(z, F.sets && F.sets.tax)));
-      else filas.push(`<div class="fx off"><span class="fx-main"><span class="fx-dash">\u2014</span><span class="fx-t">Tourist tax</span><span class="fx-n">Not charged where these properties are</span></span></div>`);
+      const idSets = F.sets.id || {};
+      const modo = fieldValue(FEATURE_SETS.id[0], z, idSets);
+      const quien = fieldValue(FEATURE_SETS.id[1], z, idSets);
+
+      const cajas = [];
+      if (z.scheme) cajas.push(tile({
+        badge:'Required by law', title:'Police reporting', ctl:lock,
+        body:`${z.scheme}<div class="ft-d">${cm ? cm.req : 'Every guest, within the legal deadline'}</div>`,
+        foot:`<span class="ft-tag">Set up later</span>` }));
+
+      cajas.push(tile({
+        badge:'We recommend it', tone:'rec', title:'Guest ID verification', help:'id',
+        ctl:swi(zi, 'id', F.id), off:!F.id,
+        body:`${modo}<div class="ft-d">${quien}</div>`,
+        foot:setBtn(zi, 'id') }));
+
+      cajas.push(z.tax
+        ? tile({ badge:'Charged here', title:'Tourist tax', help:'tax',
+            ctl:swi(zi, 'tax', state.zoneTax[z.key]), off:!state.zoneTax[z.key],
+            body:taxLine(z, F.sets.tax), live:'tax', foot:setBtn(zi, 'tax') })
+        : tile({ badge:'Not charged here', tone:'na', title:'Tourist tax', help:'tax', off:true,
+            body:`Nothing to collect<div class="ft-d">No nightly tax applies where these properties are.</div>` }));
+
       return `<div class="zone" data-zk="${z.key}">
-        <div class="zhead2">
+        <div class="zhead3">
           <span class="zshield"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg></span>
-          <span class="ztitle"><b>${z.name}</b><i>${z.flag} ${z.country} \u00b7 ${z.units} ${z.units === 1 ? 'property' : 'properties'}</i></span>
+          <span class="ztitle"><b>${z.name}</b><i>${z.flag} ${z.country}</i></span>
+          <span class="zcount">${z.units} ${z.units === 1 ? 'property' : 'properties'}</span>
         </div>
-        ${cm ? `<p class="zreqline"><b>Required here</b> ${cm.req}</p>` : ''}
-        <div class="fxs">${filas.join('')}</div>
+        <div class="zgrid">${cajas.join('')}</div>
         <div class="zsettings" hidden></div>
       </div>`;
     }).join('');
 
-    $$('#foundRows [data-zi]').forEach(i => i.addEventListener('change', e => {
-      if (e.target.tagName !== 'INPUT') return;
+    $$('#foundRows .sw input').forEach(i => i.addEventListener('change', e => {
       const k = zonas[+e.target.dataset.zi].key, kind = e.target.dataset.kind;
       if (kind === 'tax') state.zoneTax[k] = e.target.checked;
       else state.zoneFeat[k][kind] = e.target.checked;
-      e.target.closest('.fx').classList.toggle('on', e.target.checked);
+      e.target.closest('.ft').classList.toggle('off', !e.target.checked);
       refresh();
     }));
 
-    $$('#foundRows .fx-set').forEach(b => b.addEventListener('click', () => {
+    /* Plain words for the two features nobody has to take on trust. Anchored
+       to the button rather than living in the card, because the card is
+       already carrying everything that has to be read at a glance. */
+    $$('#foundRows .ft-q').forEach(q => q.addEventListener('click', e => {
+      e.stopPropagation();
+      abreAyuda(q, q.dataset.help);
+    }));
+
+    $$('#foundRows .ft-set').forEach(b => b.addEventListener('click', () => {
       const zk = zonas[+b.dataset.zi].key, kind = b.dataset.kind;
       const zona = b.closest('.zone');
       const box = zona.querySelector('.zsettings');
       const abierto = box.dataset.kind === kind && !box.hidden;
-      $$('#foundRows .fx-set').forEach(x => x.classList.remove('open'));
+      $$('#foundRows .ft-set').forEach(x => x.classList.remove('open'));
       if (abierto){ box.hidden = true; box.dataset.kind = ''; return; }
       const F = state.zoneFeat[zk];
       box.dataset.kind = kind;
@@ -1501,6 +1582,8 @@
       b.classList.add('open');
       const zn = zonas[+b.dataset.zi];
       pintaCajon(box, zona, zn, zk, kind, b.dataset.zi);
+      /* Opening a form the user cannot see is the same as not opening it. */
+      box.scrollIntoView({ block:'nearest', behavior:'smooth' });
     }));
 
     /* Its own function because one field can reveal another — choosing to keep
@@ -1523,7 +1606,7 @@
               <span><b>${o.v}</b><i>${o.d}</i></span></label>`).join('') + `</div></div>`;
         }
         const ctl = sp.type === 'toggle'
-            ? `<input type="checkbox" class="zs-tg" ${id} ${cur ? 'checked' : ''}>`
+            ? `<label class="sw"><input type="checkbox" ${id} ${cur ? 'checked' : ''}><i></i></label>`
           : sp.type === 'num'
             ? `<span class="zs-num"><input type="text" inputmode="decimal" ${id} value="${cur}">${sp.suffix ? `<i>${sp.suffix}</i>` : ''}</span>`
           : sp.type === 'text'
@@ -1543,7 +1626,7 @@
           /* The rate on the card is the same number this form edits, so it
              follows the edit instead of waiting for a re-render. */
           if (kind === 'tax'){
-            const fila = zona.querySelector('.fx-n2');
+            const fila = zona.querySelector('[data-live="tax"]');
             if (fila) fila.innerHTML = taxLine(zn, F.sets.tax);
           }
           if (FEATURE_SETS[kind].some(sp => sp.showIf && sp.showIf.k === field)){
