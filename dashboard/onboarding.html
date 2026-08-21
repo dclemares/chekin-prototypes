@@ -276,6 +276,40 @@
      the next screen's job — saying it twice made the first one redundant. */
   .grp-why{margin:0 0 14px;font:400 13.5px/21px var(--font-primary);color:var(--text-gray-dark);max-width:68ch}
   .grp-why b{color:var(--text-dark)}
+  /* ───────── Property protection ───────── */
+  .pmodes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .pmode{position:relative;text-align:left;padding:14px 16px 15px;cursor:pointer;background:var(--bg-white);
+    border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);
+    transition:border-color .12s,box-shadow .12s}
+  .pmode:hover{border-color:var(--stroke-gray-medium)}
+  .pmode.on{border-color:var(--text-brand);box-shadow:inset 0 0 0 1px var(--text-brand)}
+  .pmode-b{position:absolute;top:13px;right:14px;font:700 9.5px var(--font-primary);letter-spacing:.06em;
+    text-transform:uppercase;color:var(--success);background:var(--bg-success-light);border-radius:20px;padding:3px 8px}
+  .pmode-t{display:block;font:700 14px var(--font-primary);color:var(--text-dark);margin-bottom:5px;padding-right:84px}
+  .pmode-d{display:block;font:400 12px/17px var(--font-primary);color:var(--text-gray-dark)}
+
+  .pnone{grid-column:1/-1;background:none;border:0;padding:2px 0 0;cursor:pointer;text-align:left;
+    font:500 12px var(--font-primary);color:var(--text-gray-medium);text-decoration:underline}
+  .pnone.on{color:var(--text-warn);text-decoration:none;font-weight:600}
+
+  .plans{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .plan{position:relative;text-align:left;padding:12px 14px 13px;cursor:pointer;background:var(--bg-white);
+    border:1px solid var(--stroke-gray-lighter);border-radius:12px;transition:border-color .12s}
+  .plan:hover{border-color:var(--stroke-gray-medium)}
+  .plan.on{border-color:var(--text-brand);box-shadow:inset 0 0 0 1px var(--text-brand)}
+  .plan-h{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .plan-h b{font:700 13.5px var(--font-primary);color:var(--text-dark)}
+  .plan-h em{font-style:normal;font:700 9px var(--font-primary);letter-spacing:.05em;text-transform:uppercase;
+    color:var(--text-brand);background:var(--bg-blue-light);border-radius:20px;padding:3px 7px;white-space:nowrap}
+  .plan-d{display:block;font:400 11.5px/16px var(--font-primary);color:var(--text-gray-medium);margin-bottom:7px;min-height:32px}
+  .plan-p{display:block;font:400 11.5px var(--font-primary);color:var(--text-gray-dark)}
+  .plan-p b{font:700 14px var(--font-primary);color:var(--text-dark);margin-right:3px}
+  .plan-p i{display:block;font:400 11px var(--font-primary);color:var(--text-gray-medium);font-style:normal;margin-top:1px}
+  .plan-l{display:block;margin-top:6px;font:600 11.5px var(--font-primary);color:var(--text-brand)}
+  .plan-note{margin:9px 0 12px;font:400 11.5px/16px var(--font-primary);color:var(--text-gray-medium)}
+  .prset{margin-top:14px;padding-top:13px;border-top:1px solid var(--stroke-gray-lighter)}
+  @media (max-width:760px){ .pmodes,.plans{grid-template-columns:1fr} }
+
   .stats{display:flex;gap:30px;flex-wrap:wrap}
   .stat b{font:700 24px var(--font-primary);color:var(--text-dark);letter-spacing:-.025em;margin-right:6px}
   .stat span{font:600 13px var(--font-primary);color:var(--text-dark)}
@@ -592,8 +626,9 @@
       <div class="rstep" data-s="1"><span class="bub">1</span><div class="txt"><div class="t">How you manage bookings</div><div class="d">PMS sync, OTA calendars or manual.</div></div></div>
       <div class="rstep" data-s="2"><span class="bub">2</span><div class="txt"><div class="t">Where you operate</div><div class="d">Read from your PMS where we can.</div></div></div>
       <div class="rstep" data-s="3" id="railLegal" hidden><span class="bub">3</span><div class="txt"><div class="t">Legal compliance</div><div class="d">Set per group, ready to change.</div></div></div>
-      <div class="rstep" data-s="4"><span class="bub">4</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
-      <div class="rstep" data-s="5"><span class="bub">5</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
+      <div class="rstep" data-s="4"><span class="bub">4</span><div class="txt"><div class="t">Property protection</div><div class="d">Who pays when something breaks.</div></div></div>
+      <div class="rstep" data-s="5"><span class="bub">5</span><div class="txt"><div class="t">What matters most</div><div class="d">We put your priority front and centre.</div></div></div>
+      <div class="rstep" data-s="6"><span class="bub">6</span><div class="txt"><div class="t">Your plan</div><div class="d">A dashboard built for you.</div></div></div>
     </div>
     <div class="plan-so-far">
       <div class="h">Your setup so far</div>
@@ -734,7 +769,32 @@
         </div>
       </section>
 
-      <!-- STEP 4 · Priority -->
+      <!-- STEP 4 · Property protection -->
+      <section class="panel" data-panel="9">
+        <h1 id="prTitle">Protect your properties from damage</h1>
+        <p class="lead" id="prLead">One bad stay costs more than a month of good ones.</p>
+
+        <div class="found">
+          <div class="pmodes" id="prModes"></div>
+          <div id="prBody"></div>
+
+          <div class="prset">
+            <div class="ad-h">Property protection settings</div>
+            <div class="zs">
+              <span class="zs-l">Can the guest skip it?<i>Whether a property protection option always has to be paid before check-in.</i></span>
+              <select id="prMust"><option>Always required</option><option>The guest can skip it</option></select>
+            </div>
+            <div class="zs">
+              <span class="zs-l">Booking sources excluded<em>Optional</em><i>Bookings from these sources are never charged for protection.</i></span>
+              <select id="prSkip"><option>None</option><option>Airbnb</option><option>Booking.com</option><option>Airbnb and Booking.com</option></select>
+            </div>
+          </div>
+
+          <p class="grp-foot" id="prFoot">Nothing is charged to you. Whichever you pick, the guest pays it as part of their check-in.</p>
+        </div>
+      </section>
+
+      <!-- STEP 5 · Priority -->
       <section class="panel" data-panel="4">
         <h1 id="prioTitle">What matters most to you right now?</h1>
         <p class="lead" id="prioLead">Pick one or several — we'll build your dashboard around them. You can change this anytime.</p>
@@ -1018,7 +1078,7 @@
   let step = 1;
   const TOTAL = 5;
   const LAST = 5;
-  const RAIL_OF = { 3:1, 6:1, 7:2, 1:2, 8:3, 4:4, 5:5 };
+  const RAIL_OF = { 3:1, 6:1, 7:2, 1:2, 8:3, 9:4, 4:5, 5:6 };
   /* Bookings first: it is the longest step and the only one that imports
      anything, so getting the PMS authorising early leaves it syncing in the
      background while the shorter questions get answered. */
@@ -1032,9 +1092,9 @@
      question, only comes back if the read is wrong or there was no PMS. */
   function flow(){
     const connectable = state.manage === 'pms' && state.pms && state.pms.kind !== 'catalogue';
-    if (!connectable) return [3,1,4,5];
-    if (state.pmsConnected && !state.manualGeo) return [3,6,7,8,4,5];
-    return [3,6,1,4,5];
+    if (!connectable) return [3,1,9,4,5];
+    if (state.pmsConnected && !state.manualGeo) return [3,6,7,8,9,4,5];
+    return [3,6,1,9,4,5];
   }
 
   const $ = s => document.querySelector(s);
@@ -1440,6 +1500,114 @@
     if (!c.tax) return null;
     if (c.taxRegions && !c.taxRegions.includes(REGION_SCHEME[region] || region)) return null;
     return TAX_RATE[region] || TAX_RATE[REGION_SCHEME[region]] || { amount:'', note:'' };
+  }
+
+  /* The plans as they are sold: the standard three sit under Chekin's own
+     Program Policy and are named by what they cover, because a coverage limit
+     is the thing a host actually compares. Stellar is the separate policy.
+     Every figure excludes VAT. */
+  const PLANS = [
+    { k:'p1500', lim:'Up to 1.500 \u20ac', pol:'Chekin Program Policy',
+      d:'Instant, essential damage coverage that ensures peace of mind for everyone.',
+      flat:'28,00 \u20ac', day:'1,00 \u20ac' },
+    { k:'p2500', lim:'Up to 2.500 \u20ac', pol:'Chekin Program Policy',
+      d:'Designed for properties seeking robust protection with seamless claims processing for both parties.',
+      flat:'42,00 \u20ac', day:'4,00 \u20ac' },
+    { k:'p5000', lim:'Up to 5.000 \u20ac', pol:'Chekin Program Policy',
+      d:'Full coverage with extra benefits, ideal for high-value properties.',
+      flat:'60,00 \u20ac', day:'8,00 \u20ac', details:true },
+    { k:'stellar', lim:'Stellar', pol:'Stellar Program Policy',
+      d:'Premium properties need advanced protection with comprehensive coverage and quicker claim support.',
+      flat:'65,00 \u20ac', day:'7,00 \u20ac' },
+  ];
+  /* Recommended off the nightly rate the read came back with, because that is
+     the only thing we know about what a stay is worth. */
+  function planSugerido(){
+    const a = state.readAvg || 140;
+    return a < 120 ? 'p1500' : a < 200 ? 'p2500' : a < 300 ? 'p5000' : 'stellar';
+  }
+
+  state.prot = { mode:'program', plan:null, fee:true,
+                 amount:'250,00', dtype:'Pre-authorisation', dfees:false };
+
+  function renderProtect(){
+    if (!state.prot.plan) state.prot.plan = planSugerido();
+    const P = state.prot;
+    const avg = state.readAvg || null;
+
+    $('#prLead').innerHTML = avg
+      ? `At <b>\u20ac${avg} a night</b>, one broken TV or one stained sofa costs more than a week of good stays \u2014 and it comes out of your revenue unless the guest covers it. Pick how they do that.`
+      : 'A broken TV or a stained sofa comes out of your revenue unless the guest covers it. Pick how they do that.';
+
+    const modo = (k, t, d, badge) => `
+      <button type="button" class="pmode${P.mode === k ? ' on' : ''}" data-mode="${k}">
+        ${badge ? `<span class="pmode-b">${badge}</span>` : ''}
+        <span class="pmode-t">${t}</span>
+        <span class="pmode-d">${d}</span>
+      </button>`;
+
+    $('#prModes').innerHTML =
+      modo('program', 'Damage protection program',
+        'The guest pays a small fee with their check-in payment and damage is covered up to the limit you choose. We handle the claim, so you are not the one chasing anybody \u2014 and nothing is blocked on their card.',
+        'Recommended') +
+      modo('deposit', 'Security deposit',
+        'You hold an amount on the guest\u2019s card before arrival and release it after checkout. No fee for them, but the money is blocked for the whole stay and any claim is yours to handle.')
+      + `<button type="button" class="pnone${P.mode === 'none' ? ' on' : ''}" data-mode="none">${
+          P.mode === 'none' ? 'No protection \u2014 damage comes out of your own pocket. Pick one above to change that.'
+                            : 'Neither for now \u2014 I will cover damage myself'}</button>`;
+
+    if (P.mode === 'none'){
+      $('#prBody').innerHTML = '';
+    } else if (P.mode === 'program'){
+      $('#prBody').innerHTML = `
+        <div class="plans">${PLANS.map(pl => `
+          <button type="button" class="plan${P.plan === pl.k ? ' on' : ''}" data-plan="${pl.k}">
+            <span class="plan-h"><b>${pl.lim}</b>${pl.k === planSugerido() ? '<em>Best fit for your rate</em>' : ''}</span>
+            <span class="plan-d">${pl.d}</span>
+            <span class="plan-p"><b>${pl.flat}</b> per stay <i>or ${pl.day} a day, or the nightly price \u00f7 150</i></span>
+            ${pl.details ? '<span class="plan-l">View coverage details</span>' : ''}
+          </button>`).join('')}</div>
+        <p class="plan-note">The three standard limits are covered by Chekin\u2019s Program Policy; Stellar has its own. All prices exclude VAT.</p>
+        <div class="zs">
+          <span class="zs-l">Charge the fee to the guest<i>Off means you absorb it and keep protection invisible to them.</i></span>
+          <label class="sw"><input type="checkbox" id="prFee" ${P.fee ? 'checked' : ''}><i></i></label>
+        </div>`;
+    } else {
+      $('#prBody').innerHTML = `
+        <div class="zs">
+          <span class="zs-l">Deposit amount<i>Held on the card, released after checkout.</i></span>
+          <span class="zs-num"><input type="text" inputmode="decimal" id="prAmt" value="${P.amount}"><i>\u20ac</i></span>
+        </div>
+        <div class="zs">
+          <span class="zs-l">Type of deposit<i>A pre-authorisation reserves the amount; a retention takes it and gives it back.</i></span>
+          <select id="prType">
+            <option ${P.dtype === 'Pre-authorisation' ? 'selected' : ''}>Pre-authorisation</option>
+            <option ${P.dtype === 'Retention' ? 'selected' : ''}>Retention</option>
+          </select>
+        </div>
+        <div class="zs">
+          <span class="zs-l">The guest pays the payment fees</span>
+          <label class="sw"><input type="checkbox" id="prDFees" ${P.dfees ? 'checked' : ''}><i></i></label>
+        </div>`;
+    }
+
+    $$('#prModes .pmode, #prModes .pnone').forEach(b => b.addEventListener('click', () => {
+      state.prot.mode = b.dataset.mode; renderProtect(); renderChips(); refresh();
+    }));
+    $$('#prBody .plan').forEach(b => b.addEventListener('click', () => {
+      state.prot.plan = b.dataset.plan; renderProtect(); refresh();
+    }));
+    const wire = (id, prop, prop2) => {
+      const el = $(id); if (!el) return;
+      el.addEventListener(el.type === 'text' ? 'input' : 'change', e => {
+        state.prot[prop] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        if (prop2) renderChips();
+      });
+    };
+    wire('#prFee', 'fee'); wire('#prAmt', 'amount');
+    wire('#prType', 'dtype'); wire('#prDFees', 'dfees');
+    $('.prset').hidden = P.mode === 'none';
+    $('#prFoot').hidden = P.mode === 'none';
   }
 
   function readPortfolio(){
@@ -2167,9 +2335,16 @@
     if ((state.sizeTier ?? 0) >= 2){
       steps.push({ k:'team', phase:'Import', t:'Invite your team', d:'Owners, managers and front desk — each with the right permissions.', eta:3 });
     }
+    const pr = state.prot || {};
+    if (pr.mode === 'program'){
+      const pl = PLANS.find(x => x.k === pr.plan) || PLANS[1];
+      steps.push({ k:'protect', phase:'Protect', t:`Turn on damage protection \u2014 ${pl.lim}`,
+        d:`${pl.flat} a stay, ${pr.fee ? 'paid by the guest with their check-in' : 'absorbed by you'}. We handle any claim.`, eta:2 });
+    } else if (pr.mode === 'deposit'){
+      steps.push({ k:'protect', phase:'Protect', t:'Turn on security deposits',
+        d:`${pr.amount} \u20ac held on the card as a ${String(pr.dtype).toLowerCase()}, released after checkout.`, eta:2 });
+    }
     const ad = state.addons || {};
-    if (ad.protect) steps.push({ k:'protect', phase:'Protect', t:'Turn on deposits and damage waivers',
-      d:`Charged at check-in and released after checkout, or a small waiver instead.`, eta:2 });
     if (ad.locks) steps.push({ k:'locks', phase:'Protect', t:'Connect your smart locks',
       d:'The code goes out with the check-in link, only once the guest is verified.', eta:3 });
 
@@ -2455,6 +2630,7 @@
        exist. Replay the result, not the animation. */
     if (step === 8 && !$('#foundRows').children.length){ scanRan = true; runScan(); }
     if (step !== 7 && state.pmsConnected) startImport();
+    if (step === 9) renderProtect();
     if (step === 4) setupPrioStep();
     if (step === LAST) renderPlan();
     refresh();
@@ -2514,6 +2690,7 @@
         geoFromRead: !!state.geoFromRead,
         manualGeo: !!state.manualGeo,
         imported: !!state.imported,
+        prot: state.prot,
         prios: state.prios
       }));
     } catch(e){}
@@ -2531,6 +2708,7 @@
       const card = groupsBox.querySelector(`.card.country[data-code="${code}"]`);
       if (card && !card.classList.contains('sel')) card.click();
     });
+    if (p.prot && typeof p.prot === 'object') state.prot = { ...state.prot, ...p.prot };
     state.regions = Array.isArray(p.regions) ? p.regions : [];
     if (p.primary) state.primary = p.primary;
 
