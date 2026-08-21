@@ -2045,7 +2045,10 @@
   function renderBrand(){
     const n = Number(state.size) || 0;
     if (n) BRAND_SETS.General[0].f[1].def = `${n} selected`;
-    $('#brLead').innerHTML = `Your site at <b>${state.brand.site}</b> gave us the navy, the gold and the type, and we have saved them as your first template. Here is what your guests would open.`;
+    /* Generic on purpose: naming the colours we happened to read made the
+       screen about our cleverness. The argument is the brand, and it is the
+       same argument for everyone. */
+    $('#brLead').innerHTML = `<b>Your brand image matters</b> \u2014 it is what your guests recognised when they booked. The check-in they open should look like you, not like us.`;
 
     const box = $('#brOn');
     box.checked = !!state.brand.on;
