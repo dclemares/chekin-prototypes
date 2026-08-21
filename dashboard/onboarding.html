@@ -188,10 +188,10 @@
      room for its own status, the fact that matters (who receives the report,
      the rate being charged) and its own switch. */
   .zone{border:1px solid var(--stroke-gray-lighter);border-radius:var(--radius-lg);background:var(--bg-white);
-    box-shadow:var(--shadow-card);margin-bottom:10px;overflow:hidden}
+    box-shadow:var(--shadow-card);margin-bottom:9px;overflow:hidden}
 
   .zhead3{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;
-    padding:12px 16px;border-bottom:1px solid var(--stroke-gray-lighter);background:var(--bg-blue-light)}
+    padding:10px 16px;border-bottom:1px solid var(--stroke-gray-lighter);background:var(--bg-blue-light)}
   .zshield{width:34px;height:34px;border-radius:10px;background:var(--bg-white);display:grid;place-items:center}
   .zshield svg{width:17px;height:17px;stroke:var(--text-brand);fill:none;stroke-width:2}
   .ztitle b{display:block;font:700 15px var(--font-primary);color:var(--text-dark);letter-spacing:-.01em}
@@ -199,7 +199,7 @@
   .zcount{font:600 12.5px var(--font-primary);color:var(--text-gray-dark);white-space:nowrap}
 
   .zgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
-  .ft{padding:11px 16px 13px;border-left:1px solid var(--stroke-gray-lighter);display:flex;flex-direction:column;min-width:0}
+  .ft{padding:10px 16px 11px;border-left:1px solid var(--stroke-gray-lighter);display:flex;flex-direction:column;min-width:0}
   .ft:first-child{border-left:0}
   .ft-badge{font:700 9.5px var(--font-primary);letter-spacing:.06em;text-transform:uppercase;color:var(--text-brand);
     background:var(--bg-blue-light);border-radius:20px;padding:3px 8px;align-self:flex-start;margin-bottom:7px}
@@ -215,7 +215,7 @@
   .ft-lock svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3.4}
   .ft-b{font:600 12.5px/17px var(--font-primary);color:var(--text-dark);word-break:break-word}
   .ft-d{font:400 11.5px/16px var(--font-primary);color:var(--text-gray-medium);margin-top:1px}
-  .ft-foot{margin-top:auto;padding-top:8px}
+  .ft-foot{margin-top:auto;padding-top:7px}
   .ft-set{background:none;border:0;padding:0;cursor:pointer;font:600 12px var(--font-primary);color:var(--text-brand)}
   .ft-set.open{text-decoration:underline}
   .ft-tag{font:600 10px var(--font-primary);letter-spacing:.04em;text-transform:uppercase;color:var(--text-gray-medium)}
@@ -283,6 +283,11 @@
      Two options instead of three, so the grid splits in half rather than
      leaving a gap where a third feature would be. */
   #protRows .zgrid{grid-template-columns:1fr 1fr}
+  .zpreview{margin:0;padding:6px 16px 7px;border-top:1px solid var(--stroke-gray-lighter);background:var(--bg-screen);
+    font:400 12px/16px var(--font-primary);color:var(--text-gray-dark)}
+  .zpreview b{font-weight:700;color:var(--text-dark)}
+  .zpreview.mal{background:var(--warn-bg);color:var(--text-warn)}
+  .phead{display:flex;align-items:center;gap:7px;flex-shrink:0}
   .pflag{display:inline-flex;border:1px solid var(--stroke-gray-light);border-radius:20px;background:var(--bg-white);
     padding:2px;gap:2px;flex-shrink:0}
   .pflag button{border:0;background:none;cursor:pointer;border-radius:20px;padding:4px 11px;
@@ -1446,10 +1451,12 @@
   const QHELP = {
     id: { t:'Guest ID verification',
       d:'Each guest photographs their ID or passport before arrival, and — if you leave the selfie on — takes a photo of themselves that we compare with it. You know the person arriving is the person who booked, and the details the police report needs are already filled in, so nobody types them twice.' },
+    flag: { t:'Off, optional or mandatory',
+      d:'<b>Mandatory</b> \u2014 the guest has to pay one of the options switched on below before they can finish check-in. <b>Optional</b> \u2014 they are offered it and can carry on without paying. <b>Off</b> \u2014 nothing is asked, and anything that breaks is yours to absorb.' },
     program: { t:'Damage protection program',
-      d:'The guest pays a small fee with their check-in payment, and damage up to the limit you pick is covered. We handle the claim, so you are not the one chasing anybody \u2014 and nothing is blocked on their card, which is why more guests finish check-in.' },
+      d:'Maximise profit by making your guests pay a protection fee, with each stay covered up to your chosen limit. We handle the claim, so you are not the one chasing anybody \u2014 and nothing is blocked on their card, which is why more guests finish check-in.' },
     deposit: { t:'Security deposit',
-      d:'You hold an amount on the guest\u2019s card before they arrive and release it after they leave. There is no fee for them, but the money is blocked for the whole stay, and if something breaks the claim is yours to make.' },
+      d:'A simple, online and secure way for your guests to leave their deposit. There is no fee for them, but the money is held for the whole stay, and if something breaks the claim is yours to make.' },
     tax: { t:'Tourist tax',
       d:'The nightly tax your city or region charges each guest. We work out what every booking owes from how many nights they stay and how old they are, collect it with the check-in payment, and keep the record you would have to show if anyone asks.' },
   };
@@ -1544,6 +1551,35 @@
     return [z];
   }
 
+  /* Settings turned back into the thing they produce. Someone who has just
+     switched two toggles and picked a plan should not have to imagine what
+     lands in front of their guest — this says it. */
+  function protPreview(z){
+    const F = state.zoneFeat[z.key];
+    if (F.prot === 'off') return { txt:'Nothing is asked at check-in.', mal:true };
+    const pl  = PLANS.find(x => x.lim === fieldValue(FEATURE_SETS.program[0], z, F.sets.program || {})) || PLANS[1];
+    const amt = fieldValue(FEATURE_SETS.deposit[0], z, F.sets.deposit || {});
+    const op = [];
+    if (F.program) op.push(`a <b>${pl.flat}</b> protection fee`);
+    if (F.deposit) op.push(`a <b>${amt} \u20ac</b> deposit`);
+    if (!op.length) return { txt:'Nothing is asked at check-in \u2014 this group is unprotected.', mal:true };
+    const cola = F.prot === 'optional' ? ', and they can skip it' : '';
+    return { txt: op.length === 2
+      ? `At check-in the guest chooses \u2014 ${op.join(' or ')}${cola}.`
+      : `At check-in the guest pays ${op[0]}${cola}.` };
+  }
+
+  /* Doing the same setup three times is the whole cost of splitting into
+     groups, so every form can hand itself to the others. The tax rate and the
+     exemption age stay behind: those are local, and copying Barcelona's 9,50
+     onto Lisbon would be a silent error. */
+  const EXPORTABLE = {
+    tax:     { t:'Apply how it is charged to the other groups', f:['exname','exrule','skip','fees'] },
+    program: { t:'Apply these settings to the other groups',    f:['plan','fee','addfee','skip'] },
+    deposit: { t:'Apply these settings to the other groups',    f:['amount','dtype','dfees','skip'] },
+    id:      { t:'Apply these settings to the other groups',    f:['method','who','when','skip','block','keep','days'] },
+  };
+
   const PROT_FLAG = [
     { v:'off',       t:'Off',       d:'Guests are not asked for anything.' },
     { v:'optional',  t:'Optional',  d:'Guests are offered it and can skip it.' },
@@ -1554,8 +1590,8 @@
     const zonas = protZonas();
     const avg = state.readAvg || null;
     $('#prLead').innerHTML = avg
-      ? `At <b>\u20ac${avg} a night</b>, one broken TV or one stained sofa costs more than a week of good stays. Turn on the protection program, the traditional deposit, or both and let the guest choose \u2014 either way they pay it during online check-in, not you.`
-      : 'Turn on the protection program, the traditional deposit, or both and let the guest choose. Either way they pay it during online check-in, not you.';
+      ? `At <b>\u20ac${avg} a night</b>, one bad stay costs more than a week of good ones \u2014 and the guest can carry it, not you.`
+      : 'A broken TV or a stained sofa can be carried by the guest, not by you.';
 
     montaZonas('#protRows', zonas, (z, zi) => {
       const F = state.zoneFeat[z.key];
@@ -1563,10 +1599,12 @@
       return [
         tile({ badge:'We recommend it', tone:'rec', title:'Damage protection', help:'program',
           ctl:swi(zi, 'program', F.program && !apagado, apagado), off:!F.program || apagado,
-          body:protLine(z, 'program'), live:'program', foot:setBtn(zi, 'program') }),
+          body:caraDe(z, 'program'), live:'program',
+          foot: apagado ? '' : setBtn(zi, 'program') }),
         tile({ badge:'Traditional option', title:'Security deposit', help:'deposit',
           ctl:swi(zi, 'deposit', F.deposit && !apagado, apagado), off:!F.deposit || apagado,
-          body:protLine(z, 'deposit'), live:'deposit', foot:setBtn(zi, 'deposit') }),
+          body:caraDe(z, 'deposit'), live:'deposit',
+          foot: apagado ? '' : setBtn(zi, 'deposit') }),
       ];
     },
     z => z.country
@@ -1575,10 +1613,15 @@
     pintaPie,
     (z, zi) => {
       const cur = state.zoneFeat[z.key].prot || 'mandatory';
-      const sel = PROT_FLAG.find(f => f.v === cur);
-      return `<span class="pflag" title="${sel ? sel.d : ''}">${PROT_FLAG.map(f =>
-        `<button type="button" data-zi="${zi}" data-v="${f.v}" class="${f.v === cur ? 'on' : ''}"${
-          f.v === cur ? ` aria-current="true"` : ''}>${f.t}</button>`).join('')}</span>`;
+      return `<span class="phead">
+        <button type="button" class="ft-q" data-help="flag" aria-label="What is this?">?</button>
+        <span class="pflag">${PROT_FLAG.map(f =>
+          `<button type="button" data-zi="${zi}" data-v="${f.v}" class="${f.v === cur ? 'on' : ''}"${
+            f.v === cur ? ' aria-current="true"' : ''}>${f.t}</button>`).join('')}</span></span>`;
+    },
+    (z) => {
+      const pv = protPreview(z);
+      return `<p class="zpreview${pv.mal ? ' mal' : ''}">${pv.txt}</p>`;
     });
 
     /* What each state means, said once under the cards rather than repeated
@@ -1594,21 +1637,15 @@
       const malo = off.concat(nada);
       /* Optional is a real setting, not a footnote to the "both are on"
          message — it is the one that decides whether anybody pays at all. */
-      const partes = [];
-      if (malo.length){
-        partes.push(malo.length === zonas.length
-          ? 'Nothing is protected \u2014 damage comes out of your own pocket. Switch something on above to change that.'
-          : `${malo.map(z => z.name).join(' and ')} ${malo.length === 1 ? 'is' : 'are'} unprotected: damage there comes out of your own pocket.`);
-      }
-      if (opt.length){
-        partes.push(`In ${opt.map(z => z.name).join(' and ')} the guest is offered it and can skip paying.`);
-      }
-      if (!partes.length){
-        partes.push(dos.length === zonas.length
-          ? 'Both options are on everywhere, so the guest decides which suits them at check-in.'
-          : 'Nothing is charged to you. Whichever they pick, the guest pays it during online check-in.');
-      }
-      pie.innerHTML = partes.join(' ');
+      /* Each card already states its own outcome, so the footer is only for
+         the thing the cards cannot say: money you would be leaving on the
+         table. Silence when everything is covered. */
+      pie.innerHTML = malo.length
+        ? (malo.length === zonas.length
+            ? 'Nothing is protected \u2014 damage comes out of your own pocket. Switch something on above to change that.'
+            : `${malo.map(z => z.name).join(' and ')} ${malo.length === 1 ? 'is' : 'are'} unprotected: damage there comes out of your own pocket.`)
+        : '';
+      pie.hidden = !malo.length;
       pie.classList.toggle('warn', malo.length > 0);
     }
     pintaPie();
@@ -1652,6 +1689,20 @@
   const lock = `<span class="ft-lock"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`;
   const setBtn = (zi, kind) => `<button type="button" class="ft-set" data-zi="${zi}" data-kind="${kind}">Settings</button>`;
 
+  /* What a feature's tile says about itself, from whatever its settings are
+     now. One function so a card face can never disagree with its own form —
+     "Who is verified" used to change in the drawer and stay wrong on the
+     card. */
+  function caraDe(z, kind){
+    const F = state.zoneFeat[z.key];
+    if (kind === 'tax') return taxLine(z, F.sets.tax || {});
+    if (kind === 'id'){
+      const sets = F.sets.id || {};
+      return `${fieldValue(FEATURE_SETS.id[0], z, sets)}<div class="ft-d">${fieldValue(FEATURE_SETS.id[1], z, sets)}</div>`;
+    }
+    return protLine(z, kind);
+  }
+
   /* Both can be on: that is the point of offering them. With the two live the
      guest picks one at check-in. */
   function toggleZona(z, kind, on){
@@ -1661,7 +1712,7 @@
     return false;
   }
 
-  function montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn){
+  function montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn, pieFn){
     const root = $(rootSel);
     root.innerHTML = zonas.map((z, zi) => `
       <div class="zone" data-zk="${z.key}">
@@ -1671,13 +1722,14 @@
           ${headFn ? headFn(z, zi) : `<span class="zcount">${z.units ? `${z.units} ${z.units === 1 ? 'property' : 'properties'}` : ''}</span>`}
         </div>
         <div class="zgrid">${tilesFn(z, zi).join('')}</div>
+        ${pieFn ? pieFn(z, zi) : ''}
         <div class="zsettings" hidden></div>
       </div>`).join('');
 
     $$(`${rootSel} .sw input`).forEach(i => i.addEventListener('change', e => {
       const z = zonas[+e.target.dataset.zi];
       const redibuja = toggleZona(z, e.target.dataset.kind, e.target.checked);
-      if (redibuja){ montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn); }
+      if (redibuja){ montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn, pieFn); }
       else e.target.closest('.ft').classList.toggle('off', !e.target.checked);
       if (alCambiar) alCambiar();
       renderChips();
@@ -1697,12 +1749,27 @@
        guest must pay one. A switch could not say the middle one. */
     $$(`${rootSel} .pflag button`).forEach(b => b.addEventListener('click', () => {
       state.zoneFeat[zonas[+b.dataset.zi].key].prot = b.dataset.v;
-      montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn);
+      montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn, pieFn);
       if (alCambiar) alCambiar();
       renderChips();
       guardaZonas();
       refresh();
     }));
+
+    /* Repaint what every card states without touching the cards themselves. */
+    function refrescaCaras(){
+      $$(`${rootSel} .zone`).forEach((el, i) => {
+        const z = zonas[i];
+        el.querySelectorAll('[data-live]').forEach(n => { n.innerHTML = caraDe(z, n.dataset.live); });
+        const pv = el.querySelector('.zpreview');
+        if (pv && pieFn){
+          const tmp = document.createElement('div');
+          tmp.innerHTML = pieFn(z, i);
+          if (tmp.firstElementChild) pv.replaceWith(tmp.firstElementChild);
+        }
+      });
+      if (alCambiar) alCambiar();
+    }
 
     $$(`${rootSel} .ft-set`).forEach(b => b.addEventListener('click', () => {
       const zn = zonas[+b.dataset.zi], zk = zn.key, kind = b.dataset.kind;
@@ -1714,7 +1781,10 @@
       box.dataset.kind = kind;
       box.hidden = false;
       b.classList.add('open');
-      pintaCajon(box, zona, zn, zk, kind, b.dataset.zi, () => montaZonas(rootSel, zonas, tilesFn, subFn, alCambiar, headFn));
+      /* Not a full redraw: copying settings to the other groups used to
+         rebuild the cards and take this very drawer down with them, so the
+         "Copied" confirmation vanished along with the user's place. */
+      pintaCajon(box, zona, zn, zk, kind, b.dataset.zi, refrescaCaras);
       /* Opening a form the user cannot see is the same as not opening it. */
       box.scrollIntoView({ block:'nearest', behavior:'smooth' });
     }));
@@ -1748,7 +1818,7 @@
         : `<select ${id}>` + sp.opts.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('') + `</select>`;
       return `<div class="zs">${eti}${ctl}</div>${sp.foot ? `<p class="zs-foot">${sp.foot}</p>` : ''}`;
     }).join('')
-      + (kind === 'tax' ? `<button type="button" class="zs-export">Export these settings to the other groups</button>` : '')
+      + (EXPORTABLE[kind] ? `<button type="button" class="zs-export">${EXPORTABLE[kind].t}</button>` : '')
       + `<p class="zs-note">${zn.units
             ? `Applies to the ${zn.units} ${zn.units === 1 ? 'property' : 'properties'} in ${zn.name} only.`
             : 'Applies to every property in this account.'}</p>`;
@@ -1759,15 +1829,15 @@
         const t = e.target, field = t.dataset.field;
         F.sets[kind] = F.sets[kind] || {};
         F.sets[kind][field] = t.type === 'checkbox' ? t.checked : t.value;
-        /* The figure on the card is the same number this form edits, so it
-           follows the edit instead of waiting for a re-render. */
-        if (kind === 'tax'){
-          const fila = zona.querySelector('[data-live="tax"]');
-          if (fila) fila.innerHTML = taxLine(zn, F.sets.tax);
-        }
-        if (kind === 'program' || kind === 'deposit'){
-          const fila = zona.querySelector(`[data-live="${kind}"]`);
-          if (fila) fila.innerHTML = protLine(zn, kind);
+        /* The card states the same values this form edits, so it follows the
+           edit instead of waiting for a re-render. */
+        const cara = zona.querySelector(`[data-live="${kind}"]`);
+        if (cara) cara.innerHTML = caraDe(zn, kind);
+        const pv = zona.querySelector('.zpreview');
+        if (pv && typeof protPreview === 'function' && state.zoneFeat[zk].prot){
+          const r = protPreview(zn);
+          pv.innerHTML = r.txt;
+          pv.classList.toggle('mal', !!r.mal);
         }
         renderChips();
         guardaZonas();
@@ -1779,16 +1849,24 @@
 
     const exp = box.querySelector('.zs-export');
     if (exp) exp.addEventListener('click', () => {
-      /* Same rate everywhere is rarely right — the amount is local — so this
-         copies how it is charged and leaves each group's own figures alone. */
-      const src = F.sets.tax || {};
-      (state.zones || []).forEach(o => {
-        if (o.key === zk || !o.tax) return;
-        const dst = state.zoneFeat[o.key].sets.tax = state.zoneFeat[o.key].sets.tax || {};
-        ['exname','exrule','skip','fees'].forEach(f => { if (src[f] !== undefined) dst[f] = src[f]; });
+      const spec = EXPORTABLE[kind];
+      const src = F.sets[kind] || {};
+      const destinos = (kind === 'tax' ? (state.zones || []).filter(o => o.tax) : protZonas())
+        .filter(o => o.key !== zk);
+      /* The values as they stand, not only the ones typed by hand: an
+         untouched form is still a decision, and copying nothing while saying
+         "Copied" is worse than not offering it. */
+      destinos.forEach(o => {
+        const dst = state.zoneFeat[o.key].sets[kind] = state.zoneFeat[o.key].sets[kind] || {};
+        spec.f.forEach(f => {
+          const sp = FEATURE_SETS[kind].find(x => x.k === f);
+          if (sp) dst[f] = fieldValue(sp, zn, src);
+        });
       });
-      exp.textContent = 'Copied to the other groups';
+      exp.textContent = `Copied to ${destinos.length} other ${destinos.length === 1 ? 'group' : 'groups'}`;
       exp.disabled = true;
+      if (alCambiar) alCambiar();
+      guardaZonas();
     });
   }
 
@@ -1880,7 +1958,6 @@
     montaZonas('#foundRows', zonas, (z, zi) => {
       const cm = COMPLY[z.scheme];
       const F = state.zoneFeat[z.key];
-      const idSets = F.sets.id || {};
       const cajas = [];
       if (z.scheme) cajas.push(tile({
         badge:'Required by law', title:'Police reporting', ctl:lock,
@@ -1890,13 +1967,12 @@
       cajas.push(tile({
         badge:'We recommend it', tone:'rec', title:'Guest ID verification', help:'id',
         ctl:swi(zi, 'id', F.id), off:!F.id,
-        body:`${fieldValue(FEATURE_SETS.id[0], z, idSets)}<div class="ft-d">${fieldValue(FEATURE_SETS.id[1], z, idSets)}</div>`,
-        foot:setBtn(zi, 'id') }));
+        body:caraDe(z, 'id'), live:'id', foot:setBtn(zi, 'id') }));
 
       cajas.push(z.tax
         ? tile({ badge:'Charged here', title:'Tourist tax', help:'tax',
             ctl:swi(zi, 'tax', state.zoneTax[z.key]), off:!state.zoneTax[z.key],
-            body:taxLine(z, F.sets.tax), live:'tax', foot:setBtn(zi, 'tax') })
+            body:caraDe(z, 'tax'), live:'tax', foot:setBtn(zi, 'tax') })
         : tile({ badge:'Not charged here', tone:'na', title:'Tourist tax', help:'tax', off:true,
             body:`Nothing to collect<div class="ft-d">No nightly tax applies where these properties are.</div>` }));
       return cajas;
