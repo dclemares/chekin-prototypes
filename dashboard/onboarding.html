@@ -1328,18 +1328,20 @@
   function runScan(){
     const busy = $('#scanBusy'), found = $('#scanFound');
     const read = readPortfolio();
-    applyRead(read);
-    renderFound(read);
+
     /* Coming back to a read that already happened: show the result, and say so
        — the branch used to leave the heading on "Reading your portfolio" over
        a finished diagnosis. */
     if (scanRan){
+      applyRead(read);
+      renderFound(read);
       busy.style.display = 'none';
       found.classList.add('on');
       scanResultCopy();
       refresh();
       return;
     }
+
     scanRan = true;
     busy.style.display = '';
     found.classList.remove('on');
@@ -1348,13 +1350,21 @@
     const items = $$('#scanSteps li');
     items.forEach(li => li.classList.remove('done'));
     items.forEach((li, i) => setTimeout(() => li.classList.add('done'), 500 + i * 550));
+
+    /* Nothing is applied until the read lands. Applying it up front populated
+       the rail with the countries, the regions and the property count while
+       the screen still said "Reading your portfolio" — announcing findings we
+       were supposedly still looking for. */
     setTimeout(() => {
+      applyRead(read);
+      renderFound(read);
       busy.style.display = 'none';
       scanResultCopy();
       found.classList.add('on');
       refresh();
     }, 2100);
   }
+
 
   $('#useRead').addEventListener('click', () => {
     /* The read is still there — it was never thrown away, only stepped over. */
