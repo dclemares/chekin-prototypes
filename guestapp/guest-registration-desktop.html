@@ -17,6 +17,19 @@
   /* Roomier than mobile, but only slightly — the summary is a glance, and at
      16/20 padding with a 56 px ring it read as a hero block above the roster
      it is only introducing. */
+  /* Breadcrumb bar: replaces the floating "Back" pill. Same height as the Vela rail header
+     (24 + 38 + 14 padding) so both dividers line up across the whole shell. */
+  .desk-page { padding-top: 0; }
+  .crumbbar { height: 77px; margin: 0 -34px; padding: 0 34px; display: flex; align-items: center; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, 0.55); }
+  .crumbbar ol { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-size: 13px; font-weight: 600; }
+  .crumbbar li { display: inline-flex; align-items: center; gap: 4px; }
+  .crumbbar a { color: var(--text-secondary); text-decoration: none; padding: 8px 6px; margin: -8px -6px; border-radius: 8px; transition: color .15s, background .15s; }
+  .crumbbar a:hover { color: var(--blue-500); background: rgba(56, 91, 248, 0.08); }
+  .crumbbar a:focus-visible { outline: 2px solid var(--blue-500); outline-offset: 1px; }
+  .crumbbar [aria-current="page"] { color: var(--navy); }
+  .crumbbar .crumb-sep { color: var(--text-tertiary); width: 14px; height: 14px; }
+  .crumbbar + .desk-col { margin-top: 30px; }
+  @media (max-width: 760px) { .crumbbar { height: 56px; margin: 0 -20px; padding: 0 20px; } }
   .guests-summary { gap: 14px; padding: 13px 18px; }
   .guests-summary .gs-ring { width: 48px; height: 48px; }
   .guests-summary .gs-ring .arc { stroke-dasharray: 151; stroke-dashoffset: 101; }
@@ -46,7 +59,7 @@
   <p class="lede">The registration hub and the pre-filled review form inside the desktop journey shell — group progress ring, per-guest status rows, share-link banner, auto-fill tags and a wider two-column form. Mock data only.</p>
 
   <!-- ═══ SCREEN 1: HUB ═══ -->
-  <div class="browser">
+  <div class="browser" id="hub">
     <div class="browser-bar">
       <span class="dots"><i></i><i></i><i></i></span>
       <span class="url"><svg viewBox="0 0 24 24" class="icon" style="width:11px;height:11px"><use href="#i-lock-sm"/></svg> guest.chekin.com/villa-serena/registration</span>
@@ -56,7 +69,7 @@
       <aside class="sidebar" data-sidebar data-active="guests"></aside>
 
       <main class="desk-page">
-        <button class="back-pill"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back to home</button>
+        <nav class="crumbbar" aria-label="Breadcrumb"><ol><li><a href="home-desktop.html">Home</a><svg viewBox="0 0 24 24" class="icon icon-sm crumb-sep" aria-hidden="true"><use href="#i-chevron-right"/></svg></li><li><span aria-current="page">Registration</span></li></ol></nav>
         <div class="desk-col">
           <div class="page-head fade-up" style="padding:0 0 4px" data-page-head
                data-title="Who are we {registering}?"
@@ -252,10 +265,9 @@
       <aside class="sidebar" data-sidebar data-active="guests"></aside>
 
       <main class="desk-page">
-        <button class="back-pill"><svg viewBox="0 0 24 24" class="icon icon-sm"><use href="#i-arrow-left"/></svg> Back to registration</button>
+        <nav class="crumbbar" aria-label="Breadcrumb"><ol><li><a href="home-desktop.html">Home</a><svg viewBox="0 0 24 24" class="icon icon-sm crumb-sep" aria-hidden="true"><use href="#i-chevron-right"/></svg></li><li><a href="#hub">Registration</a><svg viewBox="0 0 24 24" class="icon icon-sm crumb-sep" aria-hidden="true"><use href="#i-chevron-right"/></svg></li><li><span aria-current="page">Review details</span></li></ol></nav>
         <div class="desk-col">
           <div class="page-head fade-up" style="padding:0 0 4px" data-page-head
-               data-kicker="Guest registration"
                data-title="Review your {details}"
                data-intro="We pre-filled this from your document — check it and sign to finish."></div>
 
