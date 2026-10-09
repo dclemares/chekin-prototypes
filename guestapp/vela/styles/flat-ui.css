@@ -1,0 +1,69 @@
+/* ============================================================================
+   Chekin · Guest App V3 — FLAT UI overlay
+   ----------------------------------------------------------------------------
+   Goal: a single, reusable sheet that flattens the whole UI:
+     1) removes EVERY shadow (incl. the inline html.to.design dumps),
+     2) de-pills action buttons (squarer corners, like "Add to stay"),
+     3) fixes the journey connector line dangling past the last step.
+
+   HOW TO APPLY (progressively, per page):
+     Link it LAST, after every other stylesheet, so its rules win:
+       <link rel="stylesheet" href="/styles/chekin-design-system.css" />
+       <link rel="stylesheet" href="/styles/flat-ui.css" />
+
+   Web components (chekin-navbar / chekin-vela / chekin-booking-card) live in
+   shadow DOM, which this sheet can't reach — those are flattened at the source
+   inside each component's own <style>. See the README note there.
+   ============================================================================ */
+
+/* ---- 1 · Kill all shadows ------------------------------------------------- */
+/* `!important` beats the inline `style="box-shadow:…"` the export injects.
+   NOTE: we no longer blanket-kill `filter` — that also wiped intended blurs
+   (Vela aura, glass). Depth now comes from borders (see flat-ui.js), not blur. */
+*, *::before, *::after {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+/* ---- 1b · Flat depth: definition without shadows -------------------------- */
+/* flat-ui.js tags formerly-shadowed light surfaces. We draw their boundary
+   with `outline` (inset) so there is NO layout shift and it is NOT a shadow. */
+[data-flat-surface] {
+  outline: 1px solid rgba(22, 22, 67, .09) !important;
+  outline-offset: -1px;
+}
+[data-flat-surface="float"] {            /* dropdowns, menus, modals, popovers */
+  outline: 1px solid rgba(22, 22, 67, .16) !important;
+}
+
+/* ---- 1c · Focus visibility (box-shadow rings were removed above) ---------- */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--chekin-color-brand, #385bf8) !important;
+  outline-offset: 2px;
+}
+input:focus, select:focus, textarea:focus,
+.input:focus-within, [contenteditable]:focus {
+  outline: 2px solid var(--chekin-color-brand, #385bf8) !important;
+  outline-offset: 0;
+  border-color: var(--chekin-color-brand, #385bf8) !important;
+}
+
+/* ---- 2 · Squarer action buttons (no pills) -------------------------------- */
+/* Verified: no circular <button> elements exist; circular chrome (avatars,
+   sparkle, lock) are <div>/<span>, so squaring <button> is safe.
+   Add class `ui-round` to any button you want to keep circular. */
+button:not(.ui-round),
+[role="button"]:not(.ui-round) {
+  border-radius: 14px !important;
+}
+
+/* ---- 3 · Journey connector must not dangle past the last step ------------- */
+/* On the LAST step (its row is the container's :last-child) there is no next
+   node, so kill its connector. Two mechanisms exist:
+     · default rail line  → `.landing-step-rail > :nth-child(2)`
+     · flow=2 patch       → a `::after` on the step's node (runs 85px down)   */
+:last-child > .landing-step-rail > :nth-child(2),
+:last-child > .landing-step-rail ::after {
+  display: none !important;
+}

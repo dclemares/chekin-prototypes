@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vela — Transfers · sponsored banners</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Poppins:wght@400;500;600&display=swap');
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  :root{ --blue:#385bf8; --blue-deep:#1047ff; --navy:#07154d; --ink:#222a4d; --grey:#65709a; --grey-soft:#8b95bd; --line:rgba(203,214,236,.82); --green:#0f9f80; }
+  body{ font-family:'Montserrat',sans-serif; color:var(--navy); min-height:100vh; padding:40px 34px 90px;
+    background:radial-gradient(circle 260px at 300px 180px, rgba(79,107,255,.18), rgba(79,107,255,0) 72%), linear-gradient(160deg,#e9eefc 0%,#f4f6f9 60%,#eef0f7 100%); background-attachment:fixed; }
+  .page-h{ max-width:1100px; margin:0 auto 28px; }
+  .page-h .kick{ font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--blue); }
+  .page-h h1{ margin:6px 0 4px; font-size:30px; font-weight:800; letter-spacing:-.02em; }
+  .page-h p{ margin:0; font-family:'Poppins',sans-serif; font-size:14px; color:var(--grey); max-width:720px; }
+  .row{ display:flex; gap:30px; align-items:flex-start; flex-wrap:wrap; max-width:1100px; margin:0 auto; }
+  .item{ width:380px; }
+  .item .tag{ display:inline-flex; height:20px; align-items:center; padding:0 8px; border-radius:999px; font-size:10px; font-weight:800; background:var(--blue); color:#fff; margin-bottom:8px; letter-spacing:.04em; }
+  .item .label{ display:block; margin:0 0 11px; font-size:12.5px; font-weight:800; }
+  .item .label small{ display:block; margin-top:2px; font-family:'Poppins',sans-serif; font-weight:500; font-size:11.5px; color:var(--grey); }
+  .stage{ width:345px; padding:14px; border-radius:18px; background:rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.8); box-shadow:0 14px 36px rgba(22,40,90,.10); }
+
+  .spon{ position:absolute; z-index:5; font-size:7.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+
+  .bn{ position:relative; width:100%; border-radius:14px; overflow:hidden; color:#fff; box-shadow:0 10px 24px rgba(23,42,96,.16); }
+  .bn .link{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:800; }
+  .bn .link svg{ width:13px; height:13px; stroke-width:2.4; }
+  .btn{ border:0; cursor:pointer; font:inherit; font-weight:800; border-radius:9px; display:inline-flex; align-items:center; gap:6px; }
+  .btn svg{ width:13px; height:13px; stroke-width:2.4; }
+
+  /* ===== TB1 · Editorial photo (free-tours style) ===== */
+  .tb1{ height:96px; background:url(landingV1/assets/deals/transfer.jpg) center 55% / cover; }
+  .tb1 .tint{ position:absolute; inset:0; background:rgba(8,12,30,.34); }
+  .tb1 .in{ position:absolute; inset:0; z-index:3; padding:0 76px 0 16px; display:flex; flex-direction:column; justify-content:center; }
+  .tb1 .kik{ font-size:8px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; opacity:.95; text-shadow:0 1px 5px rgba(0,0,0,.5); }
+  .tb1 b{ font-size:14.5px; font-weight:900; line-height:1.12; letter-spacing:-.02em; margin-top:3px; text-shadow:0 2px 10px rgba(0,0,0,.5); max-width:185px; }
+  .tb1 .link{ margin-top:6px; text-shadow:0 1px 6px rgba(0,0,0,.5); }
+  .tb1 .spon{ right:13px; bottom:8px; color:#fff; opacity:.8; text-shadow:0 1px 4px rgba(0,0,0,.6); }
+  .tb1 .star{ position:absolute; right:13px; top:50%; transform:translateY(-50%) rotate(-6deg); z-index:4; width:58px; height:58px; color:#fff; display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; font-weight:900; line-height:1.04; filter:drop-shadow(0 7px 13px rgba(0,0,0,.3)); }
+  .tb1 .star::before{ content:''; position:absolute; inset:0; background:#ff4c5c; clip-path:polygon(50% 0,61% 12%,76% 6%,79% 23%,95% 25%,90% 41%,100% 50%,90% 59%,95% 75%,79% 77%,76% 94%,61% 88%,50% 100%,39% 88%,24% 94%,21% 77%,5% 75%,10% 59%,0 50%,10% 41%,5% 25%,21% 23%,24% 6%,39% 12%); }
+  .tb1 .star span{ position:relative; z-index:2; }
+
+  /* ===== TB2 · Brand block + car (reference style) ===== */
+  .tb2{ height:104px; background:linear-gradient(120deg,#2b46d8,#4f6bff 60%,#6f86ff); }
+  .tb2 .car{ position:absolute; right:-18px; bottom:-6px; width:168px; height:104px; background:url(landingV1/assets/deals/transfer.jpg) center / cover; -webkit-mask-image:linear-gradient(90deg, transparent, #000 38%); mask-image:linear-gradient(90deg, transparent, #000 38%); opacity:.92; }
+  .tb2 .in{ position:absolute; inset:0; z-index:3; padding:13px 15px; display:flex; flex-direction:column; }
+  .tb2 .pill{ align-self:flex-start; height:20px; display:inline-flex; align-items:center; gap:5px; padding:0 9px; border-radius:999px; background:#ffd24a; color:#3a2a00; font-size:9px; font-weight:900; letter-spacing:.03em; text-transform:uppercase; }
+  .tb2 b{ font-size:15px; font-weight:900; line-height:1.12; letter-spacing:-.02em; margin:7px 0 0; max-width:185px; text-shadow:0 2px 8px rgba(0,0,0,.2); }
+  .tb2 .chips{ display:flex; gap:6px; margin-top:auto; }
+  .tb2 .chip{ height:18px; display:inline-flex; align-items:center; padding:0 8px; border-radius:999px; background:rgba(255,255,255,.18); font-size:8.5px; font-weight:700; -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); }
+  .tb2 .spon{ right:12px; top:11px; color:#fff; opacity:.85; }
+
+  /* ===== TB3 · Map strip + fixed price ===== */
+  .tb3{ height:96px; display:flex; background:#fff; color:var(--navy); }
+  .tb3 .mapwrap{ position:relative; width:128px; flex:none; }
+  .tb3 .map{ display:block; width:100%; height:100%; }
+  .tb3 .body{ flex:1; min-width:0; padding:12px 14px 12px 13px; display:flex; flex-direction:column; justify-content:center; }
+  .tb3 .kik{ font-size:8px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); }
+  .tb3 b{ font-size:13.5px; font-weight:800; letter-spacing:-.01em; margin-top:2px; }
+  .tb3 .pay{ display:flex; align-items:baseline; gap:6px; margin-top:3px; }
+  .tb3 .pay b{ font-size:16px; } .tb3 .pay span{ font-size:9.5px; font-weight:700; color:var(--green); background:rgba(15,159,128,.1); padding:2px 6px; border-radius:6px; }
+  .tb3 .btn{ align-self:flex-start; margin-top:9px; height:30px; padding:0 14px; background:#10142b; color:#fff; font-size:11px; }
+  .tb3 .spon{ left:8px; top:8px; right:auto; color:#fff; background:rgba(16,20,43,.5); padding:2px 5px; border-radius:5px; -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); }
+
+  /* ===== TB4 · Premium dark (Uber Black) ===== */
+  .tb4{ height:104px; background:#0c1020; }
+  .tb4 .ph{ position:absolute; inset:0; background:url(landingV1/assets/deals/transfer.jpg) right center / cover; }
+  .tb4 .ph::after{ content:''; position:absolute; inset:0; background:linear-gradient(100deg, rgba(8,11,26,.96) 38%, rgba(8,11,26,.55) 64%, rgba(8,11,26,.2)); }
+  .tb4 .in{ position:absolute; inset:0; z-index:3; padding:13px 15px; display:flex; flex-direction:column; justify-content:center; }
+  .tb4 .kik{ font-size:8px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:#9fb0ff; }
+  .tb4 b{ font-size:14.5px; font-weight:900; line-height:1.14; letter-spacing:-.02em; margin-top:3px; max-width:175px; }
+  .tb4 .foot{ display:flex; align-items:center; gap:10px; margin-top:9px; }
+  .tb4 .price{ font-size:9.5px; font-weight:600; opacity:.85; } .tb4 .price b{ display:inline; font-size:15px; font-weight:900; opacity:1; margin-left:3px; }
+  .tb4 .btn{ margin-left:auto; height:30px; padding:0 15px; background:#fff; color:#10142b; font-size:11px; }
+  .tb4 .spon{ right:13px; top:11px; color:#fff; opacity:.7; }
+</style>
+</head>
+<body>
+  <div class="page-h">
+    <div class="kick">Vela · sponsored · transfers</div>
+    <h1>Airport transfers — sponsored banner</h1>
+    <p>Transfer as an <b>advertising banner</b> inside Vela (Uber-like aesthetic). Four treatments: editorial photo, brand block + car, map strip with fixed price, and dark premium hero. Pick one and I will integrate it with hover interactions, like free tours.</p>
+  </div>
+
+  <div class="row" id="row"></div>
+
+<script>
+  var ARR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  var PLANE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.2 3.3c.5-.5 1.4-.5 1.7.3l2 5.2 5.6 1.9c.9.3.9 1.6 0 1.9l-5.6 1.9-2 5.2c-.3.8-1.2.8-1.6.1l-1.4-4.9-4.9-1.4c-.8-.3-.8-1.4 0-1.6l4.9-1.5 1.3-6.7Z"/></svg>';
+  function mapSVG(){ return '<svg class="map" viewBox="0 0 128 96" preserveAspectRatio="xMidYMid slice">'+
+    '<rect width="128" height="96" fill="#e8eef8"/>'+
+    '<g fill="#dde6f5"><rect x="8" y="8" width="40" height="26" rx="4"/><rect x="60" y="6" width="40" height="22" rx="4"/><rect x="10" y="58" width="44" height="30" rx="4"/><rect x="70" y="56" width="50" height="34" rx="4"/></g>'+
+    '<g stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"><path d="M0 46 H128"/><path d="M56 0 V96"/></g>'+
+    '<path d="M22 78 C 56 72, 56 40, 104 30" stroke="#385bf8" stroke-width="4" fill="none" stroke-linecap="round"/>'+
+    '<circle cx="22" cy="78" r="6.5" fill="#385bf8" stroke="#fff" stroke-width="2.5"/>'+
+    '<g transform="translate(104,30)"><path d="M0 -13 C 7 -13 11 -7 11 -1 C 11 6 0 15 0 15 C 0 15 -11 6 -11 -1 C -11 -7 -7 -13 0 -13Z" fill="#10142b" stroke="#fff" stroke-width="2"/><circle cx="0" cy="-1" r="3.6" fill="#fff"/></g>'+
+    '</svg>'; }
+
+  var TB1='<div class="bn tb1"><div class="tint"></div><span class="spon">Sponsored</span>'+
+    '<span class="star"><span>−20%</span></span>'+
+    '<div class="in"><span class="kik">Transfers · airport and city</span>'+
+    '<b>Get to the airport without stress</b>'+
+    '<span class="link">Book '+ARR+'</span></div></div>';
+
+  var TB2='<div class="bn tb2"><span class="car"></span><span class="spon">Sponsored</span>'+
+    '<div class="in"><span class="pill">🔥 Special offer</span>'+
+    '<b>Airport and city transfers</b>'+
+    '<div class="chips"><span class="chip">Free cancellation</span><span class="chip">24/7 assistance</span></div></div></div>';
+
+  var TB3='<div class="bn tb3"><div class="mapwrap">'+mapSVG()+'</div>'+
+    '<div class="body"><span class="kik">Door-to-door transfer</span>'+
+    '<div class="pay"><b>from €28</b><span>Fixed price</span></div>'+
+    '<button class="btn">Book transfer '+ARR+'</button></div>'+
+    '<span class="spon">Sponsored</span></div>';
+
+  var TB4='<div class="bn tb4"><div class="ph"></div><span class="spon">Sponsored</span>'+
+    '<div class="in"><span class="kik">Private transfer</span>'+
+    '<b>Your car to the airport</b>'+
+    '<div class="foot"><span class="price">from<b>€28</b></span><button class="btn">Book '+ARR+'</button></div></div></div>';
+
+  var items=[
+    {tag:'TB1', name:'Editorial photo', desc:'Same style as free tours: car photo, tint, large title, link CTA, and starburst sticker (−20%).', html:TB1},
+    {tag:'TB2', name:'Brand block + car', desc:'Your reference adapted: blue gradient, “Special offer”, car blended on the right, and guarantee chips.', html:TB2},
+    {tag:'TB3', name:'Tira de mapa', desc:'Mini-map route on the left + fixed price and CTA. Uber aesthetic as an ad banner.', html:TB3},
+    {tag:'TB4', name:'Hero premium oscuro', desc:'Uber Black vibe: dark background with the car, “from €28”, and white CTA. Premium.', html:TB4}
+  ];
+  document.getElementById('row').innerHTML = items.map(function(it){
+    return '<div class="item"><span class="tag">'+it.tag+'</span><div class="label">'+it.name+'<small>'+it.desc+'</small></div><div class="stage">'+it.html+'</div></div>';
+  }).join('');
+</script>
+</body>
+</html>
