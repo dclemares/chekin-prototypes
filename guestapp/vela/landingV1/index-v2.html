@@ -1096,15 +1096,7 @@ html, body { height: 100%; margin: 0; }
 
   // Single global swap timer — re-reads the DOM each tick so it survives any rebuild.
   var swapStarted = false;
-  function startSwap(){
-    if(swapStarted) return; swapStarted = true;
-    setInterval(function(){
-      var stack = document.querySelector('.promo-stack'); if(!stack) return;
-      var f = stack.querySelector('.ps-card.is-front');
-      var b = stack.querySelector('.ps-card.is-back');
-      if(f && b){ f.classList.replace('is-front','is-back'); b.classList.replace('is-back','is-front'); }
-    }, 10000);
-  }
+  function startSwap(){ swapStarted = true; /* rotation, pause, swipe and indicator live in #chk-vela-ux */ }
 
   function ensure(){
     var promo = document.querySelector('chekin-vela .vela-promo');
@@ -1122,6 +1114,365 @@ html, body { height: 100%; margin: 0; }
     });
   }
   if(document.readyState !== 'loading'){ start(); } else { document.addEventListener('DOMContentLoaded', start); }
+})();
+</script>
+<script id="chk-vela-ux">
+/* Vela panel interactions:
+   - Offers carousel: mouse drag, prev/next arrows, clickable dots, keyboard arrows
+   - Deal cards: quick add on the price coin, detail sheet on the card, "See all" sheet
+   - Promo deck (free tours <-> transfer): labelled indicator with progress, pause on hover/focus,
+     click the card behind or swipe to switch, no auto-rotation with reduced motion
+   - Mobile: the Vela block no longer covers the check-in journey */
+(function(){
+  var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DUR = 10000;
+  var DESC = {
+    'Early check-in':'Get into the flat from 11:00 instead of 15:00. Subject to availability: your host confirms it within 24 h, or you are not charged.',
+    'Airport transfer':'Private car from the airport to Casa del Mar, for up to 4 people with luggage. The driver waits with a name sign.',
+    'Parking spot':'Covered on-site parking space, charged per night of your stay.',
+    'Late check-out':'Keep the flat until 14:00 on your departure day.',
+    'Welcome groceries':'Coffee, milk, bread, fruit and water, stocked before you arrive.',
+    'Beach gear':'Two beach towels and a parasol, ready at the flat.'
+  };
+  var added = {};
+  var ARR_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>';
+  var ARR_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
+  var X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+  var CSS = [
+    /* carousel */
+    'chekin-vela .vela-carwrap{position:relative;}',
+    'chekin-vela .vela-car{cursor:grab;}',
+    'chekin-vela .vela-car.vx-drag{cursor:grabbing;user-select:none;scroll-behavior:auto;}',
+    'chekin-vela .vela-car.vx-drag .vela-dc{pointer-events:none;}',
+    'chekin-vela .vela-car:focus-visible{outline:2px solid #385bf8;outline-offset:2px;border-radius:16px;}',
+    'chekin-vela .vx-arr{position:absolute;top:40px;z-index:8;width:34px;height:34px;border-radius:50%;border:0;background:#fff;color:#16183a;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 16px rgba(7,21,77,.24);opacity:0;transform:scale(.85);transition:opacity .2s ease,transform .2s ease;}',
+    'chekin-vela .vx-arr svg{width:16px;height:16px;}',
+    'chekin-vela .vx-arr.l{left:-6px;}chekin-vela .vx-arr.r{right:-6px;}',
+    'chekin-vela .vela-carwrap:hover .vx-arr:not([hidden]),chekin-vela .vx-arr:focus-visible{opacity:1;transform:scale(1);}',
+    'chekin-vela .vx-arr:hover{background:#385bf8;color:#fff;}',
+    '@media (hover:none){chekin-vela .vx-arr{display:none;}}',
+    'chekin-vela .vela-dots .dot{cursor:pointer;position:relative;}',
+    'chekin-vela .vela-dots .dot::after{content:"";position:absolute;inset:-8px -3px;}',
+    'chekin-vela .vela-dots .dot:hover:not(.on){background:rgba(56,91,248,.5);}',
+    /* deal cards */
+    'chekin-vela .vela-dc{cursor:pointer;transition:transform .2s ease;}',
+    'chekin-vela .vela-dc:hover{transform:translateY(-3px);}',
+    'chekin-vela .vela-dc.vx-added .dc-coin{background:#0f9f80 !important;box-shadow:0 6px 16px rgba(15,159,128,.4) !important;}',
+    'chekin-vela .vela-dc.vx-added .dc-coin .p{color:#fff !important;}',
+    'chekin-vela .vela-dc.vx-added:hover .dc-coin{background:#c43d52 !important;}',
+    'chekin-vela .vx-count{margin-left:auto;margin-right:10px;font-size:10px;font-weight:800;letter-spacing:0;text-transform:none;color:#0f9f80;background:rgba(15,159,128,.1);padding:2px 8px;border-radius:999px;white-space:nowrap;}',
+    'chekin-vela .vela-sec.has-see{display:flex;align-items:center;}',
+    'chekin-vela .vela-sec.has-see>span:first-child{flex:none;}',
+    'chekin-vela .vela-sec-see{margin-left:auto;}',
+    'chekin-vela .vx-count+.vela-sec-see{margin-left:0;}',
+    /* promo deck */
+    '.promo-stack{touch-action:pan-y;}',
+    '.promo-stack .ps-card.is-back{cursor:pointer;}',
+    '.promo-stack .ps-card.is-back:hover{transform:translateY(48px) rotate(6.5deg) scale(.93) !important;}',
+    '.promo-stack .ps-card.is-back:hover::after{background:rgba(8,12,30,.08) !important;}',
+    '.promo-stack .bn{cursor:pointer;}',
+    '.ps-ind{display:flex;gap:8px;justify-content:center;margin:-16px 0 14px;position:relative;z-index:2;}',
+    '.ps-ind button{position:relative;overflow:hidden;border:0;border-radius:999px;background:rgba(56,91,248,.1);color:#5a6695;font:700 10px/1 Poppins,Montserrat,sans-serif;padding:6px 11px;cursor:pointer;}',
+    '.ps-ind button.on{color:#1047ff;background:rgba(56,91,248,.14);}',
+    '.ps-ind button i{position:absolute;left:0;bottom:0;height:2px;width:0;background:#385bf8;border-radius:2px;}',
+    '.ps-ind button.on i{transition:width .25s linear;}',
+    '.ps-ind button:focus-visible{outline:2px solid #385bf8;outline-offset:2px;}',
+    '@media (max-width:767px){.ps-ind{display:none !important;}}',
+    /* sheet */
+    '.vx-ov{position:fixed;inset:0;z-index:1000;background:rgba(10,14,40,.48);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;transition:opacity .2s ease;}',
+    '.vx-ov.on{opacity:1;}',
+    '.vx-sheet{width:100%;max-width:400px;max-height:calc(100vh - 32px);overflow:auto;background:#fff;border-radius:20px;box-shadow:0 24px 60px rgba(7,21,77,.35);font-family:Poppins,Montserrat,system-ui,sans-serif;color:#16183a;transform:translateY(14px) scale(.98);transition:transform .25s cubic-bezier(.2,.9,.3,1.2);}',
+    '.vx-ov.on .vx-sheet{transform:none;}',
+    '.vx-sheet.wide{max-width:560px;}',
+    '.vx-hero{height:180px;background-size:cover;background-position:center;border-radius:20px 20px 0 0;position:relative;}',
+    '.vx-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.94);color:#16183a;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.18);}',
+    '.vx-x svg{width:18px;height:18px;}',
+    '.vx-bd{padding:18px 20px 20px;}',
+    '.vx-bd h3{margin:0;font-size:20px;font-weight:700;}',
+    '.vx-sub{margin:2px 0 0;color:#5a6695;font-size:13.5px;}',
+    '.vx-desc{margin:12px 0 0;font-size:14px;line-height:1.55;color:#3b4570;}',
+    '.vx-row{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1px solid #e7eaf5;}',
+    '.vx-price{font-size:22px;font-weight:800;}',
+    '.vx-price small{display:block;font-size:11.5px;font-weight:600;color:#5a6695;}',
+    '.vx-btn{height:46px;padding:0 20px;border:0;border-radius:12px;background:#385bf8;color:#fff;font:700 14.5px Poppins,sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}',
+    '.vx-btn:hover{background:#2747d9;}',
+    '.vx-btn.on{background:#e6f6f1;color:#0a6e56;}',
+    '.vx-btn.on:hover{background:#fdecef;color:#ad0037;}',
+    '.vx-note{margin-top:10px;font-size:12px;color:#5a6695;}',
+    '.vx-hd{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 6px;}',
+    '.vx-hd h3{margin:0;font-size:19px;font-weight:700;}',
+    '.vx-hd .vx-x{position:static;box-shadow:none;background:#f1f3fa;}',
+    '.vx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:12px 20px 20px;}',
+    '.vx-it{border:1px solid #e7eaf5;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}',
+    '.vx-it .im{height:90px;background-size:cover;background-position:center;cursor:pointer;}',
+    '.vx-it .tx{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px;flex:1;}',
+    '.vx-it b{font-size:13.5px;}',
+    '.vx-it small{font-size:11.5px;color:#5a6695;}',
+    '.vx-it .ft{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px;}',
+    '.vx-it .ft span{font-weight:800;font-size:14px;}',
+    '.vx-it .vx-btn{height:32px;padding:0 12px;font-size:12px;border-radius:9px;}',
+    '@media (max-width:767px){.vx-ov{align-items:flex-end;padding:0;}.vx-sheet{max-width:none !important;border-radius:20px 20px 0 0;max-height:88vh;}.vx-hero{border-radius:20px 20px 0 0;}}',
+    /* toast */
+    '.vx-toast{position:fixed;left:50%;bottom:96px;z-index:1100;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:#16183a;color:#fff;font:600 13px/1.35 Poppins,sans-serif;padding:11px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(7,21,77,.3);max-width:calc(100vw - 32px);transition:opacity .2s ease,transform .2s ease;}',
+    '.vx-toast.on{opacity:1;transform:translate(-50%,0);}',
+    '@media (prefers-reduced-motion:reduce){.vx-ov,.vx-sheet,.vx-toast,.vx-arr,chekin-vela .vela-dc{transition:none !important;}}'
+  ].join('\n');
+  var st = document.createElement('style'); st.id = 'chk-vela-ux-css'; st.textContent = CSS; document.head.appendChild(st);
+
+  function $(s, r){ return (r || document).querySelector(s); }
+  function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  /* ---------- toast ---------- */
+  var toastEl, toastT;
+  function toast(msg){
+    if(!toastEl){ toastEl = document.createElement('div'); toastEl.className = 'vx-toast'; toastEl.setAttribute('role','status'); document.body.appendChild(toastEl); }
+    toastEl.textContent = msg; toastEl.classList.add('on');
+    clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, 2600);
+  }
+
+  /* ---------- deals data ---------- */
+  function dealOf(card){
+    var bg = ($('.dc-img', card) || {}).style;
+    var m = bg && bg.backgroundImage && bg.backgroundImage.match(/url\(["']?(.*?)["']?\)/);
+    return {
+      title: ($('.dc-info b', card) || {}).textContent || '',
+      sub: ($('.dc-info small', card) || {}).textContent || '',
+      price: card.getAttribute('data-vx-price') || ($('.dc-coin .p', card) || {}).textContent || '',
+      img: m ? m[1] : ''
+    };
+  }
+  function allDeals(){ var seen = {}; return $$('chekin-vela .vela-dc').map(dealOf).filter(function(d){ if(seen[d.title]) return false; seen[d.title] = 1; return true; }); }
+  function eur(s){ return parseFloat(String(s).replace(/[^\d.,]/g,'').replace(',','.')) || 0; }
+
+  function sync(){
+    $$('chekin-vela .vela-dc').forEach(function(card){
+      var coin = $('.dc-coin', card); if(!coin) return;
+      var p = $('.p', coin), a = $('.a', coin);
+      if(!card.getAttribute('data-vx-price') && p) card.setAttribute('data-vx-price', p.textContent);
+      var d = dealOf(card), on = !!added[d.title];
+      card.classList.toggle('vx-added', on);
+      if(p) p.textContent = on ? '✓' : card.getAttribute('data-vx-price');
+      if(a) a.textContent = on ? '\u2715' : 'Add';
+      coin.setAttribute('role','button'); coin.setAttribute('tabindex','0');
+      coin.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + d.title + ', ' + card.getAttribute('data-vx-price'));
+      card.setAttribute('aria-label', d.title + ', ' + d.sub + ', ' + card.getAttribute('data-vx-price') + (on ? ', added' : ''));
+    });
+    var keys = Object.keys(added), total = keys.reduce(function(t,k){ return t + eur(added[k]); }, 0);
+    $$('chekin-vela .vela-sec.has-see').forEach(function(sec){
+      var c = $('.vx-count', sec);
+      if(!keys.length){ if(c) c.remove(); return; }
+      if(!c){ c = document.createElement('span'); c.className = 'vx-count'; var see = $('.vela-sec-see', sec); sec.insertBefore(c, see); }
+      c.textContent = '✓ ' + keys.length + ' added · €' + total.toFixed(0);
+    });
+    $$('.vx-ov [data-vx-toggle]').forEach(function(b){
+      var on = !!added[b.getAttribute('data-vx-toggle')];
+      b.classList.toggle('on', on);
+      b.innerHTML = b.classList.contains('sm') ? (on ? '✓ Added' : 'Add') : (on ? '✓ Added · tap to remove' : 'Add to my stay · ' + esc(b.getAttribute('data-vx-price')));
+    });
+  }
+  function toggle(d){
+    if(added[d.title]){ delete added[d.title]; toast(d.title + ' removed'); }
+    else { added[d.title] = d.price; toast(d.title + ' added · you pay it with your check-in'); }
+    sync();
+  }
+
+  /* ---------- sheet ---------- */
+  var ov, lastFocus;
+  function openSheet(html, wide){
+    closeSheet(true);
+    lastFocus = document.activeElement;
+    ov = document.createElement('div'); ov.className = 'vx-ov';
+    ov.innerHTML = '<div class="vx-sheet' + (wide ? ' wide' : '') + '" role="dialog" aria-modal="true" aria-labelledby="vx-t">' + html + '</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function(){ ov.classList.add('on'); });
+    sync();
+    var x = $('.vx-x', ov); if(x) x.focus();
+  }
+  function closeSheet(instant){
+    if(!ov) return; var o = ov; ov = null;
+    if(instant){ o.remove(); } else { o.classList.remove('on'); setTimeout(function(){ o.remove(); }, 200); }
+    if(lastFocus && lastFocus.focus) try{ lastFocus.focus({preventScroll:true}); }catch(e){}
+  }
+  function detail(d){
+    openSheet(
+      '<div class="vx-hero" style="background-image:url(\'' + esc(d.img) + '\')"><button class="vx-x" aria-label="Close">' + X + '</button></div>' +
+      '<div class="vx-bd"><h3 id="vx-t">' + esc(d.title) + '</h3><p class="vx-sub">' + esc(d.sub) + '</p>' +
+      '<p class="vx-desc">' + esc(DESC[d.title] || 'An extra for your stay at Casa del Mar.') + '</p>' +
+      '<div class="vx-row"><div class="vx-price">' + esc(d.price) + '<small>One-off price</small></div>' +
+      '<button class="vx-btn" data-vx-toggle="' + esc(d.title) + '" data-vx-price="' + esc(d.price) + '"></button></div>' +
+      '<p class="vx-note">Nothing is charged now. Added extras are paid together with your check-in.</p></div>');
+  }
+  function seeAll(){
+    var items = allDeals().map(function(d){
+      return '<div class="vx-it"><div class="im" data-vx-open="' + esc(d.title) + '" style="background-image:url(\'' + esc(d.img) + '\')"></div>' +
+        '<div class="tx"><b>' + esc(d.title) + '</b><small>' + esc(d.sub) + '</small>' +
+        '<div class="ft"><span>' + esc(d.price) + '</span><button class="vx-btn sm" data-vx-toggle="' + esc(d.title) + '" data-vx-price="' + esc(d.price) + '"></button></div></div></div>';
+    }).join('');
+    openSheet('<div class="vx-hd"><h3 id="vx-t">Offers for your stay</h3><button class="vx-x" aria-label="Close">' + X + '</button></div><div class="vx-grid">' + items + '</div>', true);
+  }
+
+  /* ---------- carousel ---------- */
+  function step(rail){ var c = $('.vela-dc', rail); return c ? c.offsetWidth + 12 : 130; }
+  function updArrows(wrap){
+    var rail = $('.vela-car', wrap); if(!rail) return;
+    var l = $('.vx-arr.l', wrap), r = $('.vx-arr.r', wrap);
+    if(l) l.hidden = rail.scrollLeft <= 4;
+    if(r) r.hidden = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
+  }
+  function ensure(){
+    $$('chekin-vela .vela-carwrap').forEach(function(wrap){
+      var rail = $('.vela-car', wrap); if(!rail) return;
+      if(!$('.vx-arr', wrap)){
+        wrap.insertAdjacentHTML('beforeend', '<button class="vx-arr l" aria-label="Previous offers">' + ARR_L + '</button><button class="vx-arr r" aria-label="Next offers">' + ARR_R + '</button>');
+        rail.setAttribute('tabindex','0'); rail.setAttribute('aria-label','Offers for your stay. Use the arrow keys to scroll.');
+        updArrows(wrap);
+      }
+      var dots = wrap.nextElementSibling;
+      if(dots && dots.classList.contains('vela-dots') && !dots.__vx){
+        dots.__vx = 1;
+        $$('.dot', dots).forEach(function(d, i){ d.setAttribute('role','button'); d.setAttribute('aria-label','Go to offer ' + (i + 1)); });
+      }
+    });
+    var promo = $('chekin-vela .vela-promo');
+    var stack = $('.promo-stack');
+    if(stack && !(stack.nextElementSibling && stack.nextElementSibling.classList.contains('ps-ind'))){
+      stack.insertAdjacentHTML('afterend', '<div class="ps-ind" role="group" aria-label="Featured"><button data-ps="0" aria-label="Show free walking tours">Free tours<i></i></button><button data-ps="1" aria-label="Show airport transfers">Transfers<i></i></button></div>');
+      PS.start = Date.now(); PS.elapsed = 0;
+    }
+    sync();
+  }
+
+  /* drag to scroll (mouse) + swipe on the promo deck (any pointer) */
+  var drag = null, suppress = false;
+  document.addEventListener('pointerdown', function(e){
+    var rail = e.target.closest && e.target.closest('chekin-vela .vela-car');
+    var deck = e.target.closest && e.target.closest('.promo-stack');
+    if(rail && e.pointerType === 'mouse' && e.button === 0 && !e.target.closest('.dc-coin')){
+      drag = { kind:'rail', el:rail, x:e.clientX, sl:rail.scrollLeft, moved:false };
+    } else if(deck){
+      drag = { kind:'deck', el:deck, x:e.clientX, y:e.clientY, moved:false };
+    }
+  });
+  window.addEventListener('pointermove', function(e){
+    if(!drag) return;
+    var dx = e.clientX - drag.x;
+    if(drag.kind === 'rail'){
+      if(!drag.moved && Math.abs(dx) > 5){ drag.moved = true; drag.el.classList.add('vx-drag'); drag.el.style.scrollSnapType = 'none'; }
+      if(drag.moved){ drag.el.scrollLeft = drag.sl - dx; e.preventDefault(); }
+    } else if(Math.abs(dx) > 8){ drag.moved = true; }
+  });
+  window.addEventListener('pointerup', function(e){
+    if(!drag) return; var d = drag; drag = null;
+    if(d.kind === 'rail' && d.moved){
+      var s = step(d.el), i = Math.round(d.el.scrollLeft / s);
+      d.el.classList.remove('vx-drag'); d.el.style.scrollSnapType = '';
+      d.el.scrollTo({ left:i * s, behavior:REDUCED ? 'auto' : 'smooth' });
+      suppress = true; setTimeout(function(){ suppress = false; }, 50);
+    }
+    if(d.kind === 'deck' && d.moved && Math.abs(e.clientX - d.x) > 40){
+      swap(); suppress = true; setTimeout(function(){ suppress = false; }, 50);
+    }
+  });
+  window.addEventListener('pointercancel', function(){ if(drag && drag.kind === 'rail'){ drag.el.classList.remove('vx-drag'); drag.el.style.scrollSnapType = ''; } drag = null; });
+  document.addEventListener('scroll', function(e){
+    var t = e.target; if(t && t.classList && t.classList.contains('vela-car')) updArrows(t.parentNode);
+  }, true);
+
+  /* ---------- promo deck controller ---------- */
+  var PS = { start:Date.now(), elapsed:0, paused:false };
+  function deckActive(stack){ var f = $('.ps-card.is-front', stack); return f && f.classList.contains('vela-promo') ? 0 : 1; }
+  function swap(){
+    var stack = $('.promo-stack'); if(!stack) return;
+    var f = $('.ps-card.is-front', stack), b = $('.ps-card.is-back', stack);
+    if(f && b){ f.classList.replace('is-front','is-back'); b.classList.replace('is-back','is-front'); }
+    PS.start = Date.now(); PS.elapsed = 0; paintInd(0);
+  }
+  function show(i){ var stack = $('.promo-stack'); if(stack && deckActive(stack) !== i) swap(); else { PS.start = Date.now(); PS.elapsed = 0; } }
+  function paintInd(frac){
+    var stack = $('.promo-stack'), ind = $('.ps-ind'); if(!stack || !ind) return;
+    var a = deckActive(stack);
+    $$('button', ind).forEach(function(b, i){
+      b.classList.toggle('on', i === a); b.setAttribute('aria-pressed', i === a);
+      var bar = $('i', b); bar.style.width = (i === a ? (REDUCED ? 100 : Math.min(100, frac * 100)) : 0) + '%';
+    });
+  }
+  setInterval(function(){
+    var stack = $('.promo-stack'); if(!stack) return;
+    var paused = REDUCED || document.hidden || stack.matches(':hover') || stack.contains(document.activeElement) || (ind() && ind().matches(':hover'));
+    var now = Date.now();
+    if(paused){ if(!PS.paused){ PS.elapsed += now - PS.start; PS.paused = true; } }
+    else { if(PS.paused){ PS.start = now; PS.paused = false; } }
+    var el = PS.elapsed + (PS.paused ? 0 : now - PS.start);
+    if(el >= DUR){ swap(); return; }
+    paintInd(el / DUR);
+  }, 250);
+  function ind(){ return $('.ps-ind'); }
+
+  /* ---------- clicks & keys ---------- */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(suppress){ e.preventDefault(); e.stopPropagation(); return; }
+    if(ov){
+      if(t === ov || t.closest('.vx-x')){ closeSheet(); return; }
+      var tg = t.closest('[data-vx-toggle]');
+      if(tg){ var title = tg.getAttribute('data-vx-toggle'); toggle({ title:title, price:tg.getAttribute('data-vx-price') }); return; }
+      var op = t.closest('[data-vx-open]');
+      if(op){ var dd = allDeals().filter(function(x){ return x.title === op.getAttribute('data-vx-open'); })[0]; if(dd) detail(dd); return; }
+      return;
+    }
+    var arr = t.closest('chekin-vela .vx-arr');
+    if(arr){ var rail = $('.vela-car', arr.parentNode); rail.scrollBy({ left:(arr.classList.contains('l') ? -1 : 1) * step(rail) * 2, behavior:REDUCED ? 'auto' : 'smooth' }); return; }
+    var dot = t.closest('chekin-vela .vela-dots .dot');
+    if(dot){ var dots = dot.parentNode, wrap = dots.previousElementSibling, r = wrap && $('.vela-car', wrap);
+      if(r){ var i = $$('.dot', dots).indexOf(dot); r.scrollTo({ left:i * step(r), behavior:REDUCED ? 'auto' : 'smooth' }); } return; }
+    var coin = t.closest('chekin-vela .vela-dc .dc-coin');
+    if(coin){ e.stopPropagation(); toggle(dealOf(coin.closest('.vela-dc'))); return; }
+    var card = t.closest('chekin-vela .vela-dc');
+    if(card){ detail(dealOf(card)); return; }
+    if(t.closest('chekin-vela .vela-sec-see')){ e.preventDefault(); seeAll(); return; }
+    var pb = t.closest('.ps-ind button');
+    if(pb){ show(+pb.getAttribute('data-ps')); return; }
+    var back = t.closest('.promo-stack .ps-card.is-back');
+    if(back){ e.preventDefault(); e.stopPropagation(); swap(); return; }
+    var front = t.closest('.promo-stack .ps-card.is-front');
+    if(front){ toast(front.classList.contains('vela-promo') ? 'Opens free walking tours in Madrid: pick a day and join for free' : 'Opens airport transfer booking with 20% off'); return; }
+    if(t.closest('chekin-vela .vela-banner .bn-cta')){ toast('Opens airalo eSIM plans (sponsored partner)'); return; }
+  }, true);
+  document.addEventListener('keydown', function(e){
+    if(ov && e.key === 'Escape'){ closeSheet(); return; }
+    var rail = e.target.closest && e.target.closest('chekin-vela .vela-car');
+    if(rail && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')){ e.preventDefault(); rail.scrollBy({ left:(e.key === 'ArrowLeft' ? -1 : 1) * step(rail), behavior:REDUCED ? 'auto' : 'smooth' }); }
+    var coin = e.target.closest && e.target.closest('chekin-vela .dc-coin');
+    if(coin && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); toggle(dealOf(coin.closest('.vela-dc'))); }
+  });
+
+  /* ---------- mobile: keep the Vela block below the journey ---------- */
+  var unwrapped = [];
+  function fixMobile(){
+    var vela = $('chekin-vela'), main = $('.chk-main'); if(!vela || !main) return;
+    var mob = window.innerWidth <= 767;
+    if(!mob){
+      unwrapped.forEach(function(e){ ['height','overflow','max-height'].forEach(function(k){ e.style.removeProperty(k); }); });
+      unwrapped = []; vela.style.removeProperty('margin-top'); document.body.style.removeProperty('background'); return;
+    }
+    /* the baked export puts the journey in a 100vh box with its own scroll, so on a phone the
+       Vela block either covered the journey or left a gap; let the page flow as one scroll */
+    var n = main; unwrapped = [];
+    while(n && n !== document.body){
+      n.style.setProperty('height','auto','important'); n.style.setProperty('overflow','visible','important'); n.style.setProperty('max-height','none','important');
+      unwrapped.push(n); n = n.parentElement;
+    }
+    vela.style.setProperty('margin-top','8px','important');
+    document.body.style.setProperty('background','#f3f5fc','important');
+  }
+
+  function boot(){ ensure(); fixMobile(); }
+  if(document.readyState !== 'loading') boot(); else document.addEventListener('DOMContentLoaded', boot);
+  window.addEventListener('load', boot);
+  window.addEventListener('resize', function(){ fixMobile(); $$('chekin-vela .vela-carwrap').forEach(updArrows); });
+  var iv = setInterval(boot, 600); setTimeout(function(){ clearInterval(iv); setInterval(ensure, 2000); }, 15000);
 })();
 </script>
 </body></html>
